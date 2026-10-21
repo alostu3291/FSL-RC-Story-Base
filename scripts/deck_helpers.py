@@ -166,3 +166,62 @@ def arrow(slide, x1, y1, x2, y2, color=BLUE, w=2.0):
 
 def notes(slide, body):
     slide.notes_slide.notes_text_frame.text = body.strip()
+
+
+# ---------------------------------------------------------------- managed package + screenshots
+
+PKG = RGBColor(0x6B, 0x2B, 0xD9)
+PKG_BG = RGBColor(0xF3, 0xEC, 0xFF)
+BORDER = RGBColor(0xC9, 0xC9, 0xC9)
+
+
+def pkg_pill(slide, x, y, label="MANAGED PACKAGE", w=2.2, size=11, h=0.36):
+    s = box(slide, x, y, w, h, fill=PKG, radius=0.5)
+    tf = s.text_frame
+    tf.margin_left = tf.margin_right = Inches(0.05)
+    tf.margin_top = tf.margin_bottom = Inches(0)
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    p = tf.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    r = p.add_run()
+    r.text = label
+    style_run(r, size, WHITE, bold=True)
+    return s
+
+
+def pkg_callout(slide, x, y, w, h, value, size=15):
+    box(slide, x, y, w, h, fill=PKG_BG, line=PKG, radius=0.06, line_w=1)
+    box(slide, x, y, 0.1, h, fill=PKG, radius=0, shape=MSO_SHAPE.RECTANGLE)
+    text(slide, x + 0.3, y + 0.1, w - 0.45, h - 0.2,
+         [dict(t="WITH THE MANAGED PACKAGE", size=12, color=PKG, bold=True),
+          dict(t=value, size=size, color=NAVY, space=4)],
+         anchor=MSO_ANCHOR.MIDDLE)
+
+
+def _content_height(path):
+    from PIL import Image, ImageChops
+    img = Image.open(path).convert("RGB")
+    w, h = img.size
+    bg = img.getpixel((w // 2, h - 1))
+    diff = ImageChops.difference(img, Image.new("RGB", img.size, bg)).convert("L").point(
+        lambda v: 255 if v > 12 else 0)
+    bbox = diff.getbbox()
+    return min(h, bbox[3] + 20) if bbox else h
+
+
+def fit_picture(slide, path, x, y, w, h, top_px=None):
+    """Fit the whole screenshot in the box (inches), or crop a box-shaped band from top_px."""
+    from PIL import Image
+    pw, ph = Image.open(path).size
+    if top_px is None:
+        start, band = 0, _content_height(path)
+    else:
+        start, band = top_px, min(ph - top_px, pw * h / w)
+    scale = min(w / pw, h / band)
+    pic_w, pic_h = pw * scale, band * scale
+    pic = slide.shapes.add_picture(path, Inches(x + (w - pic_w) / 2), Inches(y), Inches(pic_w), Inches(pic_h))
+    pic.crop_top = start / ph
+    pic.crop_bottom = (ph - start - band) / ph
+    pic.line.color.rgb = BORDER
+    pic.line.width = Pt(0.75)
+    return pic

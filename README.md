@@ -1,67 +1,57 @@
-# FSL-RC Story (Base)
+# FSL-RC Story — Pest Control (Rentokil)
 
-The base Revenue Cloud + Field Service demo story: **high tech, data center**.
-QuantumBit sells PowerSwerve rack servers to Infinitech for its San Francisco
-data center, installs and services them with Field Service, and bills through
-Revenue Cloud.
+Secondary demo story on the **`pest-control`** branch: **residential pest
+control**. Rentokil sells Home Protection (and related plans) to Michael Reyes
+in Bloomingdale, IL. The quote is created **in the field** on a tablet.
+
+> The **base** story (high tech / data center, sale over the phone or with an
+> account rep) is on `main` — see the QuantumBit deck and `demo-guide.md` there.
 
 ## Story notes
 
-- **Industry:** high tech. The asset is a PowerSwerve R750 rack server going
-  into a customer data center, with Installation and Assembly and Gold Hardware
-  Maintenance sold alongside it.
-- **The sale happens the typical way.** A seller (inside sales over the phone,
-  or an account rep working with the customer) builds the quote in Revenue
-  Cloud and converts it to an order. The deal is not sold in the field by a
-  technician; Field Service only enters once the order is activated and the
-  install is orchestrated.
-- **Field Service is delivery and service, not sales.** Technicians install,
-  maintain and repair. In Scene 8 the technician *flags* an expansion from the
-  Work Order, which creates an opportunity, but the account's seller still runs
-  the follow-up quote.
+- **Industry:** residential pest control (Rentokil).
+- **The sale happens in the field.** A sales rep inspects the property, captures
+  findings on a tablet, and places a Revenue Cloud quote with location-aware
+  pricing (service ZIP → zone multiplier). Field Service then delivers the
+  Initial Service and every quarterly visit after that.
+- **Not the QuantumBit path.** QuantumBit's sale is typical inside sales /
+  account-rep quoting; this story is door-to-door inspect-and-quote.
 
 ## The nine scenes
 
 | Act | # | Scene | Persona |
 |-----|---|-------|---------|
-| 1 · Sell, deliver, bill | 1 | Configure & quote | Seller (phone / account rep) |
-| | 2 | Activate the order | Fulfillment Manager |
-| | 3 | Automatic dispatch | Dispatcher |
-| | 4 | Technician on site | Technician |
-| | 5 | Billing starts at install | Billing Specialist |
-| 2 · Service, protect, grow | 6 | Maintenance runs itself | Service Manager |
-| | 7 | Break/fix with coverage check | Dispatcher & Billing |
-| | 8 | Upsell from the field | Technician flags → Seller quotes |
-| | 9 | One install base | Account Team |
-
-Scene 7 compares Infinitech (covered by Gold) with Apex Dynamics, a second
-customer whose R750 has no Gold maintenance.
+| Sell | 1 | Plan the day | Sales Rep |
+| | 2 | Inspect & quote on the tablet | Sales Rep |
+| | 3 | Sign & pay at the door | Sales Rep + Michael |
+| Hand off | 4 | The plan builds itself | Automation / Dispatcher |
+| Serve | 5 | First treatment starts billing | Technician + Billing |
+| | 6 | Recurring visits run themselves | Service Manager |
+| | 7 | Re-service with a guarantee check | Care + Billing |
+| Grow & retain | 8 | Upsell in the driveway | Technician |
+| | 9 | Pause, resume & renew | Care + Subscription |
 
 ## Contents
 
 | Path | What it is |
 |------|------------|
-| `deck/QuantumBit Revenue Cloud + Field Service Demo Story.pptx` | Presentation with screenshots on every scene slide and a screenshot appendix |
-| `deck/source/…Storyboard.pptx` | Unfilled storyboard that `fill_deck.py` builds from |
-| `deck/preview-demo-map.png` | Demo map preview image |
-| `screenshots/` | 33 screenshots from the fsl-rc org run (`sN-NN-*.png`), plus `story-records.json` with the record Ids used |
-| `demo-guide.md` | Build steps, automation and click path (copy of `docs/guides/fsl-rev-cloud-demo.md` in the Revenue Cloud Base Foundations repo) |
-| `scripts/fill_deck.py` | Places the screenshots into the deck and aligns its text with the built demo |
-| `scripts/capture_screenshots.py` | Runs the story against an org and captures each scene |
-| `scripts/build_deck.py`, `scripts/deck_helpers.py` | Original storyboard builder (needs the Salesforce FY27 template, not included) |
+| `deck/Rentokil Residential Pest Control Lifecycle Story.pptx` | Pest lifecycle deck |
+| `deck/QuantumBit…pptx` | Base high-tech deck (also present for comparison) |
+| `demo-guide-pest.md` | Click path and build notes for this story |
+| `scripts/fill_pest_deck.py` | Recolors Vision → Core Demo and sets field-sale notes |
+| `scripts/build_pest_deck.py` | Storyboard builder (needs Salesforce FY27 template) |
+| `scripts/place_pest…` | Drivers live in rlm-base-dev (`scripts/place_pest_demo_order.py`) |
 
 ## Rebuild
 
 ```bash
-pip install python-pptx pillow selenium
-
-# Refresh the deck from the current screenshots
-python3 scripts/fill_deck.py
-
-# Re-run the story and recapture screenshots (scenes are optional, e.g. 1,2,3)
-RLM_REPO=/path/to/rlm-base-dev FSL_ORG=<sf alias> python3 scripts/capture_screenshots.py [scenes]
+pip install python-pptx
+python3 scripts/fill_pest_deck.py
 ```
 
-`capture_screenshots.py` needs an org built with `fsl: true` from the Revenue
-Cloud Base Foundations repo (`prepare_fsl` + `setup_fsl_revenue`) and a
-logged-in `sf` CLI alias.
+## Related build
+
+Enable `pest: true` (and `fsl: true`) in Revenue Cloud Base Foundations
+(`rlm-base-dev` branch `pest-control`), then `cci flow run prepare_pest`.
+After loading prices, refresh pricing decision tables and wait for
+`Price_Book_Entry_Decision_Table_v2` before placing quotes.
