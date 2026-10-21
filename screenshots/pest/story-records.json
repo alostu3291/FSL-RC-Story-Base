@@ -1,19 +1,14 @@
 {
   "accountId": "001jV00000HG5YEQA1",
-  "instance": "https://trailsignup-4f7500afaf2171.my.salesforce.com",
   "quoteId": "0Q0jV000000CUHlSAO",
   "quoteNumber": "00000037",
   "orderId": "801jV00000HHCfhQAH",
   "orderNumber": "00000141",
-  "workOrders": [
-    {
-      "attributes": {
-        "type": "WorkOrder",
-        "url": "/services/data/v68.0/sobjects/WorkOrder/0WOjV000000VUhlWAG"
-      },
-      "Id": "0WOjV000000VUhlWAG",
-      "WorkOrderNumber": "00000030",
-      "Status": "Completed"
-    }
-  ]
+  "opportunityId": "006jV000002JsTNQA0",
+  "expansionOpportunityId": "006jV000002JrvVQAS",
+  "workOrderId": "0WOjV000000VUhlWAG",
+  "assetId": "02ijV000000H8XSQA0",
+  "maintenancePlanId": "1MPjV000000WFaDWAW",
+  "fulfillmentPlanId": "13VjV000000HvbNUAS",
+  "territoryId": "0HhjV000000HCXpSAO"
 }
