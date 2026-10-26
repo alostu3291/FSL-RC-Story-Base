@@ -13,7 +13,11 @@ final Map<String, Decimal> PRICES = new Map<String, Decimal>{
     'RTK-MOSQUITO' => 69,
     'RTK-INITIAL' => 199,
     'RTK-RESERVICE' => 149,
-    'RTK-INSPECTION' => 0
+    'RTK-INSPECTION' => 0,
+    'RTK-WASP-NEST' => 179,
+    'RTK-RODENT-EXCL' => 349,
+    'RTK-ATTIC-SANI' => 499,
+    'RTK-BEDBUG' => 649
 };
 final Set<String> EVERGREEN_SKUS = new Set<String>{
     'RTK-ESSENTIAL', 'RTK-HOME-PROT', 'RTK-HOME-PROT-PLUS', 'RTK-TERMITE', 'RTK-MOSQUITO'

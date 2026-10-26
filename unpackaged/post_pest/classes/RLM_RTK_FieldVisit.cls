@@ -437,6 +437,14 @@ public with sharing class RLM_RTK_FieldVisit {
                 }
             }
             update open;
+            List<WorkOrderLineItem> addOns = [
+                SELECT Id FROM WorkOrderLineItem
+                WHERE WorkOrderId = :wo.Id AND RLM_RTK_Approved_At__c != null AND Status != 'Completed'
+            ];
+            for (WorkOrderLineItem line : addOns) {
+                line.Status = 'Completed';
+            }
+            update addOns;
             update new WorkOrder(Id = wo.Id, Status = 'Completed');
             return wo.WorkOrderNumber;
         } catch (Exception e) {

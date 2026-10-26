@@ -7,3 +7,7 @@ RTK-MOSQUITO;Evergreen Monthly;USD,USD,true,false,RTK-MOSQUITO,Standard Price Bo
 RTK-INITIAL;One-Time;USD,USD,true,false,RTK-INITIAL,Standard Price Book;true,RTK-INITIAL,One-Time;OneTime,199
 RTK-RESERVICE;One-Time;USD,USD,true,false,RTK-RESERVICE,Standard Price Book;true,RTK-RESERVICE,One-Time;OneTime,149
 RTK-INSPECTION;One-Time;USD,USD,true,false,RTK-INSPECTION,Standard Price Book;true,RTK-INSPECTION,One-Time;OneTime,0
+RTK-WASP-NEST;One-Time;USD,USD,true,false,RTK-WASP-NEST,Standard Price Book;true,RTK-WASP-NEST,One-Time;OneTime,179
+RTK-RODENT-EXCL;One-Time;USD,USD,true,false,RTK-RODENT-EXCL,Standard Price Book;true,RTK-RODENT-EXCL,One-Time;OneTime,349
+RTK-ATTIC-SANI;One-Time;USD,USD,true,false,RTK-ATTIC-SANI,Standard Price Book;true,RTK-ATTIC-SANI,One-Time;OneTime,499
+RTK-BEDBUG;One-Time;USD,USD,true,false,RTK-BEDBUG,Standard Price Book;true,RTK-BEDBUG,One-Time;OneTime,649

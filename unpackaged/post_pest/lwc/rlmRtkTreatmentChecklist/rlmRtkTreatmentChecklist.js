@@ -38,6 +38,11 @@ export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningE
         return this.workOrderId || this.recordId;
     }
 
+    @api
+    refresh() {
+        return this.load();
+    }
+
     async load() {
         if (!this.targetId) return;
         try {

@@ -42,6 +42,12 @@ cci task run refresh_dt_default_pricing        # after price book changes
 | RTK-INITIAL | One-time | Initial Service (auto-added) |
 | RTK-RESERVICE | One-time | Billable re-service when uncovered |
 | RTK-INSPECTION | One-time | Inspection |
+| RTK-WASP-NEST | One-time | Field add-on: wasp and hornet nest removal ($179) |
+| RTK-RODENT-EXCL | One-time | Field add-on: rodent exclusion ($349) |
+| RTK-ATTIC-SANI | One-time | Field add-on: attic sanitation ($499) |
+| RTK-BEDBUG | One-time | Field add-on: bed bug treatment ($649) |
+
+Field add-ons are the products in category `PC-RTK-FIELD` (Field Add-ons); adding a product there makes it available in Find & Add.
 
 ## Location pricing
 
@@ -70,6 +76,7 @@ No treatment work order exists until the customer has been inspected, quoted and
 - **Login:** in the FS app choose **Use Custom Domain** and enter the org's My Domain prefix. Winter '27 orgs created before the app supported them (such as `fsl-rc`) can't sign in from iOS.
 - **Inspect & Quote** (`rlmRtkFieldVisit`, on the appointment and the work order): Walk the property, then Review the plan, then Create quote, then show the customer the findings and the generated `RLM_RTK_PestProposal` PDF, then **Sign & Pay** (embedded `rlmSignAndPay`), then Booked. Booking creates the order with the `createOrdersFromQuote` standard action, fills the bill-to and ship-to contact from the quote or the account's first contact, activates it, and marks the inspection **Accepted**. The DRO plan then creates the Initial Pest Treatment work order and an unscheduled appointment. The last screen offers six open times for the first treatment (business days at 8, 10, 1 and 3 on the territory's clock, inside the appointment's window, skipping the technician's other appointments); picking one schedules it and dispatches it to the technician (`treatmentSlots` / `bookTreatment`). **Leave for dispatch** keeps it unscheduled for a dispatcher. Every step is resumable: reopening the action picks up at the current stage (`RLM_RTK_FieldVisit.getContext`).
 - **Treatment** (`rlmRtkTreatmentAction`, on the work order) is the treatment checklist for the first visit.
+- **Find & Add** (`rlmRtkFindAndAdd`, under the checklist in **Treatment**): the technician logs a new finding (saved on the visit's inspection, so it joins the checklist) and picks one-time services from the Field Add-ons category, priced at list price times the customer's service zone. Findings suggest add-ons: wasps or bees for nest removal, rodent entry points or damage for exclusion, attic droppings or rodents for attic sanitation, bed bugs for bed bug treatment. The customer approves on the device. Approved add-ons become work order line items (`RLM_RTK_Approved_By__c` / `RLM_RTK_Approved_At__c`, linked to the finding). When the work order is completed, `RLM_RTK_Bill_Field_Add_Ons` calls `RLM_RTK_FieldAddOn.billAddOns`, which places one priced order for them, activates it and posts the invoice (`RLM_RTK_Add_On_Order__c` on each line). Plan changes, such as adding Termite, still go through Flag Expansion for now.
 - **Completing visits:** the app has no status picker in this org, so both actions finish with a button that completes the work order's open appointments and then the work order (`RLM_RTK_FieldVisit.completeVisit`): **Complete visit** on the last Inspect & Quote screen, **Complete treatment** under the checklist. Completing the treatment work order starts milestone billing.
 - **Photos:** `lightning-file-upload` isn't supported in the app, so `rlmRtkPhotoCapture` resizes images to 1600 px JPEG and uploads them through `RLM_RTK_Inspection.uploadPhoto`.
 - LWC actions live in each layout's `platformActionList` (`templates/layouts/pest/`); the Metadata API rejects them in `quickActionList`. Fully quit and reopen the iOS app after deploying LWC changes.

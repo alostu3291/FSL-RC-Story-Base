@@ -45,6 +45,11 @@
                     <label>Wasps / Bees</label>
                 </value>
                 <value>
+                    <fullName>Bed Bugs</fullName>
+                    <default>false</default>
+                    <label>Bed Bugs</label>
+                </value>
+                <value>
                     <fullName>Other</fullName>
                     <default>false</default>
                     <label>Other</label>

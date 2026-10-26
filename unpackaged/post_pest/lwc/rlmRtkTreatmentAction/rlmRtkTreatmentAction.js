@@ -21,6 +21,11 @@ export default class RlmRtkTreatmentAction extends LightningElement {
         }
     }
 
+    handleFindingAdded() {
+        const checklist = this.template.querySelector('.checklist');
+        if (checklist) checklist.refresh();
+    }
+
     close() {
         this.dispatchEvent(new CloseActionScreenEvent());
     }

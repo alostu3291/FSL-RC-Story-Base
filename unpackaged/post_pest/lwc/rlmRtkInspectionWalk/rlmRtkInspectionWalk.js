@@ -15,7 +15,7 @@ const ZONES = [
     { value: 'Attic', icon: 'utility:up', hint: 'Insulation, vents' },
     { value: 'Yard', icon: 'utility:world', hint: 'Standing water, wood piles' }
 ];
-const PESTS = ['Ants', 'Spiders', 'Cockroaches', 'Rodents', 'Termites', 'Mosquitoes', 'Wasps / Bees', 'Other'];
+const PESTS = ['Ants', 'Spiders', 'Cockroaches', 'Rodents', 'Termites', 'Mosquitoes', 'Wasps / Bees', 'Bed Bugs', 'Other'];
 const EVIDENCE = [
     'Live Activity',
     'Droppings',
