@@ -18,6 +18,7 @@ const STEPS = [
 const POLL_MS = 3000;
 const PROPOSAL_POLLS = 40;
 const ORDER_POLLS = 30;
+const SIGN_POLLS = 400;
 
 /**
  * Inspect & Quote for the Field Service mobile app: one quick action on the inspection
@@ -36,6 +37,7 @@ export default class RlmRtkFieldVisit extends LightningElement {
     signMessage;
     embedded = true;
     _timer;
+    _signTimer;
 
     @api
     get recordId() {
@@ -49,6 +51,7 @@ export default class RlmRtkFieldVisit extends LightningElement {
 
     disconnectedCallback() {
         clearTimeout(this._timer);
+        clearTimeout(this._signTimer);
     }
 
     message(e) {
@@ -243,6 +246,9 @@ export default class RlmRtkFieldVisit extends LightningElement {
 
     applyProposal(status, attempt) {
         this.proposal = status;
+        if (status.status === 'Ready') {
+            this.watchForSignature(0);
+        }
         if (status.status === 'Generating') {
             if (attempt >= PROPOSAL_POLLS) {
                 this.proposal = { status: 'Failed', message: 'The proposal is taking too long. Try again.' };
@@ -285,6 +291,28 @@ export default class RlmRtkFieldVisit extends LightningElement {
     handleAccepted(event) {
         this.signMessage = event.detail && event.detail.message;
         this.book();
+    }
+
+    // The Field Service app does not always deliver Sign & Pay's accepted event, so also
+    // watch the quote and book as soon as it is signed.
+    watchForSignature(attempt) {
+        clearTimeout(this._signTimer);
+        if (this.step !== 'customer' || attempt >= SIGN_POLLS) return;
+        // eslint-disable-next-line @lwc/lwc/no-async-operation
+        this._signTimer = setTimeout(async () => {
+            if (this.step !== 'customer') return;
+            try {
+                const ctx = await getContext({ recordId: this._recordId });
+                if (this.step === 'customer' && ctx.signed) {
+                    this.ctx = ctx;
+                    this.book();
+                    return;
+                }
+            } catch (e) {
+                // keep watching; the sign panel shows its own errors
+            }
+            this.watchForSignature(attempt + 1);
+        }, POLL_MS);
     }
 
     // ---------- book the treatment ----------
