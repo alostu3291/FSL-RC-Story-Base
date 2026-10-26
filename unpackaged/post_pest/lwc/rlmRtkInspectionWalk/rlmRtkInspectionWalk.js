@@ -27,7 +27,6 @@ const EVIDENCE = [
     'Moisture'
 ];
 const SEVERITIES = ['Light', 'Moderate', 'Heavy'];
-const PHOTO_FORMATS = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp'];
 
 const emptyDraft = (zone) => ({
     id: null,
@@ -59,8 +58,6 @@ export default class RlmRtkInspectionWalk extends NavigationMixin(LightningEleme
     saving = false;
     loading = true;
     error;
-
-    photoFormats = PHOTO_FORMATS;
 
     connectedCallback() {
         this.load();

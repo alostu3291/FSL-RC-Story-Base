@@ -173,6 +173,34 @@ public with sharing class RLM_RTK_Inspection {
         }
     }
 
+    /**
+     * Saves a photo on a finding from base64 image data. Used instead of lightning-file-upload,
+     * which the Field Service mobile app does not support.
+     */
+    @AuraEnabled
+    public static Id uploadPhoto(Id findingId, String fileName, String base64Data, String stage) {
+        try {
+            if ([SELECT COUNT() FROM RLM_RTK_Finding__c WHERE Id = :findingId] == 0) {
+                throw new InspectionException('That finding no longer exists.');
+            }
+            if (String.isBlank(base64Data)) {
+                throw new InspectionException('The photo was empty.');
+            }
+            String name = String.isBlank(fileName) ? 'photo.jpg' : fileName;
+            ContentVersion version = new ContentVersion(
+                Title = name.substringBeforeLast('.'),
+                PathOnClient = name,
+                VersionData = EncodingUtil.base64Decode(base64Data),
+                FirstPublishLocationId = findingId,
+                RLM_RTK_Photo_Stage__c = stage == 'After' ? 'After' : 'Before'
+            );
+            insert version;
+            return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id].ContentDocumentId;
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
     private static Id inspectionFor(Id workOrderId) {
         if (workOrderId == null) {
             return null;

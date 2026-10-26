@@ -2,28 +2,36 @@ import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getWorkOrderFindings from '@salesforce/apex/RLM_RTK_Inspection.getWorkOrderFindings';
 import saveTreatment from '@salesforce/apex/RLM_RTK_Inspection.saveTreatment';
-import tagAfterPhotos from '@salesforce/apex/RLM_RTK_Inspection.tagAfterPhotos';
 
 const THUMB = '/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB240BY180&versionId=';
-const PHOTO_FORMATS = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp'];
 const STATUSES = [
     { value: 'Treated', label: 'Treated', tone: 'done' },
     { value: 'Needs Follow-up', label: 'Needs follow-up', tone: 'follow' }
 ];
 
 export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningElement) {
-    @api recordId;
     @api workOrderId;
 
+    // Quick actions can set recordId after connectedCallback, so load from the setter too.
+    @api
+    get recordId() {
+        return this._recordId;
+    }
+    set recordId(value) {
+        const changed = value !== this._recordId;
+        this._recordId = value;
+        if (changed && this.isConnected) this.load();
+    }
+
+    _recordId;
     state;
     loaded = false;
     error;
     savingId;
     notes = {};
-    photoFormats = PHOTO_FORMATS;
 
     connectedCallback() {
-        this.load();
+        if (this.targetId) this.load();
     }
 
     get targetId() {
@@ -31,6 +39,7 @@ export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningE
     }
 
     async load() {
+        if (!this.targetId) return;
         try {
             this.apply(await getWorkOrderFindings({ workOrderId: this.targetId }));
         } catch (e) {
@@ -143,11 +152,9 @@ export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningE
         }
     }
 
-    async handleAfterUpload(event) {
-        const findingId = event.target.dataset.id;
-        const documentIds = (event.detail.files || []).map((file) => file.documentId);
+    async handleAfterUpload() {
         try {
-            this.apply(await tagAfterPhotos({ workOrderId: this.targetId, findingId, documentIds }));
+            this.apply(await getWorkOrderFindings({ workOrderId: this.targetId }));
         } catch (e) {
             this.error = this.message(e);
         }

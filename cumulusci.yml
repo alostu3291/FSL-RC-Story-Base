@@ -372,6 +372,8 @@ project:
     ps_fsl: &ps_fsl
       # License-owned Field Service permission sets (cannot be added to a PSG)
       - FieldServiceMobileStandardPermSet
+      # Lightning SDK for Field Service Mobile (LWC quick actions in the mobile app)
+      - RLM_FSL_Mobile_Extensions
 
 #-----------------#
 # DECISION TABLES #
@@ -1651,12 +1653,12 @@ tasks:
 
   deploy_post_pest:
     group: Revenue Lifecycle Management
-    description: Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, work order treatment checklist, Inspection and FieldQuote Apex). Runs RLM_RTK_FieldQuoteTest and RLM_RTK_InspectionTest.
+    description: Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Inspection, FieldQuote and FieldVisit Apex). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest and RLM_RTK_FieldVisitTest.
     class_path: cumulusci.tasks.salesforce.Deploy
     options:
       path: unpackaged/post_pest
       test_level: RunSpecifiedTests
-      specified_tests: RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest
+      specified_tests: RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest,RLM_RTK_FieldVisitTest
 
   deploy_post_pest_docgen:
     group: Revenue Lifecycle Management
@@ -1721,6 +1723,13 @@ tasks:
     class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
     options:
       path: scripts/apex/setupRtkGrow.apex
+
+  setup_rtk_inspection_visit:
+    group: Revenue Lifecycle Management
+    description: Idempotently book a free Pest Inspection work order and appointment for prospect Priya Nair, dispatched to the running user tomorrow at 10:00, for running Inspect and Quote from the Field Service mobile app. Re-running moves the open visit back to tomorrow.
+    class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
+    options:
+      path: scripts/apex/setupRtkInspectionVisit.apex
 
   setup_rtk_dro_steps:
     group: Revenue Lifecycle Management
@@ -3065,6 +3074,9 @@ flows:
         when: project_config.project__custom__pest
       11:
         task: setup_rtk_grow
+        when: project_config.project__custom__pest and project_config.project__custom__fsl
+      11.5:
+        task: setup_rtk_inspection_visit
         when: project_config.project__custom__pest and project_config.project__custom__fsl
       12:
         task: deploy_post_pest_docgen

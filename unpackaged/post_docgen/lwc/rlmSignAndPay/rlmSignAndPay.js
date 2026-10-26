@@ -11,6 +11,8 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
     @api quoteId;
     @api contentDocumentId;
     @api documentTitle;
+    /** Hosted inside another component (e.g. a Field Service mobile action): fire "accepted" instead of leaving the flow. */
+    @api embedded = false;
 
     _accepted = false;
     _signerName = '';
@@ -366,7 +368,7 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
             this.onFileBrand = this.cardBrand;
             this.signedBy = this._signerName;
             this.signedAt = new Date().toISOString();
-            this.completeAndOrder(`${res.message} Opening Create Order…`);
+            this.completeAndOrder(res.message);
         } catch (e) {
             this.error = e?.body?.message || e?.message || 'Unable to record acceptance.';
         } finally {
@@ -377,9 +379,7 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
     handleUseCardOnFile() {
         this._signerName = this.signedBy || this._signerName;
         this._cardLast4 = this.onFileLast4;
-        this.completeAndOrder(
-            `Using ${this.onFileBrand || 'card'} •••• ${this.onFileLast4} on file. Opening Create Order…`
-        );
+        this.completeAndOrder(`Using ${this.onFileBrand || 'card'} •••• ${this.onFileLast4} on file.`);
     }
 
     handleAddAnother() {
@@ -400,8 +400,17 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
 
     completeAndOrder(message) {
         this._accepted = true;
-        this._message = message;
         this.mode = 'done';
+        if (this.embedded) {
+            this._message = message;
+            this.dispatchEvent(
+                new CustomEvent('accepted', {
+                    detail: { message, signerName: this._signerName, cardLast4: this._cardLast4 }
+                })
+            );
+            return;
+        }
+        this._message = `${message} Opening Create Order…`;
         this.emitOutputs();
         // Close this flow screen, then open the same Create Order UI as the Quote button.
         // eslint-disable-next-line @lwc/lwc/no-async-operation

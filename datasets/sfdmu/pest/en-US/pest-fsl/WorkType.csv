@@ -1,4 +1,5 @@
 Description,DurationType,EstimatedDuration,Name,ShouldAutoCreateSvcAppt
 Initial cleanout and exclusion after signup,Hours,2,Initial Pest Treatment,true
+Free in-home inspection and quote before any treatment is booked,Hours,1,Pest Inspection,true
 Quarterly residential pest maintenance visit,Hours,1,Quarterly Pest Visit,true
 Guarantee re-service or billable follow-up,Hours,1,Pest Re-service,true

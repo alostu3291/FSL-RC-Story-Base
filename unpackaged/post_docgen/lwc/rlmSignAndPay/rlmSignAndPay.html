@@ -71,10 +71,12 @@
                         <p>{message}</p>
                     </div>
                 </div>
-                <div class="footer">
-                    <p>If Create Order did not open, use the button.</p>
-                    <button type="button" class="primary" onclick={handleCreateOrderClick}>Create Order</button>
-                </div>
+                <template if:false={embedded}>
+                    <div class="footer">
+                        <p>If Create Order did not open, use the button.</p>
+                        <button type="button" class="primary" onclick={handleCreateOrderClick}>Create Order</button>
+                    </div>
+                </template>
             </template>
 
             <template if:true={isEntry}>

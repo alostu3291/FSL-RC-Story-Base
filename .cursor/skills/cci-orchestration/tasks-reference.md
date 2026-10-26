@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**222 tasks** across **9 groups**.
+**223 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*141 task(s)*
+*142 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1294,7 +1294,7 @@
 
 ### `deploy_post_pest`
 
-**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, work order treatment checklist, Inspection and FieldQuote Apex). Runs RLM_RTK_FieldQuoteTest and RLM_RTK_InspectionTest.
+**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Inspection, FieldQuote and FieldVisit Apex). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest and RLM_RTK_FieldVisitTest.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1302,7 +1302,7 @@
 
 - `path`: `unpackaged/post_pest`
 - `test_level`: `RunSpecifiedTests`
-- `specified_tests`: `RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest`
+- `specified_tests`: `RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest,RLM_RTK_FieldVisitTest`
 
 ---
 
@@ -2388,6 +2388,18 @@
 **Options:**
 
 - `path`: `scripts/apex/setupRtkGrow.apex`
+
+---
+
+### `setup_rtk_inspection_visit`
+
+**Description:** Idempotently book a free Pest Inspection work order and appointment for prospect Priya Nair, dispatched to the running user tomorrow at 10:00, for running Inspect and Quote from the Field Service mobile app. Re-running moves the open visit back to tomorrow.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/setupRtkInspectionVisit.apex`
 
 ---
 

@@ -31,12 +31,12 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `docgen` | `True` | 13 flow step(s) |
 | `dro` | `True` | 12 flow step(s) |
 | `einstein` | `True` | 3 flow step(s) |
-| `fsl` | `False` | 16 flow step(s) |
+| `fsl` | `False` | 17 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
-| `pest` | `False` | 16 flow step(s) |
+| `pest` | `False` | 17 flow step(s) |
 | `prm` | `True` | 9 flow step(s) |
 | `prm_exp_bundle` | `True` | 4 flow step(s) |
 | `procedure_plan_definition_version_active` | `False` | — |
@@ -223,6 +223,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 7 → `setup_rtk_foundation`
 - `prepare_pest` step 8 → `insert_pest_dro_fsl_data`
 - `prepare_pest` step 11 → `setup_rtk_grow`
+- `prepare_pest` step 11.5 → `setup_rtk_inspection_visit`
 
 ### `fsl_managed_package` (default: `False`)
 
@@ -257,6 +258,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 9 → `update_product_fulfillment_decomp_rules`
 - `prepare_pest` step 10 → `refresh_dt_default_pricing`
 - `prepare_pest` step 11 → `setup_rtk_grow`
+- `prepare_pest` step 11.5 → `setup_rtk_inspection_visit`
 - `prepare_pest` step 12 → `deploy_post_pest_docgen`
 - `prepare_pest` step 13 → `activate_docgen_templates`
 - `prepare_pest` step 14 → `fix_pest_document_template_binaries`
@@ -643,9 +645,10 @@ These `project.custom` entries are YAML anchors (lists or maps) reused throughou
 
 ### `ps_fsl`
 
-*1 items:*
+*2 items:*
 
 - `FieldServiceMobileStandardPermSet`
+- `RLM_FSL_Mobile_Extensions`
 
 ### `ps_prm`
 

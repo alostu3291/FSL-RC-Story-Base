@@ -61,15 +61,12 @@
                                         <img src={p.url} alt={p.title} />
                                     </button>
                                 </template>
-                                <lightning-file-upload
+                                <c-rlm-rtk-photo-capture
                                     label="Add after photos"
-                                    name="afterPhotos"
-                                    accept={photoFormats}
+                                    stage="After"
                                     record-id={f.id}
-                                    data-id={f.id}
-                                    multiple
-                                    onuploadfinished={handleAfterUpload}
-                                ></lightning-file-upload>
+                                    onuploaded={handleAfterUpload}
+                                ></c-rlm-rtk-photo-capture>
                             </div>
                         </div>
                     </div>

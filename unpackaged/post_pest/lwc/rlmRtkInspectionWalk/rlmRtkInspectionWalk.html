@@ -94,15 +94,13 @@
                                     <img src={p.url} alt={p.title} />
                                 </button>
                             </template>
-                            <lightning-file-upload
+                            <c-rlm-rtk-photo-capture
                                 class="uploader"
                                 label="Add photos"
-                                name="findingPhotos"
-                                accept={photoFormats}
+                                stage="Before"
                                 record-id={f.id}
-                                multiple
-                                onuploadfinished={handleUploadFinished}
-                            ></lightning-file-upload>
+                                onuploaded={handleUploadFinished}
+                            ></c-rlm-rtk-photo-capture>
                         </div>
                     </article>
                 </template>

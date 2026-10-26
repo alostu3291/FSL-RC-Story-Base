@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Lightning SDK for Field Service Mobile: lets Lightning web component quick actions (such as Rentokil Inspect and Quote and Treatment Checklist) appear in the Field Service mobile app. Requires the Field Service Mobile permission set license.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>RLM FSL Mobile Extensions</label>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>LightningOnFSMobile</name>
+    </userPermissions>
+</PermissionSet>

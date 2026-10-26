@@ -310,7 +310,7 @@ Enable Field Service Core and connect it to DRO: assign Field Service PSLs, depl
 **Steps:**
 
 6.5. **task** `assign_permission_sets`  `when: project_config.project__custom__fsl`
-   - `api_names`: `['FieldServiceMobileStandardPermSet']`
+   - `api_names`: `['FieldServiceMobileStandardPermSet', 'RLM_FSL_Mobile_Extensions']`
 1. **task** `assign_permission_set_licenses`  `when: project_config.project__custom__fsl`
    - `api_names`: `['FieldServiceStandardPsl', 'FieldServiceDispatcherPsl', 'FieldServiceSchedulingPsl', 'FieldServi...`
 2. **task** `deploy_pre_fsl`  `when: project_config.project__custom__fsl`
@@ -369,6 +369,7 @@ Deploy Rentokil residential pest control demo: catalog, location-aware pricing c
 1.5. **task** `assign_permission_sets`  `when: project_config.project__custom__pest`
    - `api_names`: `['RLM_Rentokil_Pest']`
 8.5. **task** `setup_rtk_dro_steps`  `when: project_config.project__custom__pest and project_config.project__custom__dro`
+11.5. **task** `setup_rtk_inspection_visit`  `when: project_config.project__custom__pest and project_config.project__custom__fsl`
 1. **task** `deploy_post_pest`  `when: project_config.project__custom__pest`
 2. **task** `apply_context_pest_location`  `when: project_config.project__custom__pest`
 3. **task** `insert_pest_pcm_data`  `when: project_config.project__custom__pest`

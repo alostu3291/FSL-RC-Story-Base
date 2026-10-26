@@ -1,0 +1,12 @@
+<template>
+    <div class="capture">
+        <input class="file" type="file" accept="image/*" multiple onchange={handleFiles} />
+        <button type="button" class="add" disabled={busy} onclick={pick}>
+            <lightning-icon icon-name="utility:photo" size="x-small" alternative-text=""></lightning-icon>
+            <span>{buttonLabel}</span>
+        </button>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+    </div>
+</template>
