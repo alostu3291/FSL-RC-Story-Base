@@ -1,15 +1,13 @@
 import { LightningElement, api, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
 import getQuoteFindings from '@salesforce/apex/RLM_RTK_Inspection.getQuoteFindings';
 
-const THUMB = '/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=';
-
-export default class RlmRtkInspectionFindings extends NavigationMixin(LightningElement) {
+export default class RlmRtkInspectionFindings extends LightningElement {
     @api quoteId;
     @api recordId;
 
     state;
     error;
+    viewing;
 
     get targetId() {
         return this.quoteId || this.recordId;
@@ -30,8 +28,7 @@ export default class RlmRtkInspectionFindings extends NavigationMixin(LightningE
             ...f,
             observation: [f.pest, f.evidence].filter(Boolean).join(' – ') || 'Observation',
             sevClass: `sev-pill ${(f.severity || 'Light').toLowerCase()}`,
-            hasPhotos: f.photos && f.photos.length > 0,
-            photos: (f.photos || []).map((p) => ({ ...p, url: THUMB + p.versionId }))
+            hasPhotos: f.photos && f.photos.length > 0
         }));
     }
 
@@ -52,10 +49,11 @@ export default class RlmRtkInspectionFindings extends NavigationMixin(LightningE
     }
 
     previewPhoto(event) {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__namedPage',
-            attributes: { pageName: 'filePreview' },
-            state: { selectedRecordId: event.currentTarget.dataset.doc }
-        });
+        const { url, title } = event.currentTarget.dataset;
+        this.viewing = { url, title };
+    }
+
+    closePhoto() {
+        this.viewing = undefined;
     }
 }

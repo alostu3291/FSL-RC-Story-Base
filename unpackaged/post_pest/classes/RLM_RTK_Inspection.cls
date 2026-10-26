@@ -25,6 +25,7 @@ public with sharing class RLM_RTK_Inspection {
         @AuraEnabled public Id documentId;
         @AuraEnabled public String title;
         @AuraEnabled public String stage;
+        @AuraEnabled public String url;
     }
 
     public class FindingView {
@@ -346,7 +347,8 @@ public with sharing class RLM_RTK_Inspection {
             for (ContentDocumentLink link : [
                 SELECT LinkedEntityId, ContentDocumentId, ContentDocument.Title,
                     ContentDocument.LatestPublishedVersionId,
-                    ContentDocument.LatestPublishedVersion.RLM_RTK_Photo_Stage__c
+                    ContentDocument.LatestPublishedVersion.RLM_RTK_Photo_Stage__c,
+                    ContentDocument.LatestPublishedVersion.VersionDataUrl
                 FROM ContentDocumentLink
                 WHERE LinkedEntityId IN :views.keySet()
                 ORDER BY ContentDocument.CreatedDate ASC
@@ -355,6 +357,7 @@ public with sharing class RLM_RTK_Inspection {
                 p.documentId = link.ContentDocumentId;
                 p.versionId = link.ContentDocument.LatestPublishedVersionId;
                 p.title = link.ContentDocument.Title;
+                p.url = link.ContentDocument.LatestPublishedVersion.VersionDataUrl;
                 p.stage = link.ContentDocument.LatestPublishedVersion.RLM_RTK_Photo_Stage__c == 'After' ? 'After' : 'Before';
                 FindingView v = views.get(link.LinkedEntityId);
                 if (p.stage == 'After') {

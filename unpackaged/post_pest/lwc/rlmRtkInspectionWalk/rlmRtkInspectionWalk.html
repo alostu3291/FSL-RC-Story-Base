@@ -87,7 +87,8 @@
                                     key={p.versionId}
                                     type="button"
                                     class="thumb"
-                                    data-doc={p.documentId}
+                                    data-url={p.url}
+                                    data-title={p.title}
                                     onclick={previewPhoto}
                                     title={p.title}
                                 >
@@ -202,4 +203,7 @@
             <p class="hint">Tap <strong>Next</strong> to review the plan and price. You can still change it.</p>
         </section>
     </div>
+    <template lwc:if={viewing}>
+        <c-rlm-file-viewer url={viewing.url} title={viewing.title} onclose={closePhoto}></c-rlm-file-viewer>
+    </template>
 </template>

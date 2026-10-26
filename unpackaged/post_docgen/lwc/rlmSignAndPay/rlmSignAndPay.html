@@ -176,4 +176,13 @@
             </template>
         </template>
     </div>
+    <template lwc:if={viewingDocument}>
+        <c-rlm-file-viewer
+            url={proposalUrl}
+            version-id={proposalVersionId}
+            file-type={proposalFileType}
+            title={proposalTitle}
+            onclose={closeDocument}
+        ></c-rlm-file-viewer>
+    </template>
 </template>

@@ -32,7 +32,8 @@
                                         key={p.versionId}
                                         type="button"
                                         class="photo"
-                                        data-doc={p.documentId}
+                                        data-url={p.url}
+                                        data-title={p.title}
                                         onclick={previewPhoto}
                                         title={p.title}
                                     >
@@ -51,5 +52,8 @@
     </template>
     <template lwc:elseif={error}>
         <p class="error">{error}</p>
+    </template>
+    <template lwc:if={viewing}>
+        <c-rlm-file-viewer url={viewing.url} title={viewing.title} onclose={closePhoto}></c-rlm-file-viewer>
     </template>
 </template>

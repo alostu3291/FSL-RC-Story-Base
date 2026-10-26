@@ -1,5 +1,4 @@
 import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
 import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
 import getState from '@salesforce/apex/RLM_RTK_Inspection.getState';
 import saveFinding from '@salesforce/apex/RLM_RTK_Inspection.saveFinding';
@@ -38,7 +37,7 @@ const emptyDraft = (zone) => ({
     internalNote: ''
 });
 
-export default class RlmRtkInspectionWalk extends NavigationMixin(LightningElement) {
+export default class RlmRtkInspectionWalk extends LightningElement {
     @api inspectionId;
     @api accountName;
     @api serviceAddress;
@@ -58,6 +57,7 @@ export default class RlmRtkInspectionWalk extends NavigationMixin(LightningEleme
     saving = false;
     loading = true;
     error;
+    viewing;
 
     connectedCallback() {
         this.load();
@@ -150,10 +150,7 @@ export default class RlmRtkInspectionWalk extends NavigationMixin(LightningEleme
                 sevClass: `sev-pill ${(f.severity || 'Light').toLowerCase()}`,
                 hasPhotos: f.photos && f.photos.length > 0,
                 photoCount: f.photos ? f.photos.length : 0,
-                photos: (f.photos || []).map((p) => ({
-                    ...p,
-                    url: `/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB240BY180&versionId=${p.versionId}`
-                }))
+                photos: f.photos || []
             }));
     }
 
@@ -293,11 +290,12 @@ export default class RlmRtkInspectionWalk extends NavigationMixin(LightningEleme
     }
 
     previewPhoto(event) {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__namedPage',
-            attributes: { pageName: 'filePreview' },
-            state: { selectedRecordId: event.currentTarget.dataset.doc }
-        });
+        const { url, title } = event.currentTarget.dataset;
+        this.viewing = { url, title };
+    }
+
+    closePhoto() {
+        this.viewing = undefined;
     }
 
     // ---------- recommendation ----------

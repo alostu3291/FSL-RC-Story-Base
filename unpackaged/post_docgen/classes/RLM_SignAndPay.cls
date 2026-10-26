@@ -8,6 +8,8 @@ public with sharing class RLM_SignAndPay {
         @AuraEnabled public Id contentVersionId;
         @AuraEnabled public String title;
         @AuraEnabled public Datetime createdDate;
+        @AuraEnabled public String fileType;
+        @AuraEnabled public String url;
     }
 
     public class QuoteContext {
@@ -74,7 +76,8 @@ public with sharing class RLM_SignAndPay {
     public static ProposalDoc findLatestProposal(Id quoteId) {
         List<ContentDocumentLink> links = [
             SELECT ContentDocumentId, ContentDocument.Title, ContentDocument.FileType,
-                ContentDocument.LatestPublishedVersionId, ContentDocument.CreatedDate
+                ContentDocument.LatestPublishedVersionId, ContentDocument.CreatedDate,
+                ContentDocument.LatestPublishedVersion.VersionDataUrl
             FROM ContentDocumentLink
             WHERE LinkedEntityId = :quoteId
             ORDER BY ContentDocument.CreatedDate DESC
@@ -96,6 +99,8 @@ public with sharing class RLM_SignAndPay {
             doc.contentVersionId = link.ContentDocument.LatestPublishedVersionId;
             doc.title = link.ContentDocument.Title;
             doc.createdDate = link.ContentDocument.CreatedDate;
+            doc.fileType = link.ContentDocument.FileType;
+            doc.url = link.ContentDocument.LatestPublishedVersion.VersionDataUrl;
             if (title.contains('proposal')) {
                 return doc;
             }
@@ -163,7 +168,8 @@ public with sharing class RLM_SignAndPay {
 
     private static ProposalDoc describeDocument(Id contentDocumentId) {
         ContentDocument doc = [
-            SELECT Id, Title, LatestPublishedVersionId, CreatedDate
+            SELECT Id, Title, FileType, LatestPublishedVersionId, CreatedDate,
+                LatestPublishedVersion.VersionDataUrl
             FROM ContentDocument
             WHERE Id = :contentDocumentId
             LIMIT 1
@@ -173,6 +179,8 @@ public with sharing class RLM_SignAndPay {
         result.contentVersionId = doc.LatestPublishedVersionId;
         result.title = doc.Title;
         result.createdDate = doc.CreatedDate;
+        result.fileType = doc.FileType;
+        result.url = doc.LatestPublishedVersion.VersionDataUrl;
         return result;
     }
 }

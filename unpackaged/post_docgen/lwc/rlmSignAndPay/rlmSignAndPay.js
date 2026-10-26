@@ -25,6 +25,10 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
     currencyIsoCode = 'USD';
     proposalTitle;
     proposalDocId;
+    proposalVersionId;
+    proposalUrl;
+    proposalFileType;
+    viewingDocument = false;
     loading = true;
     submitting = false;
     error;
@@ -168,6 +172,9 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
             if (ctx.proposal) {
                 this.proposalDocId = ctx.proposal.contentDocumentId;
                 this.proposalTitle = this.documentTitle || ctx.proposal.title;
+                this.proposalVersionId = ctx.proposal.contentVersionId;
+                this.proposalUrl = ctx.proposal.url;
+                this.proposalFileType = ctx.proposal.fileType;
             } else {
                 this.proposalDocId = this.contentDocumentId || null;
                 this.proposalTitle = this.documentTitle || null;
@@ -315,11 +322,19 @@ export default class RlmSignAndPay extends NavigationMixin(LightningElement) {
 
     openDocument() {
         if (!this.proposalDocId) return;
+        if (this.proposalUrl) {
+            this.viewingDocument = true;
+            return;
+        }
         this[NavigationMixin.Navigate]({
             type: 'standard__namedPage',
             attributes: { pageName: 'filePreview' },
             state: { selectedRecordId: this.proposalDocId }
         });
+    }
+
+    closeDocument() {
+        this.viewingDocument = false;
     }
 
     emit(name, value) {

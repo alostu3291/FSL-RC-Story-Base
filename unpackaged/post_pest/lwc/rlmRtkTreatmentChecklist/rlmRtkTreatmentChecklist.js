@@ -1,15 +1,13 @@
 import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
 import getWorkOrderFindings from '@salesforce/apex/RLM_RTK_Inspection.getWorkOrderFindings';
 import saveTreatment from '@salesforce/apex/RLM_RTK_Inspection.saveTreatment';
 
-const THUMB = '/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB240BY180&versionId=';
 const STATUSES = [
     { value: 'Treated', label: 'Treated', tone: 'done' },
     { value: 'Needs Follow-up', label: 'Needs follow-up', tone: 'follow' }
 ];
 
-export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningElement) {
+export default class RlmRtkTreatmentChecklist extends LightningElement {
     @api workOrderId;
 
     // Quick actions can set recordId after connectedCallback, so load from the setter too.
@@ -29,6 +27,7 @@ export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningE
     error;
     savingId;
     notes = {};
+    viewing;
 
     connectedCallback() {
         if (this.targetId) this.load();
@@ -90,15 +89,14 @@ export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningE
     get findings() {
         return this.state.findings.map((f) => {
             const status = f.treatmentStatus || 'Open';
-            const thumbs = (list) => (list || []).map((p) => ({ ...p, url: THUMB + p.versionId }));
             return {
                 ...f,
                 observation: [f.pest, f.evidence].filter(Boolean).join(' – ') || 'Observation',
                 sevClass: `sev-pill ${(f.severity || 'Light').toLowerCase()}`,
                 cardClass: `finding ${status === 'Treated' ? 'done' : status === 'Needs Follow-up' ? 'follow' : ''}`,
                 statusLabel: status,
-                beforePhotos: thumbs(f.photos),
-                afterThumbs: thumbs(f.afterPhotos),
+                beforePhotos: f.photos || [],
+                afterThumbs: f.afterPhotos || [],
                 noBefore: !(f.photos && f.photos.length > 0),
                 busy: this.savingId === f.id,
                 noteValue: this.notes[f.id] !== undefined ? this.notes[f.id] : f.treatmentNote || '',
@@ -166,10 +164,11 @@ export default class RlmRtkTreatmentChecklist extends NavigationMixin(LightningE
     }
 
     previewPhoto(event) {
-        this[NavigationMixin.Navigate]({
-            type: 'standard__namedPage',
-            attributes: { pageName: 'filePreview' },
-            state: { selectedRecordId: event.currentTarget.dataset.doc }
-        });
+        const { url, title } = event.currentTarget.dataset;
+        this.viewing = { url, title };
+    }
+
+    closePhoto() {
+        this.viewing = undefined;
     }
 }
