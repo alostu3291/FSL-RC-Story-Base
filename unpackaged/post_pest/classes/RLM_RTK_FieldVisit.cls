@@ -415,6 +415,35 @@ public with sharing class RLM_RTK_FieldVisit {
         }
     }
 
+    /**
+     * Completes the visit from the app, which has no status picker in this org: every open
+     * appointment on the work order, then the work order. Completing a treatment work order
+     * starts milestone billing (RLM_FSL_Complete_Fulfillment_Step).
+     */
+    @AuraEnabled
+    public static String completeVisit(Id recordId) {
+        try {
+            WorkOrder wo = workOrderFor(recordId);
+            List<ServiceAppointment> open = [
+                SELECT Id, ActualStartTime FROM ServiceAppointment
+                WHERE ParentRecordId = :wo.Id AND Status NOT IN ('Completed', 'Canceled', 'Cannot Complete')
+            ];
+            Datetime now = Datetime.now();
+            for (ServiceAppointment sa : open) {
+                sa.Status = 'Completed';
+                sa.ActualEndTime = now;
+                if (sa.ActualStartTime == null) {
+                    sa.ActualStartTime = now;
+                }
+            }
+            update open;
+            update new WorkOrder(Id = wo.Id, Status = 'Completed');
+            return wo.WorkOrderNumber;
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
     private static final Integer SLOT_COUNT = 6;
     private static final Integer SLOT_DAYS = 7;
     private static final List<Integer> SLOT_HOURS = new List<Integer>{ 8, 10, 13, 15 };

@@ -160,6 +160,21 @@ private class RLM_RTK_FieldVisitTest {
     }
 
     @IsTest
+    static void completingTheVisitClosesAppointmentAndWorkOrder() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+
+        String completedNumber = RLM_RTK_FieldVisit.completeVisit(sa.Id);
+
+        WorkOrder done = [SELECT WorkOrderNumber, Status FROM WorkOrder WHERE Id = :wo.Id];
+        Assert.areEqual(done.WorkOrderNumber, completedNumber);
+        Assert.areEqual('Completed', done.Status);
+        ServiceAppointment closed = [SELECT Status, ActualEndTime FROM ServiceAppointment WHERE Id = :sa.Id];
+        Assert.areEqual('Completed', closed.Status);
+        Assert.isNotNull(closed.ActualEndTime);
+    }
+
+    @IsTest
     static void otherRecordsAreRejected() {
         WorkOrder wo = inspectionVisit();
         try {

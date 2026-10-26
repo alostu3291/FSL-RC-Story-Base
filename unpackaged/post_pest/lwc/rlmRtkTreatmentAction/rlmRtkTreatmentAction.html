@@ -1,5 +1,18 @@
 <template>
     <template lwc:if={recordId}>
         <c-rlm-rtk-treatment-checklist record-id={recordId}></c-rlm-rtk-treatment-checklist>
+        <div class="complete">
+            <template lwc:if={completedNumber}>
+                <p class="done">Work order {completedNumber} and its appointment are complete.</p>
+                <button type="button" class="primary" onclick={close}>Close</button>
+            </template>
+            <template lwc:else>
+                <template lwc:if={error}>
+                    <p class="error">{error}</p>
+                </template>
+                <button type="button" class="primary" disabled={busy} onclick={complete}>Complete treatment</button>
+                <p class="hint">Completes this appointment and work order.</p>
+            </template>
+        </div>
     </template>
 </template>

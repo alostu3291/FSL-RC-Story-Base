@@ -9,6 +9,7 @@ import placeOrder from '@salesforce/apex/RLM_RTK_FieldVisit.placeOrder';
 import orderStatus from '@salesforce/apex/RLM_RTK_FieldVisit.orderStatus';
 import treatmentSlots from '@salesforce/apex/RLM_RTK_FieldVisit.treatmentSlots';
 import bookTreatment from '@salesforce/apex/RLM_RTK_FieldVisit.bookTreatment';
+import completeVisit from '@salesforce/apex/RLM_RTK_FieldVisit.completeVisit';
 import getState from '@salesforce/apex/RLM_RTK_Inspection.getState';
 
 const STEPS = [
@@ -45,6 +46,9 @@ export default class RlmRtkFieldVisit extends LightningElement {
     slotBusy = false;
     slotError;
     leftForDispatch = false;
+    completing = false;
+    completeError;
+    visitCompleted;
 
     @api
     get recordId() {
@@ -402,6 +406,18 @@ export default class RlmRtkFieldVisit extends LightningElement {
 
     leaveForDispatch() {
         this.leftForDispatch = true;
+    }
+
+    async completeInspection() {
+        this.completing = true;
+        this.completeError = undefined;
+        try {
+            this.visitCompleted = await completeVisit({ recordId: this._recordId });
+        } catch (e) {
+            this.completeError = this.message(e);
+        } finally {
+            this.completing = false;
+        }
     }
 
     get showSlots() {

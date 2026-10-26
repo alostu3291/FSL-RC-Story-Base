@@ -173,15 +173,27 @@
                     </div>
                 </template>
                 <template lwc:elseif={treatmentWhen}>
-                    <p class="muted">The first treatment is on your schedule. Complete this inspection appointment as usual.</p>
+                    <p class="muted">The first treatment is on your schedule.</p>
                 </template>
                 <template lwc:elseif={treatmentNumber}>
-                    <p class="muted">Complete this inspection appointment as usual. The treatment visit shows on the schedule once it's dispatched.</p>
+                    <p class="muted">The treatment visit shows on the schedule once it's dispatched.</p>
                 </template>
                 <template lwc:else>
                     <p class="muted">The order is active. The treatment work order appears once fulfillment creates it.</p>
                 </template>
-                <div class="bar"><button type="button" class="primary" onclick={close}>Done</button></div>
+                <template lwc:if={visitCompleted}>
+                    <p class="handoff">Inspection visit {visitCompleted} is complete.</p>
+                    <div class="bar"><button type="button" class="primary" onclick={close}>Done</button></div>
+                </template>
+                <template lwc:else>
+                    <template lwc:if={completeError}>
+                        <p class="error">{completeError}</p>
+                    </template>
+                    <div class="bar">
+                        <button type="button" class="secondary" onclick={close}>Close</button>
+                        <button type="button" class="primary" disabled={completing} onclick={completeInspection}>Complete visit</button>
+                    </div>
+                </template>
             </section>
         </template>
     </div>

@@ -1,0 +1,43 @@
+.complete {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 1rem 0 0.5rem;
+    border-top: 1px solid #d7e2db;
+}
+
+.primary {
+    min-height: 2.9rem;
+    border: none;
+    border-radius: 0.8rem;
+    background: #1f7a4d;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.primary:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.hint {
+    margin: 0;
+    color: #5b6b62;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.done {
+    margin: 0;
+    color: #145c38;
+    font-weight: 600;
+}
+
+.error {
+    margin: 0;
+    color: #b42318;
+    font-size: 0.85rem;
+}
