@@ -40,6 +40,19 @@ List<WorkOrder> open = [
         AND Status NOT IN ('Completed', 'Closed', 'Canceled', 'Cannot Complete')
     ORDER BY CreatedDate DESC LIMIT 1
 ];
+// A visit whose quote was accepted is done; close it so the next run books a fresh one.
+if (!open.isEmpty()) {
+    WorkOrder previous = [SELECT Id, RLM_RTK_Inspection__r.Status__c FROM WorkOrder WHERE Id = :open[0].Id];
+    if (previous.RLM_RTK_Inspection__r.Status__c == 'Accepted') {
+        List<ServiceAppointment> done = [SELECT Id FROM ServiceAppointment WHERE ParentRecordId = :previous.Id];
+        for (ServiceAppointment s : done) {
+            s.Status = 'Completed';
+        }
+        update done;
+        update new WorkOrder(Id = previous.Id, Status = 'Completed');
+        open.clear();
+    }
+}
 WorkOrder wo;
 if (open.isEmpty()) {
     wo = new WorkOrder(
