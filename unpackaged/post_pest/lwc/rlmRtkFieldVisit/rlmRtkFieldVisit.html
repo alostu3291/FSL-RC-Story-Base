@@ -123,7 +123,7 @@
         <template lwc:if={isDone}>
             <section class="panel done">
                 <lightning-icon icon-name="utility:success" size="small" alternative-text=""></lightning-icon>
-                <h2>Treatment booked</h2>
+                <h2>{doneTitle}</h2>
                 <template lwc:if={signMessage}>
                     <p>{signMessage}</p>
                 </template>
@@ -143,7 +143,39 @@
                         <dd>Awaiting dispatch</dd>
                     </template>
                 </dl>
-                <template lwc:if={treatmentNumber}>
+                <template lwc:if={showSlots}>
+                    <div class="slots">
+                        <h3>Book the first treatment</h3>
+                        <p class="muted">Pick a time with the customer. It's dispatched to you.</p>
+                        <template lwc:if={slotsLoading}>
+                            <div class="center"><lightning-spinner alternative-text="Finding times" size="small"></lightning-spinner></div>
+                        </template>
+                        <template lwc:elseif={hasSlots}>
+                            <div class="slot-grid">
+                                <template for:each={slotOptions} for:item="s">
+                                    <button key={s.key} type="button" class="slot" data-start={s.start}
+                                        disabled={slotBusy} onclick={pickSlot}>
+                                        <span class="slot-day">{s.day}</span>
+                                        <span class="slot-time">{s.time}</span>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                        <template lwc:elseif={noSlots}>
+                            <p class="muted">No open times this week.</p>
+                        </template>
+                        <template lwc:if={slotError}>
+                            <p class="error">{slotError}</p>
+                        </template>
+                        <div class="bar">
+                            <button type="button" class="secondary" disabled={slotBusy} onclick={leaveForDispatch}>Leave for dispatch</button>
+                        </div>
+                    </div>
+                </template>
+                <template lwc:elseif={treatmentWhen}>
+                    <p class="muted">The first treatment is on your schedule. Complete this inspection appointment as usual.</p>
+                </template>
+                <template lwc:elseif={treatmentNumber}>
                     <p class="muted">Complete this inspection appointment as usual. The treatment visit shows on the schedule once it's dispatched.</p>
                 </template>
                 <template lwc:else>

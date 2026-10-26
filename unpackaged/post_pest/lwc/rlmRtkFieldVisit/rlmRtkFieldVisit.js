@@ -7,6 +7,8 @@ import startProposal from '@salesforce/apex/RLM_RTK_FieldVisit.startProposal';
 import proposalStatus from '@salesforce/apex/RLM_RTK_FieldVisit.proposalStatus';
 import placeOrder from '@salesforce/apex/RLM_RTK_FieldVisit.placeOrder';
 import orderStatus from '@salesforce/apex/RLM_RTK_FieldVisit.orderStatus';
+import treatmentSlots from '@salesforce/apex/RLM_RTK_FieldVisit.treatmentSlots';
+import bookTreatment from '@salesforce/apex/RLM_RTK_FieldVisit.bookTreatment';
 import getState from '@salesforce/apex/RLM_RTK_Inspection.getState';
 
 const STEPS = [
@@ -38,6 +40,11 @@ export default class RlmRtkFieldVisit extends LightningElement {
     embedded = true;
     _timer;
     _signTimer;
+    slots;
+    slotsLoading = false;
+    slotBusy = false;
+    slotError;
+    leftForDispatch = false;
 
     @api
     get recordId() {
@@ -336,12 +343,12 @@ export default class RlmRtkFieldVisit extends LightningElement {
         }
         const activated = this.order.status === 'Activated';
         if (activated && this.order.treatmentWorkOrderNumber) {
-            this.step = 'done';
+            this.finish();
             return;
         }
         if (attempt >= ORDER_POLLS) {
             if (activated) {
-                this.step = 'done';
+                this.finish();
             } else {
                 this.error = 'The order has not been created yet. Close and reopen Inspect & Quote to check again.';
             }
@@ -353,6 +360,78 @@ export default class RlmRtkFieldVisit extends LightningElement {
 
     retryBooking() {
         this.book();
+    }
+
+    // ---------- first treatment time ----------
+    finish() {
+        this.step = 'done';
+        if (this.order.treatmentAppointmentId && !this.order.treatmentScheduledStart) {
+            this.loadSlots();
+        }
+    }
+
+    async loadSlots() {
+        this.slotsLoading = true;
+        this.slotError = undefined;
+        try {
+            this.slots = await treatmentSlots({ appointmentId: this.order.treatmentAppointmentId });
+        } catch (e) {
+            this.slots = [];
+            this.slotError = this.message(e);
+        } finally {
+            this.slotsLoading = false;
+        }
+    }
+
+    async pickSlot(event) {
+        const start = event.currentTarget.dataset.start;
+        this.slotBusy = true;
+        this.slotError = undefined;
+        try {
+            this.order = await bookTreatment({
+                appointmentId: this.order.treatmentAppointmentId,
+                startTime: start,
+                quoteId: this.quoteId
+            });
+        } catch (e) {
+            this.slotError = this.message(e);
+        } finally {
+            this.slotBusy = false;
+        }
+    }
+
+    leaveForDispatch() {
+        this.leftForDispatch = true;
+    }
+
+    get showSlots() {
+        return (
+            this.isDone &&
+            !this.leftForDispatch &&
+            !!this.order &&
+            !!this.order.treatmentAppointmentId &&
+            !this.order.treatmentScheduledStart
+        );
+    }
+    get hasSlots() {
+        return this.slots && this.slots.length > 0;
+    }
+    get noSlots() {
+        return !this.slotError && !this.hasSlots;
+    }
+    get slotOptions() {
+        return (this.slots || []).map((s) => {
+            const start = new Date(s.startTime);
+            return {
+                key: s.startTime,
+                start: s.startTime,
+                day: start.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                time: start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+            };
+        });
+    }
+    get doneTitle() {
+        return this.treatmentWhen ? 'Treatment booked' : 'Plan active';
     }
 
     get bookingLabel() {

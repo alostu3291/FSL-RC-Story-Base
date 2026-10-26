@@ -29,7 +29,9 @@ if (contacts.isEmpty()) {
 }
 
 WorkType inspectionType = [SELECT Id, EstimatedDuration FROM WorkType WHERE Name = 'Pest Inspection' LIMIT 1];
-ServiceTerritory territory = [SELECT Id FROM ServiceTerritory WHERE Name = 'Bloomingdale IL' LIMIT 1];
+ServiceTerritory territory = [
+    SELECT Id, OperatingHours.TimeZone FROM ServiceTerritory WHERE Name = 'Bloomingdale IL' LIMIT 1
+];
 ServiceResource resource = [
     SELECT Id FROM ServiceResource WHERE RelatedRecordId = :UserInfo.getUserId() AND IsActive = true LIMIT 1
 ];
@@ -74,7 +76,11 @@ List<ServiceAppointment> appointments = [
     SELECT Id FROM ServiceAppointment WHERE ParentRecordId = :wo.Id ORDER BY CreatedDate ASC LIMIT 1
 ];
 ServiceAppointment sa = appointments.isEmpty() ? new ServiceAppointment(ParentRecordId = wo.Id) : appointments[0];
-Datetime start = Datetime.newInstance(Date.today().addDays(1), Time.newInstance(10, 0, 0, 0));
+// 10:00 on the territory's clock, not the running user's.
+TimeZone zone = territory.OperatingHours.TimeZone == null
+    ? UserInfo.getTimeZone() : TimeZone.getTimeZone(territory.OperatingHours.TimeZone);
+Datetime wall = Datetime.newInstanceGmt(Date.today().addDays(1), Time.newInstance(10, 0, 0, 0));
+Datetime start = wall.addSeconds(-zone.getOffset(wall) / 1000);
 Integer minutes = inspectionType.EstimatedDuration == null ? 60 : (Integer) (inspectionType.EstimatedDuration * 60);
 sa.EarliestStartTime = start.addHours(-2);
 sa.DueDate = start.addDays(2);

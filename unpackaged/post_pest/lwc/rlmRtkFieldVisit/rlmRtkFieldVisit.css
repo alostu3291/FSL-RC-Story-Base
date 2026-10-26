@@ -188,6 +188,55 @@ h2 {
     cursor: progress;
 }
 
+.slots {
+    margin-top: 0.5rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--rtk-line);
+}
+
+.slots h3 {
+    margin: 0 0 0.2rem;
+    font-size: 0.95rem;
+}
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.slot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    min-height: 3.4rem;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--rtk-line);
+    border-radius: 0.8rem;
+    background: var(--rtk-soft);
+    color: var(--rtk-ink);
+    text-align: left;
+    cursor: pointer;
+}
+
+.slot:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.slot-day {
+    font-size: 0.75rem;
+    color: var(--rtk-muted);
+}
+
+.slot-time {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--rtk-accent-deep);
+}
+
 .error {
     margin: 0;
     color: var(--rtk-hot);

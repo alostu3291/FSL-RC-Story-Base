@@ -51,6 +51,12 @@ public with sharing class RLM_RTK_FieldVisit {
         @AuraEnabled public Id treatmentWorkOrderId;
         @AuraEnabled public String treatmentWorkOrderNumber;
         @AuraEnabled public Datetime treatmentScheduledStart;
+        @AuraEnabled public Id treatmentAppointmentId;
+    }
+
+    public class Slot {
+        @AuraEnabled public Datetime startTime;
+        @AuraEnabled public Datetime endTime;
     }
 
     @AuraEnabled
@@ -314,13 +320,14 @@ public with sharing class RLM_RTK_FieldVisit {
             }
             List<WorkOrder> treatments = [
                 SELECT Id, WorkOrderNumber,
-                    (SELECT SchedStartTime FROM ServiceAppointments ORDER BY SchedStartTime ASC NULLS LAST LIMIT 1)
+                    (SELECT Id, SchedStartTime FROM ServiceAppointments ORDER BY SchedStartTime ASC NULLS LAST LIMIT 1)
                 FROM WorkOrder WHERE RLM_Order__c = :o.Id ORDER BY CreatedDate ASC LIMIT 1
             ];
             if (!treatments.isEmpty()) {
                 status.treatmentWorkOrderId = treatments[0].Id;
                 status.treatmentWorkOrderNumber = treatments[0].WorkOrderNumber;
                 if (!treatments[0].ServiceAppointments.isEmpty()) {
+                    status.treatmentAppointmentId = treatments[0].ServiceAppointments[0].Id;
                     status.treatmentScheduledStart = treatments[0].ServiceAppointments[0].SchedStartTime;
                 }
             }
@@ -328,6 +335,133 @@ public with sharing class RLM_RTK_FieldVisit {
         } catch (Exception e) {
             throw auraError(e);
         }
+    }
+
+    /**
+     * Open times for the first treatment, on business days inside the appointment's window, that
+     * don't overlap the running technician's other appointments.
+     */
+    @AuraEnabled
+    public static List<Slot> treatmentSlots(Id appointmentId) {
+        try {
+            ServiceAppointment sa = treatmentAppointment(appointmentId);
+            Integer minutes = durationMinutes(sa);
+            ServiceResource resource = technician();
+            TimeZone zone = sa.ServiceTerritory.OperatingHours.TimeZone == null
+                ? UserInfo.getTimeZone() : TimeZone.getTimeZone(sa.ServiceTerritory.OperatingHours.TimeZone);
+            Datetime windowStart = sa.EarliestStartTime == null || sa.EarliestStartTime < Datetime.now()
+                ? Datetime.now() : sa.EarliestStartTime;
+            Datetime windowEnd = sa.DueDate == null ? windowStart.addDays(SLOT_DAYS) : sa.DueDate;
+
+            List<ServiceAppointment> busy = [
+                SELECT SchedStartTime, SchedEndTime FROM ServiceAppointment
+                WHERE Id IN (SELECT ServiceAppointmentId FROM AssignedResource WHERE ServiceResourceId = :resource.Id)
+                    AND SchedStartTime < :windowEnd AND SchedEndTime > :windowStart
+                    AND Status NOT IN ('Canceled', 'Cannot Complete')
+            ];
+
+            List<Slot> slots = new List<Slot>();
+            Date tomorrow = Date.today().addDays(1);
+            Date day = windowStart.date() > tomorrow ? windowStart.date() : tomorrow;
+            Date knownSunday = Date.newInstance(1900, 1, 7);
+            while (slots.size() < SLOT_COUNT && day <= windowEnd.date()) {
+                Integer weekday = Math.mod(knownSunday.daysBetween(day), 7);
+                if (weekday != 0 && weekday != 6) {
+                    for (Integer hour : SLOT_HOURS) {
+                        Datetime startTime = zonedStart(day, hour, zone);
+                        Datetime endTime = startTime.addMinutes(minutes);
+                        if (startTime < windowStart || endTime > windowEnd || overlaps(busy, startTime, endTime)) {
+                            continue;
+                        }
+                        Slot slot = new Slot();
+                        slot.startTime = startTime;
+                        slot.endTime = endTime;
+                        slots.add(slot);
+                        if (slots.size() == SLOT_COUNT) {
+                            break;
+                        }
+                    }
+                }
+                day = day.addDays(1);
+            }
+            return slots;
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
+    /** Schedules the first treatment at the chosen time and dispatches it to the running technician. */
+    @AuraEnabled
+    public static OrderStatus bookTreatment(Id appointmentId, Datetime startTime, Id quoteId) {
+        try {
+            ServiceAppointment sa = treatmentAppointment(appointmentId);
+            if (startTime == null || startTime < Datetime.now()) {
+                throw new VisitException('Pick a time in the future.');
+            }
+            ServiceResource resource = technician();
+            Datetime endTime = startTime.addMinutes(durationMinutes(sa));
+            sa.SchedStartTime = startTime;
+            sa.SchedEndTime = endTime;
+            sa.ArrivalWindowStartTime = startTime;
+            sa.ArrivalWindowEndTime = startTime.addHours(1);
+            sa.Status = 'Dispatched';
+            update sa;
+            if ([SELECT COUNT() FROM AssignedResource WHERE ServiceAppointmentId = :sa.Id] == 0) {
+                insert new AssignedResource(ServiceAppointmentId = sa.Id, ServiceResourceId = resource.Id);
+            }
+            return orderStatus(quoteId);
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
+    private static final Integer SLOT_COUNT = 6;
+    private static final Integer SLOT_DAYS = 7;
+    private static final List<Integer> SLOT_HOURS = new List<Integer>{ 8, 10, 13, 15 };
+
+    private static ServiceAppointment treatmentAppointment(Id appointmentId) {
+        List<ServiceAppointment> appointments = [
+            SELECT Id, Status, EarliestStartTime, DueDate, Duration, DurationType,
+                ServiceTerritory.OperatingHours.TimeZone
+            FROM ServiceAppointment WHERE Id = :appointmentId
+        ];
+        if (appointments.isEmpty()) {
+            throw new VisitException('The treatment appointment was not found.');
+        }
+        return appointments[0];
+    }
+
+    private static ServiceResource technician() {
+        List<ServiceResource> resources = [
+            SELECT Id FROM ServiceResource WHERE RelatedRecordId = :UserInfo.getUserId() AND IsActive = true LIMIT 1
+        ];
+        if (resources.isEmpty()) {
+            throw new VisitException('You are not set up as a service resource, so the visit is left for dispatch.');
+        }
+        return resources[0];
+    }
+
+    private static Integer durationMinutes(ServiceAppointment sa) {
+        if (sa.Duration == null || sa.Duration <= 0) {
+            return 60;
+        }
+        return (Integer) (sa.DurationType == 'Minutes' ? sa.Duration : sa.Duration * 60);
+    }
+
+    /** The instant when the clock reads day at hour:00 in zone. */
+    private static Datetime zonedStart(Date day, Integer hour, TimeZone zone) {
+        Datetime wall = Datetime.newInstanceGmt(day, Time.newInstance(hour, 0, 0, 0));
+        Datetime guess = wall.addSeconds(-zone.getOffset(wall) / 1000);
+        return wall.addSeconds(-zone.getOffset(guess) / 1000);
+    }
+
+    private static Boolean overlaps(List<ServiceAppointment> busy, Datetime startTime, Datetime endTime) {
+        for (ServiceAppointment b : busy) {
+            if (b.SchedStartTime < endTime && b.SchedEndTime > startTime) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void markAccepted(Id quoteId) {

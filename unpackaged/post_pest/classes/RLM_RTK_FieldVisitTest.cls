@@ -134,6 +134,32 @@ private class RLM_RTK_FieldVisitTest {
     }
 
     @IsTest
+    static void firstTreatmentIsBookedAtAPickedSlot() {
+        insert new ServiceResource(Name = 'Field Visit Tech', RelatedRecordId = UserInfo.getUserId(),
+            ResourceType = 'T', IsActive = true);
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = new ServiceAppointment(ParentRecordId = wo.Id, EarliestStartTime = Datetime.now(),
+            DueDate = Datetime.now().addDays(7), Duration = 1, DurationType = 'Hours');
+        insert sa;
+        Quote q = quoteFor(wo.AccountId);
+
+        List<RLM_RTK_FieldVisit.Slot> slots = RLM_RTK_FieldVisit.treatmentSlots(sa.Id);
+        Assert.areEqual(6, slots.size());
+        Assert.isTrue(slots[0].startTime > Datetime.now());
+        Assert.areEqual(slots[0].startTime.addHours(1), slots[0].endTime);
+
+        RLM_RTK_FieldVisit.bookTreatment(sa.Id, slots[0].startTime, q.Id);
+
+        ServiceAppointment booked = [
+            SELECT Status, SchedStartTime, (SELECT Id FROM ServiceResources) FROM ServiceAppointment WHERE Id = :sa.Id
+        ];
+        Assert.areEqual('Dispatched', booked.Status);
+        Assert.areEqual(slots[0].startTime, booked.SchedStartTime);
+        Assert.areEqual(1, booked.ServiceResources.size());
+        Assert.areNotEqual(slots[0].startTime, RLM_RTK_FieldVisit.treatmentSlots(sa.Id)[0].startTime);
+    }
+
+    @IsTest
     static void otherRecordsAreRejected() {
         WorkOrder wo = inspectionVisit();
         try {
