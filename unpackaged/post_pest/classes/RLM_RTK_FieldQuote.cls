@@ -93,6 +93,7 @@ public with sharing class RLM_RTK_FieldQuote {
             quoteRecord.fieldValues = new Map<String, Object>{
                 'Name' => oppName,
                 'OpportunityId' => opportunity.Id,
+                'QuoteAccountId' => account.Id,
                 'Pricebook2Id' => planEntry.Pricebook2Id,
                 'RLM_Line_of_Business__c' => LOB,
                 'ShippingStreet' => account.ShippingStreet,
