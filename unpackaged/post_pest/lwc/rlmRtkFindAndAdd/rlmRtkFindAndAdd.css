@@ -54,6 +54,10 @@ p {
     letter-spacing: 0.05em;
 }
 
+.notice {
+    margin-top: 0.75rem;
+}
+
 .error {
     margin-top: 0.6rem;
     color: var(--rtk-hot);

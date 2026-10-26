@@ -62,6 +62,12 @@ export default class RlmRtkFindAndAdd extends LightningElement {
     get canEdit() {
         return this.state && !this.state.completed;
     }
+    get isCompleted() {
+        return this.state && this.state.completed;
+    }
+    get isLoading() {
+        return !this.state && !this.error;
+    }
     get hasLines() {
         return this.state && this.state.lines.length > 0;
     }
@@ -77,7 +83,11 @@ export default class RlmRtkFindAndAdd extends LightningElement {
         return money(this.state && this.state.total);
     }
     get summary() {
-        if (!this.hasLines) return 'Log something new and add a one-time service the plan doesn’t cover.';
+        if (!this.hasLines) {
+            return this.isCompleted
+                ? 'No add-ons on this visit.'
+                : 'Log something new and add a one-time service the plan doesn’t cover.';
+        }
         const n = this.state.lines.length;
         return `${n} add-on${n === 1 ? '' : 's'} approved · ${this.linesTotal}, billed when the visit is completed.`;
     }

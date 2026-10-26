@@ -33,6 +33,13 @@
                 </ul>
             </template>
 
+            <template lwc:if={isCompleted}>
+                <p class="muted notice">This visit is complete, so add-ons can't be added. Log new findings on the next visit.</p>
+            </template>
+            <template lwc:if={isLoading}>
+                <p class="muted notice">Loading…</p>
+            </template>
+
             <template lwc:if={canEdit}>
                 <template lwc:if={logging}>
                     <div class="log">
