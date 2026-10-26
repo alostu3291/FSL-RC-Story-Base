@@ -55,4 +55,16 @@ private class RLM_SignAndPayTest {
         System.assertEquals('4242', updated.RLM_Demo_Card_Last4__c);
         System.assertEquals(String.valueOf(ctx.proposal.contentDocumentId), updated.RLM_Demo_Signed_Document_Id__c);
     }
+
+    @IsTest
+    static void pageImage_isNullWithoutARendition() {
+        ContentVersion version = new ContentVersion(
+            Title = 'RLM Quote Proposal', PathOnClient = 'proposal.pdf', VersionData = Blob.valueOf('%PDF-1.4 demo')
+        );
+        insert version;
+
+        System.assertEquals(null, RLM_SignAndPay.pageImage(version.Id, 0));
+        System.assertEquals(null, RLM_SignAndPay.pageImage(version.Id, -1));
+        System.assertEquals(null, RLM_SignAndPay.pageImage(null, 0));
+    }
 }

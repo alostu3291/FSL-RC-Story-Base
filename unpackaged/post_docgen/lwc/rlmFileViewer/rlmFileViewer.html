@@ -10,15 +10,7 @@
             </template>
             <template lwc:elseif={isPdf}>
                 <template for:each={pages} for:item="p">
-                    <img
-                        key={p.key}
-                        class="page"
-                        src={p.src}
-                        alt={p.label}
-                        data-index={p.index}
-                        onload={pageLoaded}
-                        onerror={pageMissing}
-                    />
+                    <img key={p.key} class="page" src={p.src} alt={p.label} />
                 </template>
                 <template lwc:if={loadingMore}>
                     <p class="empty">Loading…</p>

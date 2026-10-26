@@ -111,6 +111,27 @@ public with sharing class RLM_SignAndPay {
         return best;
     }
 
+    /**
+     * One page of a document as a base64, gzip-compressed JPEG, or null past the last page.
+     * The page rendition is always served gzip-encoded, which the Field Service mobile app
+     * can't load in an img tag, so the viewer fetches it here and decompresses it itself.
+     */
+    @AuraEnabled
+    public static String pageImage(Id versionId, Integer page) {
+        if (versionId == null || page == null || page < 0
+                || [SELECT COUNT() FROM ContentVersion WHERE Id = :versionId] == 0) {
+            return null;
+        }
+        PageReference rendition = new PageReference('/sfc/servlet.shepherd/version/renditionDownload');
+        rendition.getParameters().putAll(new Map<String, String>{
+            'rendition' => 'SVGZ', 'versionId' => versionId, 'page' => String.valueOf(page)
+        });
+        Blob content = Test.isRunningTest() ? Blob.valueOf('{"error":"test"}') : rendition.getContent();
+        String encoded = EncodingUtil.base64Encode(content);
+        // Gzip data starts 1f 8b 08, which is "H4sI" in base64; anything else is an error page.
+        return encoded.startsWith('H4sI') ? encoded : null;
+    }
+
     @AuraEnabled
     public static AcceptResponse accept(Id quoteId, Id contentDocumentId, String signerName, String cardLast4, String cardBrand) {
         AcceptRequest req = new AcceptRequest();
