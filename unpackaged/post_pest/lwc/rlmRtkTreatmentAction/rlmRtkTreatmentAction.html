@@ -2,7 +2,7 @@
     <template lwc:if={recordId}>
         <c-rlm-rtk-treatment-checklist class="checklist" record-id={recordId}></c-rlm-rtk-treatment-checklist>
         <c-rlm-rtk-find-and-add record-id={recordId} onfindingadded={handleFindingAdded}></c-rlm-rtk-find-and-add>
-        <c-rlm-rtk-plan-change record-id={recordId}></c-rlm-rtk-plan-change>
+        <c-rlm-rtk-plan-change class="plan-change" record-id={recordId}></c-rlm-rtk-plan-change>
         <div class="complete">
             <template lwc:if={completedNumber}>
                 <p class="done">Work order {completedNumber} and its appointment are complete. Any approved add-ons are being billed.</p>

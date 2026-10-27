@@ -30,6 +30,11 @@ export default class RlmRtkPlanChange extends LightningElement {
         this.load();
     }
 
+    @api
+    refresh() {
+        return this.load();
+    }
+
     async load() {
         try {
             this.apply(await getState({ recordId: this.recordId }));
@@ -69,7 +74,9 @@ export default class RlmRtkPlanChange extends LightningElement {
         if (!this.state) return 'Upgrade, downgrade or add a plan.';
         if (!this.state.hasPlans) return 'No active plan yet. Use Inspect & Quote to start one.';
         const plan = this.state.currentPlanName || 'Current plans';
-        return `${plan} · ${money(this.state.monthlyTotal)}/mo`;
+        const recommended = this.allPlans.filter((p) => p.recommended).length;
+        const hint = recommended && this.canChange ? ` · ${recommended} recommended from findings` : '';
+        return `${plan} · ${money(this.state.monthlyTotal)}/mo${hint}`;
     }
     get hasScheduled() {
         return this.state && this.state.scheduled.length > 0;
