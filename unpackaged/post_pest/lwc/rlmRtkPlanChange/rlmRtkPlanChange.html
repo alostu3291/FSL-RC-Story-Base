@@ -1,0 +1,95 @@
+<template>
+    <section class="plan">
+        <div class="head">
+            <div>
+                <h2>Change the plan</h2>
+                <p class="muted">{summary}</p>
+            </div>
+            <button type="button" class="secondary" onclick={toggle}>{toggleLabel}</button>
+        </div>
+
+        <template lwc:if={open}>
+            <template lwc:if={error}>
+                <p class="error">{error}</p>
+            </template>
+            <template lwc:if={isLoading}>
+                <p class="muted notice">Loading…</p>
+            </template>
+
+            <template lwc:if={hasScheduled}>
+                <template for:each={scheduledView} for:item="s">
+                    <div key={s.orderId} class="scheduled">
+                        <p class="line-name">{s.summary}</p>
+                        <p class="muted">{s.meta}</p>
+                        <p class="muted">{s.approvedBy}</p>
+                    </div>
+                </template>
+            </template>
+            <template lwc:if={lockedReason}>
+                <p class="muted notice">{lockedReason}</p>
+            </template>
+
+            <template lwc:if={state}>
+                <h3>Plan</h3>
+                <div class="addons">
+                    <template for:each={tiersView} for:item="p">
+                        <button key={p.sku} type="button" class={p.cls} data-sku={p.sku} disabled={p.disabled} onclick={choose}>
+                            <span class="addon-top">
+                                <span class="addon-name">{p.name}</span>
+                                <span class="price">{p.priceLabel}</span>
+                            </span>
+                            <template lwc:if={p.badge}>
+                                <span class={p.badgeCls}>{p.badge}</span>
+                            </template>
+                            <span class="muted">{p.description}</span>
+                            <template lwc:if={p.changeLabel}>
+                                <span class="change">{p.changeLabel}</span>
+                            </template>
+                            <template lwc:if={p.recommended}>
+                                <span class="reason">Because: {p.reason}</span>
+                            </template>
+                        </button>
+                    </template>
+                </div>
+
+                <h3>Add-on plans</h3>
+                <div class="addons">
+                    <template for:each={addOnPlansView} for:item="p">
+                        <button key={p.sku} type="button" class={p.cls} data-sku={p.sku} disabled={p.disabled} onclick={choose}>
+                            <span class="addon-top">
+                                <span class="addon-name">{p.name}</span>
+                                <span class="price">{p.priceLabel}</span>
+                            </span>
+                            <template lwc:if={p.badge}>
+                                <span class={p.badgeCls}>{p.badge}</span>
+                            </template>
+                            <span class="muted">{p.description}</span>
+                            <template lwc:if={p.changeLabel}>
+                                <span class="change">{p.changeLabel}</span>
+                            </template>
+                            <template lwc:if={p.recommended}>
+                                <span class="reason">Because: {p.reason}</span>
+                            </template>
+                        </button>
+                    </template>
+                </div>
+            </template>
+
+            <template lwc:if={hasSelection}>
+                <div class="approve">
+                    <div class="totals">
+                        <span>Now</span>
+                        <span class="price">{currentTotalLabel}</span>
+                    </div>
+                    <div class="totals">
+                        <span>From {startLabel}</span>
+                        <span class="price">{newTotalLabel}</span>
+                    </div>
+                    <p class="muted">Hand the device to the customer to approve. The change starts {startLabel} and is billed right away.</p>
+                    <lightning-input label="Customer name" value={approver} onchange={handleApprover}></lightning-input>
+                    <button type="button" class="primary wide" disabled={cannotApprove} onclick={approve}>{approveLabel}</button>
+                </div>
+            </template>
+        </template>
+    </section>
+</template>

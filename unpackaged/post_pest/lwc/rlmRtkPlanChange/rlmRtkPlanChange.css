@@ -1,0 +1,279 @@
+:host {
+    --rtk-ink: #14241a;
+    --rtk-muted: #5b6b62;
+    --rtk-line: #d7e2db;
+    --rtk-soft: #eef5f0;
+    --rtk-accent: #1f7a4d;
+    --rtk-accent-deep: #145c38;
+    --rtk-hot: #b42318;
+    display: block;
+    color: var(--rtk-ink);
+}
+
+.plan {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--rtk-line);
+    border-radius: 1rem;
+    background: #fff;
+}
+
+.head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+h2 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+h3 {
+    margin: 1rem 0 0.5rem;
+    font-size: 0.95rem;
+}
+
+p {
+    margin: 0;
+}
+
+.muted {
+    color: var(--rtk-muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.label {
+    margin: 0.6rem 0 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--rtk-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.notice {
+    margin-top: 0.75rem;
+}
+
+.error {
+    margin-top: 0.6rem;
+    color: var(--rtk-hot);
+    font-size: 0.85rem;
+}
+
+.lines {
+    margin: 0.75rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lines li {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rtk-line);
+}
+
+.line-name {
+    font-weight: 700;
+}
+
+.line-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.price {
+    font-weight: 700;
+    color: var(--rtk-accent-deep);
+    white-space: nowrap;
+}
+
+.addons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.addon {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    border: 1px solid var(--rtk-line);
+    border-radius: 0.8rem;
+    background: #fff;
+    color: var(--rtk-ink);
+    text-align: left;
+    cursor: pointer;
+}
+
+.addon.on {
+    border-color: var(--rtk-accent);
+    background: var(--rtk-soft);
+    box-shadow: inset 0 0 0 1px var(--rtk-accent);
+}
+
+.addon.added {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.addon-top {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.addon-name {
+    font-weight: 700;
+}
+
+.badge {
+    padding: 0.1rem 0.5rem;
+    border-radius: 1rem;
+    background: var(--rtk-accent);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.badge.added {
+    background: var(--rtk-muted);
+}
+
+.reason {
+    font-size: 0.8rem;
+    color: var(--rtk-accent-deep);
+    font-weight: 600;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.chip {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--rtk-line);
+    border-radius: 1rem;
+    background: #fff;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.chip.on {
+    border-color: var(--rtk-accent);
+    background: var(--rtk-accent);
+    color: #fff;
+}
+
+.log,
+.approve {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.8rem;
+    background: var(--rtk-soft);
+}
+
+.log h3 {
+    margin-top: 0;
+}
+
+.approve {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bar {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+}
+
+.primary,
+.secondary {
+    min-height: 2.6rem;
+    padding: 0 1rem;
+    border-radius: 0.8rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.primary {
+    border: none;
+    background: var(--rtk-accent);
+    color: #fff;
+}
+
+.secondary {
+    border: 1px solid var(--rtk-line);
+    background: #fff;
+    color: var(--rtk-ink);
+}
+
+.wide {
+    width: 100%;
+    margin-top: 0.75rem;
+}
+
+.primary:disabled,
+.secondary:disabled,
+.link:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.link {
+    border: none;
+    background: none;
+    color: var(--rtk-hot);
+    font-size: 0.8rem;
+    padding: 0;
+    cursor: pointer;
+}
+
+.addon.current {
+    cursor: default;
+    border-color: var(--rtk-accent-deep);
+}
+
+.badge.current {
+    background: var(--rtk-accent-deep);
+}
+
+.badge.remove {
+    background: var(--rtk-hot);
+}
+
+.change {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--rtk-muted);
+}
+
+.scheduled {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.8rem;
+    background: var(--rtk-soft);
+    border-left: 4px solid var(--rtk-accent);
+}
+
+.totals {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Rentokil Plan Change</masterLabel>
+    <description>Upgrade, downgrade, add or remove the customer's service plans from the field, approved by the customer on the device.</description>
+</LightningComponentBundle>

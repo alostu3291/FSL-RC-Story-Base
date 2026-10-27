@@ -15,27 +15,38 @@ public with sharing class RLM_FSL_InvoiceOrder {
     }
 
     public static void enqueue(Set<Id> orderIds) {
-        System.enqueueJob(new InvoiceJob(orderIds, 1), RETRY_DELAY_MINUTES);
+        enqueue(orderIds, Date.today());
+    }
+
+    /** Invoices billing up to targetDate, so a change that starts on a later day gets its first bill. */
+    public static void enqueue(Set<Id> orderIds, Date targetDate) {
+        System.enqueueJob(new InvoiceJob(orderIds, 1, targetDate), RETRY_DELAY_MINUTES);
     }
 
     public class InvoiceJob implements Queueable {
         private final Set<Id> orderIds;
         private final Integer attempt;
+        private final Date targetDate;
 
         public InvoiceJob(Set<Id> orderIds, Integer attempt) {
+            this(orderIds, attempt, Date.today());
+        }
+
+        public InvoiceJob(Set<Id> orderIds, Integer attempt, Date targetDate) {
             this.orderIds = orderIds;
             this.attempt = attempt;
+            this.targetDate = targetDate;
         }
 
         public void execute(QueueableContext context) {
             List<String> scheduleIds = readyScheduleIds(orderIds);
             if (scheduleIds.isEmpty()) {
                 if (attempt < MAX_ATTEMPTS && !Test.isRunningTest()) {
-                    System.enqueueJob(new InvoiceJob(orderIds, attempt + 1), RETRY_DELAY_MINUTES);
+                    System.enqueueJob(new InvoiceJob(orderIds, attempt + 1, targetDate), RETRY_DELAY_MINUTES);
                 }
                 return;
             }
-            ConnectApi.RevenueAsyncRepresentation result = ConnectApi.Billing.generateInvoices(buildRequest(scheduleIds));
+            ConnectApi.RevenueAsyncRepresentation result = ConnectApi.Billing.generateInvoices(buildRequest(scheduleIds, targetDate));
             if (result.success != true) {
                 System.debug(LoggingLevel.ERROR, 'Invoice generation failed for ' + orderIds + ': ' + JSON.serialize(result.errors));
             }
@@ -59,12 +70,17 @@ public with sharing class RLM_FSL_InvoiceOrder {
 
     @TestVisible
     private static ConnectApi.InvoiceInputRepresentation buildRequest(List<String> scheduleIds) {
-        String today = String.valueOf(Date.today());
+        return buildRequest(scheduleIds, Date.today());
+    }
+
+    @TestVisible
+    private static ConnectApi.InvoiceInputRepresentation buildRequest(List<String> scheduleIds, Date targetDate) {
+        Date today = Date.today();
         ConnectApi.InvoiceInputRepresentation input = new ConnectApi.InvoiceInputRepresentation();
         input.action = ConnectApi.InvoiceAction.Posted;
         input.billingScheduleIds = scheduleIds;
-        input.invoiceDate = today;
-        input.targetDate = today;
+        input.invoiceDate = String.valueOf(today);
+        input.targetDate = String.valueOf(targetDate == null || targetDate < today ? today : targetDate);
         return input;
     }
 }
