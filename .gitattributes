@@ -19,3 +19,6 @@
 *.pdf binary
 *.zip binary
 *.asset binary
+
+# Binary documents
+*.pptx binary
