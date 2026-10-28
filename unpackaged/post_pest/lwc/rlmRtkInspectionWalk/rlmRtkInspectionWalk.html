@@ -143,7 +143,7 @@
                                 onchange={handleDictation}
                             ></lightning-textarea>
                             <div class="dictate-actions">
-                                <template lwc:if={canListen}>
+                                <template lwc:if={showSpeak}>
                                     <button type="button" class="btn ghost" onclick={toggleListening}>
                                         <lightning-icon icon-name="utility:unmuted" size="x-small" alternative-text=""></lightning-icon>
                                         {listenLabel}
@@ -154,6 +154,9 @@
                                 </template>
                                 <button type="button" class="btn ai" onclick={fillFromNotes} disabled={fillDisabled}>{fillLabel}</button>
                             </div>
+                            <template lwc:if={speechNote}>
+                                <p class="hint">{speechNote}</p>
+                            </template>
                         </div>
                         <template lwc:if={filledBy}>
                             <p class="ai-filled">
