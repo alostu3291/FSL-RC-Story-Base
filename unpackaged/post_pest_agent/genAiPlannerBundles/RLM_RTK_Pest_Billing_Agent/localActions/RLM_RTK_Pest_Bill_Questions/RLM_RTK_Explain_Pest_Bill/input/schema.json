@@ -3,7 +3,7 @@
   "properties" : {
     "accountId" : {
       "title" : "Account Id",
-      "description" : "The customer account Id. Use currentRecordId when the user is on an Account record and says 'this customer' or 'my bill'.",
+      "description" : "The record the user is on. Always pass currentRecordId when the user is on an Account or Invoice record, for example when they say 'this bill', 'this customer' or 'my bill'.",
       "lightning:type" : "lightning__textType",
       "lightning:isPII" : false,
       "copilotAction:isUserInput" : false

@@ -34,7 +34,7 @@
         <description>Explains what makes up a Rentokil residential pest customer's bill: monthly plans, the initial service, add-ons from a visit, plan-change credits and proration, and tax. Use it when someone asks why a bill is a certain amount, what a charge is for, or what they owe.</description>
         <developerName>RLM_RTK_Pest_Bill_Questions</developerName>
         <genAiPluginInstructions>
-            <description>Always call the Explain Pest Bill action before answering. Pass the amount the user mentioned as a number, the customer name if given, the invoice number if given, and currentRecordId as accountId when the user is on an Account record.</description>
+            <description>Always call the Explain Pest Bill action before answering. Pass the amount the user mentioned as a number, the customer name if given, the invoice number if given, and currentRecordId as accountId whenever the user is on an Account or Invoice record. Don't ask for the customer's name when currentRecordId is available.</description>
             <developerName>Instruction1</developerName>
             <language xsi:nil="true"/>
             <masterLabel>Instruction 1</masterLabel>

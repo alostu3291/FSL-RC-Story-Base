@@ -5,7 +5,7 @@
  */
 public with sharing class RLM_RTK_BillExplainer {
     public class Request {
-        @InvocableVariable(label='Account Id' description='The customer account, when the user is on its record.')
+        @InvocableVariable(label='Account Id' description='The record the user is on: a customer account or one of its invoices.')
         public Id accountId;
         @InvocableVariable(label='Account Name' description='The customer name the user mentioned, for example Sam Patel.')
         public String accountName;
@@ -81,6 +81,15 @@ public with sharing class RLM_RTK_BillExplainer {
     private static Account findAccount(Request request) {
         if (request.accountId != null && request.accountId.getSobjectType() == Account.SObjectType) {
             return accountWhere(request.accountId, null);
+        }
+        if (request.accountId != null && request.accountId.getSobjectType() == Invoice.SObjectType) {
+            List<Invoice> onRecord = [SELECT BillingAccountId, DocumentNumber FROM Invoice WHERE Id = :request.accountId];
+            if (!onRecord.isEmpty()) {
+                if (String.isBlank(request.invoiceNumber)) {
+                    request.invoiceNumber = onRecord[0].DocumentNumber;
+                }
+                return accountWhere(onRecord[0].BillingAccountId, null);
+            }
         }
         if (String.isNotBlank(request.invoiceNumber)) {
             List<Invoice> invoices = [SELECT BillingAccountId FROM Invoice WHERE DocumentNumber = :request.invoiceNumber.trim() LIMIT 1];
