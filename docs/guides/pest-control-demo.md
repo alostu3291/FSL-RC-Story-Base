@@ -87,6 +87,24 @@ No treatment work order exists until the customer has been inspected, quoted and
 - **Viewing files:** LWCs in the app don't load from the org's domain and only support `standard__webPage` navigation, so relative `/sfc/servlet.shepherd` URLs and the `filePreview` page both fail there. Photos use the absolute `ContentVersion.VersionDataUrl`, and tapping a photo or the proposal opens `rlmFileViewer`, which shows images directly and PDFs as page images. The page rendition (`SVGZ`, `page=N`) is always served gzip-encoded, which the app can't load in an img tag, so `RLM_SignAndPay.pageImage` fetches each page and the viewer decompresses it (`DecompressionStream`).
 - LWC actions live in each layout's `platformActionList` (`templates/layouts/pest/`); the Metadata API rejects them in `quickActionList`. Fully quit and reopen the iOS app after deploying LWC changes.
 
+## Recurring visits and guarantees (Scenes 6–7)
+
+Completing the **Initial Pest Treatment** work order starts Field Service coverage (`RLM_RTK_WorkOrderTrigger` → `RLM_RTK_Coverage`, in a queueable). For each active plan asset (quantity above zero) it creates:
+
+| Plan | Guarantee entitlement covers (`Entitlement.RLM_RTK_Covered_Pests__c`) | Visit rule (work type) |
+|------|------|------|
+| Essential | Ants, Spiders, Cockroaches | Quarterly (`Quarterly Pest Visit`) |
+| Home Protection | Essential + Rodents | Monthly (`Monthly Pest Visit`) |
+| Home Protection Plus | Home Protection + Wasps / Bees, Other | Monthly (`Monthly Pest Visit`) |
+| Seasonal Mosquito | Mosquitoes | Monthly, April through October only (`Mosquito Visit`) |
+| Termite | Termites | Yearly (`Termite Monitoring`) |
+
+- **One maintenance plan per customer** ("Rentokil recurring service"), with a maintenance asset and rule per plan. It generates one work order per visit date with a line per plan due that day (`WorkOrderLineItemPerAsset`) and one appointment per work order, over a four-month window. `RLM_RTK_Generate_Maintenance_Visits` runs the standard Generate Work Orders action, which Apex can't call directly; **Generate Work Orders** on the plan extends the schedule. Auto-generation is off, because the platform blocks manual generation on auto-generating plans.
+- **Generated visits** get the work type, territory, address and contact of the customer's latest visit, and their accepted inspection, so **Treatment** shows the original findings. The recurring work types don't auto-create appointments (`ShouldAutoCreateSvcAppt = false`); the plan creates the one appointment.
+- **Re-service:** create a **Pest Re-service** work order on the account and set **Reported Pest**. An active guarantee that lists the pest marks it **Covered**, links the entitlement and its asset, and it's free. Otherwise it's **Not Covered**, and completing it bills `RTK-RESERVICE` ($149) through `RLM_FSL_Bill_Uncovered_Repair`: a "Re-service Visit - WO …" order and a posted invoice. Coverage is rechecked when the pest changes and frozen once the work order is completed.
+- **Existing customers:** `prepare_pest` step 11 (`setup_rtk_grow`) backfills coverage for every customer with an active plan and generates their visits. It's safe to re-run.
+- Plan changes (upgrade, mosquito pause, renewal, cancellation) don't update the entitlements or maintenance assets yet.
+
 ## Rentokil documents
 
 With `docgen: true`, `prepare_pest` steps 12–14 deploy `unpackaged/post_pest_docgen`:
@@ -128,8 +146,8 @@ Every AI feature suggests and the technician or customer decides. Prices always 
 | 3 | Sign & pay | **Why this plan** on screen and in the PDF; **Create Proposal** → preview → **Sign & Pay** (mock card + signature tied to the PDF), or Quote highlight **Sign & Pay** after a proposal exists → Create Order |
 | 4 | Plan builds itself | Activate Order → assets per plan, DRO fulfillment plan creates the Initial Pest Treatment WO + Service Appointment; `RTK-INITIAL` billing schedule waits on the "Initial Treatment Complete" milestone, monthly plans are Ready for Invoicing |
 | 5 | First treatment | Complete WO → fulfillment step completed, milestone accomplished, order invoiced (`RLM_FSL_Complete_Fulfillment_Step`); **Ask Einstein** in Find & Add; **visit summary** emailed |
-| 6 | Recurring visits | Maintenance Plan quarterly WOs (routing = package vision) |
-| 7 | Re-service | Coverage check; free under plan, else `RTK-RESERVICE` via `RLM_FSL_BillRepair` |
+| 6 | Recurring visits | Account → Maintenance Plans → "Rentokil recurring service": a rule per plan and the generated visits (Michael's Home Protection Plus is monthly; mosquito resumes in April); routing = package vision |
+| 7 | Re-service | Pest Re-service WO with **Reported Pest**: Ants → Covered by the Home Protection guarantee, free; Bed Bugs → Not Covered, completion bills `RTK-RESERVICE` via `RLM_FSL_BillRepair` |
 | 8 | Upsell & upgrade | Find & Add finding → **Change the plan** (Termite add or tier upgrade) on an amendment order, invoiced; **Ask Einstein**; billing agent explains the prorated bill |
 | 9 | Pause / renew | Mosquito qty amendment Nov/Apr; renew plan asset; billing agent answers "why is my bill $366?" |
 

@@ -75,6 +75,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>RLM_RTK_Reported_Pest__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>EntitlementId</field>
             </layoutItems>
             <layoutItems>

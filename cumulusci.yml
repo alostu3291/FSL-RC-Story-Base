@@ -1653,12 +1653,12 @@ tasks:
 
   deploy_post_pest:
     group: Revenue Lifecycle Management
-    description: Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, and the RLM_RTK_BillExplainer agent action). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest and RLM_RTK_BillExplainerTest.
+    description: Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, the RLM_RTK_BillExplainer agent action, and Field Service coverage through RLM_RTK_Coverage and the RLM_RTK_WorkOrderTrigger, which on Initial Pest Treatment completion creates a guarantee Entitlement per plan asset (Covered Pests) and one Maintenance Plan with per-plan visit rules, generated through the RLM_RTK_Generate_Maintenance_Visits flow, and marks Pest Re-service Work Orders Covered or Not Covered from their Reported Pest). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest, RLM_RTK_BillExplainerTest and RLM_RTK_CoverageTest.
     class_path: cumulusci.tasks.salesforce.Deploy
     options:
       path: unpackaged/post_pest
       test_level: RunSpecifiedTests
-      specified_tests: RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest,RLM_RTK_FieldVisitTest,RLM_RTK_FieldAddOnTest,RLM_RTK_PlanChangeTest,RLM_RTK_AITest,RLM_RTK_BillExplainerTest
+      specified_tests: RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest,RLM_RTK_FieldVisitTest,RLM_RTK_FieldAddOnTest,RLM_RTK_PlanChangeTest,RLM_RTK_AITest,RLM_RTK_BillExplainerTest,RLM_RTK_CoverageTest
 
   deploy_post_pest_ai:
     group: Revenue Lifecycle Management
@@ -1720,7 +1720,7 @@ tasks:
 
   insert_pest_fsl_data:
     group: Revenue Lifecycle Management
-    description: Insert Rentokil Field Service foundation (Bloomingdale OperatingHours, ServiceTerritory, WorkTypes)
+    description: Insert Rentokil Field Service foundation (Bloomingdale OperatingHours, ServiceTerritory, WorkTypes including the Monthly, Quarterly, Mosquito and Termite Monitoring recurring visit types)
     class_path: tasks.rlm_sfdmu.LoadSFDMUData
     options:
       pathtoexportjson: *pest_fsl_dataset
@@ -1749,7 +1749,7 @@ tasks:
 
   setup_rtk_grow:
     group: Revenue Lifecycle Management
-    description: Idempotently create Michael Reyes Maintenance Plan, MaintenanceAsset, and quarterly MaintenanceWorkRule after the pest order is placed.
+    description: Idempotently start Field Service coverage for every pest customer with an active plan (guarantee Entitlements, one Maintenance Plan with per-plan visit rules) and generate their visits. New customers get this automatically when their Initial Pest Treatment is completed.
     class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
     options:
       path: scripts/apex/setupRtkGrow.apex

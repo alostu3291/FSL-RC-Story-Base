@@ -536,7 +536,7 @@ public with sharing class RLM_RTK_AI {
             this.wo = wo;
             customer = wo.Contact?.Name != null ? wo.Contact.Name : wo.Account?.Name;
             workOrderNumber = wo.WorkOrderNumber;
-            isTreatment = wo.RLM_Order__c != null || wo.RLM_RTK_Inspection__c == null && wo.WorkType?.Name != null
+            isTreatment = wo.RLM_Order__c != null || wo.WorkType?.Name != null
                 && !wo.WorkType.Name.containsIgnoreCase('inspection');
             reason = String.isNotBlank(wo.Description) ? wo.Description.abbreviate(300) : wo.Subject;
             if (wo.AccountId == null) {

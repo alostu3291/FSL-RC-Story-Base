@@ -1,5 +1,8 @@
 Description,DurationType,EstimatedDuration,Name,ShouldAutoCreateSvcAppt
 Initial cleanout and exclusion after signup,Hours,2,Initial Pest Treatment,true
+Monthly residential pest maintenance visit (Home Protection plans),Hours,1,Monthly Pest Visit,false
+Seasonal mosquito treatment visit (April through October),Hours,1,Mosquito Visit,false
 Free in-home inspection and quote before any treatment is booked,Hours,1,Pest Inspection,true
-Quarterly residential pest maintenance visit,Hours,1,Quarterly Pest Visit,true
+Quarterly residential pest maintenance visit,Hours,1,Quarterly Pest Visit,false
 Guarantee re-service or billable follow-up,Hours,1,Pest Re-service,true
+Annual termite monitoring visit,Hours,1,Termite Monitoring,false

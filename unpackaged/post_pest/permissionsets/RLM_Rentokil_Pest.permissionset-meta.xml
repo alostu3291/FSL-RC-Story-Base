@@ -12,6 +12,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>RLM_RTK_Coverage</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>RLM_RTK_FieldQuote</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -39,6 +43,16 @@
         <apexClass>RLM_SignAndPay</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Entitlement.RLM_RTK_Covered_Pests__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>WorkOrder.RLM_RTK_Reported_Pest__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>WorkOrder.RLM_RTK_AI_Brief__c</field>

@@ -92,7 +92,8 @@ insert newSkills;
 Map<String, Id> workTypeByName = new Map<String, Id>();
 for (WorkType wt : [
     SELECT Id, Name FROM WorkType
-    WHERE Name IN ('Pest Inspection', 'Initial Pest Treatment', 'Quarterly Pest Visit', 'Pest Re-service')
+    WHERE Name IN ('Pest Inspection', 'Initial Pest Treatment', 'Quarterly Pest Visit', 'Monthly Pest Visit',
+        'Mosquito Visit', 'Termite Monitoring', 'Pest Re-service')
 ]) {
     workTypeByName.put(wt.Name, wt.Id);
 }
@@ -100,6 +101,9 @@ Map<String, String> workTypeSkill = new Map<String, String>{
     'Pest Inspection' => 'General Pest',
     'Initial Pest Treatment' => 'General Pest',
     'Quarterly Pest Visit' => 'General Pest',
+    'Monthly Pest Visit' => 'General Pest',
+    'Mosquito Visit' => 'Mosquito',
+    'Termite Monitoring' => 'Termite',
     'Pest Re-service' => 'General Pest'
 };
 Set<String> existingReq = new Set<String>();

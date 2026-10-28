@@ -1,9 +1,15 @@
 // Delete Rentokil pest demo configuration data (not transactional quotes/orders).
-// Dependency order: junctions → work types/territory → related components → price book → products → zones.
+// Dependency order: coverage → junctions → work types/territory → related components → price book → products → zones.
+
+List<MaintenancePlan> plans = [SELECT Id FROM MaintenancePlan WHERE MaintenancePlanTitle = 'Rentokil recurring service'];
+delete [SELECT Id FROM WorkOrder WHERE MaintenancePlanId IN :plans AND Status = 'New'];
+delete plans;
+delete [SELECT Id FROM Entitlement WHERE RLM_RTK_Covered_Pests__c != null];
 
 List<WorkType> workTypes = [
     SELECT Id FROM WorkType
-    WHERE Name IN ('Initial Pest Treatment', 'Quarterly Pest Visit', 'Pest Re-service')
+    WHERE Name IN ('Initial Pest Treatment', 'Quarterly Pest Visit', 'Monthly Pest Visit', 'Mosquito Visit',
+        'Termite Monitoring', 'Pest Re-service')
 ];
 if (!workTypes.isEmpty()) {
     delete [SELECT Id FROM SkillRequirement WHERE RelatedRecordId IN :workTypes];

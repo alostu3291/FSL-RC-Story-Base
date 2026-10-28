@@ -93,7 +93,8 @@ public with sharing class RLM_FSL_BillRepair {
             RevSalesTrxn.RecordResource orderRecord = new RevSalesTrxn.RecordResource(Order.SObjectType, 'POST');
             orderRecord.fieldValues = new Map<String, Object>{
                 'AccountId' => workOrder.AccountId, 'Pricebook2Id' => entry.Pricebook2Id, 'EffectiveDate' => today,
-                'Status' => 'Draft', 'CurrencyIsoCode' => 'USD', 'Name' => 'Break/Fix Repair - WO ' + workOrder.WorkOrderNumber,
+                'Status' => 'Draft', 'CurrencyIsoCode' => 'USD',
+                'Name' => (skuFor(workOrder) == PEST_RESERVICE_SKU ? 'Re-service Visit - WO ' : 'Break/Fix Repair - WO ') + workOrder.WorkOrderNumber,
                 'ShippingStreet' => account.ShippingStreet, 'ShippingCity' => account.ShippingCity,
                 'ShippingState' => account.ShippingState, 'ShippingPostalCode' => account.ShippingPostalCode,
                 'ShippingCountry' => account.ShippingCountry, 'BillingStreet' => account.BillingStreet,

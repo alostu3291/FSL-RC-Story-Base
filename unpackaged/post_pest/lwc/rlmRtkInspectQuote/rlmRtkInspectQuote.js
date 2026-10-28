@@ -7,7 +7,7 @@ const PLANS = [
         name: 'Essential',
         price: 45,
         blurb: 'General pest coverage for smaller homes',
-        features: ['Monthly visits', 'Ants, spiders, roaches']
+        features: ['Quarterly visits', 'Ants, spiders, roaches']
     },
     {
         sku: 'RTK-HOME-PROT',
