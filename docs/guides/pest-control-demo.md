@@ -99,11 +99,15 @@ Completing the **Initial Pest Treatment** work order starts Field Service covera
 | Seasonal Mosquito | Mosquitoes | Monthly, April through October only (`Mosquito Visit`) |
 | Termite | Termites | Yearly (`Termite Monitoring`) |
 
-- **One maintenance plan per customer** ("Rentokil recurring service"), with a maintenance asset and rule per plan. It generates one work order per visit date with a line per plan due that day (`WorkOrderLineItemPerAsset`) and one appointment per work order, over a four-month window. `RLM_RTK_Generate_Maintenance_Visits` runs the standard Generate Work Orders action, which Apex can't call directly; **Generate Work Orders** on the plan extends the schedule. Auto-generation is off, because the platform blocks manual generation on auto-generating plans.
+- **One maintenance plan per customer** ("Rentokil recurring service"), with a maintenance asset and rule per plan. It generates one work order per visit date with a line per plan due that day (`WorkOrderLineItemPerAsset`) and one appointment per work order, for the next four months. `RLM_RTK_Generate_Maintenance_Visits` runs the standard Generate Work Orders action, which Apex can't call directly. Auto-generation is off, because the platform blocks manual generation on auto-generating plans; the nightly sync below generates instead, so the schedule always reaches four months ahead.
 - **Generated visits** get the work type, territory, address and contact of the customer's latest visit, and their accepted inspection, so **Treatment** shows the original findings. The recurring work types don't auto-create appointments (`ShouldAutoCreateSvcAppt = false`); the plan creates the one appointment.
 - **Re-service:** create a **Pest Re-service** work order on the account and set **Reported Pest**. An active guarantee that lists the pest marks it **Covered**, links the entitlement and its asset, and it's free. Otherwise it's **Not Covered**, and completing it bills `RTK-RESERVICE` ($149) through `RLM_FSL_Bill_Uncovered_Repair`: a "Re-service Visit - WO …" order and a posted invoice. Coverage is rechecked when the pest changes and frozen once the work order is completed.
 - **Existing customers:** `prepare_pest` step 11 (`setup_rtk_grow`) backfills coverage for every customer with an active plan and generates their visits. It's safe to re-run.
-- Plan changes (upgrade, mosquito pause, renewal, cancellation) don't update the entitlements or maintenance assets yet.
+- **Coverage follows the plan.** Upgrades, downgrades, pauses, renewals and cancellations all land in the assets' state periods, so `RLM_RTK_Coverage.sync` rebuilds coverage from them:
+  - **Guarantees:** one entitlement per active stretch of a plan asset. An upgrade ends the old tier's guarantee the day before the change and starts the new tier's; a pause ends the guarantee at the pause and adds "… guarantee from <date>" for the resume; a renewal or cancellation moves the end date. Re-service checks use the guarantee active that day.
+  - **Upcoming visits:** a visit line for a day the plan isn't active moves to the tier that replaced it, so an upgrade keeps the customer's visit days; otherwise it's removed, along with the visit and its appointment when no lines are left. Visits take the work type of their leading plan.
+  - **Visit rules:** an ended plan's rule is removed, a paused plan's rule skips to the first visit after it resumes, and a new plan gets a rule (continuing after any visits it took over). The maintenance plan's work type follows the plan that leads the remaining visits.
+- **When it syncs:** `RLM_RTK_AssetTrigger` syncs a customer a minute after any plan asset changes, which is when assetization finishes (from **Change the plan** or the standard Amend, Renew and Cancel actions). The **RLM RTK Nightly Coverage Sync** scheduled flow syncs every customer at 3 AM org time, which also covers changes that take effect that day, and generates visits as the four-month window moves forward.
 
 ## Rentokil documents
 
@@ -148,8 +152,8 @@ Every AI feature suggests and the technician or customer decides. Prices always 
 | 5 | First treatment | Complete WO → fulfillment step completed, milestone accomplished, order invoiced (`RLM_FSL_Complete_Fulfillment_Step`); **Ask Einstein** in Find & Add; **visit summary** emailed |
 | 6 | Recurring visits | Account → Maintenance Plans → "Rentokil recurring service": a rule per plan and the generated visits (Michael's Home Protection Plus is monthly; mosquito resumes in April); routing = package vision |
 | 7 | Re-service | Pest Re-service WO with **Reported Pest**: Ants → Covered by the Home Protection guarantee, free; Bed Bugs → Not Covered, completion bills `RTK-RESERVICE` via `RLM_FSL_BillRepair` |
-| 8 | Upsell & upgrade | Find & Add finding → **Change the plan** (Termite add or tier upgrade) on an amendment order, invoiced; **Ask Einstein**; billing agent explains the prorated bill |
-| 9 | Pause / renew | Mosquito qty amendment Nov/Apr; renew plan asset; billing agent answers "why is my bill $366?" |
+| 8 | Upsell & upgrade | Find & Add finding → **Change the plan** (Termite add or tier upgrade) on an amendment order, invoiced; a minute later the new plan's guarantee and visits replace the old tier's (same visit days); **Ask Einstein**; billing agent explains the prorated bill |
+| 9 | Pause / renew | Mosquito qty amendment Nov/Apr splits the mosquito guarantee around the pause; renew plan asset extends its guarantee; billing agent answers "why is my bill $366?" |
 
 ## Driver
 

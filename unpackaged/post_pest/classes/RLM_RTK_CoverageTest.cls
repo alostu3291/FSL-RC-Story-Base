@@ -136,4 +136,181 @@ private class RLM_RTK_CoverageTest {
         Assert.areEqual(2, [SELECT COUNT() FROM Entitlement WHERE AccountId = :account.Id]);
         Assert.areEqual(1, [SELECT COUNT() FROM MaintenancePlan WHERE AccountId = :account.Id]);
     }
+
+    private static Asset addPlan(Id accountId, String name, String sku) {
+        Product2 product = new Product2(Name = name, StockKeepingUnit = sku + '-COVTEST', IsActive = true);
+        insert product;
+        RLM_RTK_Coverage.CADENCES.put(product.StockKeepingUnit, RLM_RTK_Coverage.CADENCES.get(sku));
+        Asset plan = new Asset(Name = name, AccountId = accountId, Product2Id = product.Id);
+        insert plan;
+        return plan;
+    }
+
+    private static void activeFor(Id assetId, List<RLM_RTK_Coverage.Stretch> stretches) {
+        RLM_RTK_Coverage.stretchesByAsset.put(assetId, stretches);
+    }
+
+    private static RLM_RTK_Coverage.Stretch stretch(Date startDate, Date endDate) {
+        return new RLM_RTK_Coverage.Stretch(startDate, endDate);
+    }
+
+    /** A generated visit: a work order with one line for the plan asset. */
+    private static WorkOrderLineItem visit(Id accountId, Id planId, Id assetId, Date day) {
+        WorkOrder wo = new WorkOrder(AccountId = accountId, MaintenancePlanId = planId, SuggestedMaintenanceDate = day);
+        insert wo;
+        WorkOrderLineItem line = new WorkOrderLineItem(WorkOrderId = wo.Id, AssetId = assetId,
+            MaintenancePlanId = planId, SuggestedMaintenanceDate = day);
+        insert line;
+        return line;
+    }
+
+    private static Asset homePlan(Id accountId) {
+        return [SELECT Id FROM Asset WHERE AccountId = :accountId AND Name = 'Home Protection Plan'];
+    }
+
+    @IsTest
+    static void statePeriodsBecomeActiveStretches() {
+        List<AssetStatePeriod> periods = (List<AssetStatePeriod>) JSON.deserialize('['
+            + '{"StartDate":"2026-01-01T00:00:00.000+0000","EndDate":"2026-03-31T23:59:59.000+0000","Quantity":1},'
+            + '{"StartDate":"2026-04-01T00:00:00.000+0000","EndDate":"2026-10-31T23:59:59.000+0000","Quantity":1},'
+            + '{"StartDate":"2026-11-01T00:00:00.000+0000","EndDate":"2027-03-31T23:59:59.000+0000","Quantity":0},'
+            + '{"StartDate":"2027-04-01T00:00:00.000+0000","Quantity":1}]', List<AssetStatePeriod>.class);
+
+        List<RLM_RTK_Coverage.Stretch> stretches = RLM_RTK_Coverage.stretchesFrom(periods);
+
+        Assert.areEqual(2, stretches.size(), 'Back-to-back periods join; the zero-quantity pause splits them');
+        Assert.areEqual(Date.newInstance(2026, 1, 1), stretches[0].startDate);
+        Assert.areEqual(Date.newInstance(2026, 10, 31), stretches[0].endDate);
+        Assert.areEqual(Date.newInstance(2027, 4, 1), stretches[1].startDate);
+        Assert.isNull(stretches[1].endDate, 'The resumed plan is open-ended');
+    }
+
+    @IsTest
+    static void anUpgradeMovesUpcomingVisitsToTheNewPlan() {
+        workTypes();
+        Account account = new Account(Name = 'Upgrade Home');
+        insert account;
+        Date today = Date.today();
+        Asset home = addPlan(account.Id, 'Home Protection Plan', 'RTK-HOME-PROT');
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(today.addDays(-30), null) });
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        Id planId = [SELECT Id FROM MaintenancePlan WHERE AccountId = :account.Id].Id;
+        Date nextVisit = today.addMonths(1);
+        WorkOrderLineItem line = visit(account.Id, planId, home.Id, nextVisit);
+
+        Asset plus = addPlan(account.Id, 'Home Protection Plus', 'RTK-HOME-PROT-PLUS');
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(today.addDays(-30), today) });
+        activeFor(plus.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(today.addDays(1), null) });
+        RLM_RTK_Coverage.sync(new Set<Id>{ account.Id });
+
+        Assert.areEqual(today, [SELECT EndDate FROM Entitlement WHERE AssetId = :home.Id].EndDate, 'The old guarantee ends with its plan');
+        Entitlement plusGuarantee = [SELECT StartDate, EndDate, RLM_RTK_Covered_Pests__c FROM Entitlement WHERE AssetId = :plus.Id];
+        Assert.areEqual(today.addDays(1), plusGuarantee.StartDate);
+        Assert.isNull(plusGuarantee.EndDate);
+        Assert.isTrue(plusGuarantee.RLM_RTK_Covered_Pests__c.contains('Wasps / Bees'));
+        Assert.areEqual(plus.Id, [SELECT AssetId FROM WorkOrderLineItem WHERE Id = :line.Id].AssetId, 'The upcoming visit keeps its day as a Plus visit');
+        Assert.areEqual(0, [SELECT COUNT() FROM MaintenanceAsset WHERE AssetId = :home.Id], 'The old plan stops generating visits');
+        Assert.areEqual(nextVisit.addMonths(1), [
+            SELECT NextSuggestedMaintenanceDate FROM MaintenanceWorkRule WHERE ParentMaintenanceRecord.AssetId = :plus.Id
+        ].NextSuggestedMaintenanceDate, 'Plus visits continue after the carried visit');
+    }
+
+    @IsTest
+    static void aPauseSplitsTheGuaranteeAndSkipsVisitsInTheGap() {
+        workTypes();
+        Account account = new Account(Name = 'Pause Home');
+        insert account;
+        Date today = Date.today();
+        Asset home = addPlan(account.Id, 'Home Protection Plan', 'RTK-HOME-PROT');
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(today.addDays(-30), null) });
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        Id planId = [SELECT Id FROM MaintenancePlan WHERE AccountId = :account.Id].Id;
+        Date first = today.addMonths(1);
+        Date second = first.addMonths(1);
+        Date resume = second.addMonths(1);
+        WorkOrderLineItem firstLine = visit(account.Id, planId, home.Id, first);
+        WorkOrderLineItem secondLine = visit(account.Id, planId, home.Id, second);
+
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{
+            stretch(today.addDays(-30), first.addDays(-1)), stretch(resume, null)
+        });
+        RLM_RTK_Coverage.sync(new Set<Id>{ account.Id });
+
+        List<Entitlement> guarantees = [SELECT Name, StartDate, EndDate FROM Entitlement WHERE AssetId = :home.Id ORDER BY StartDate];
+        Assert.areEqual(2, guarantees.size(), 'One guarantee before the pause and one after');
+        Assert.areEqual(first.addDays(-1), guarantees[0].EndDate);
+        Assert.areEqual(resume, guarantees[1].StartDate);
+        Assert.isNull(guarantees[1].EndDate);
+        Assert.isTrue(guarantees[1].Name.endsWith('from ' + resume.format()));
+        Assert.areEqual(0, [SELECT COUNT() FROM WorkOrder WHERE Id IN (:firstLine.WorkOrderId, :secondLine.WorkOrderId)],
+            'Visits during the pause are removed');
+        Assert.areEqual(resume, [
+            SELECT NextSuggestedMaintenanceDate FROM MaintenanceWorkRule WHERE ParentMaintenanceRecord.AssetId = :home.Id
+        ].NextSuggestedMaintenanceDate, 'Visits resume with the plan');
+    }
+
+    @IsTest
+    static void aCancellationEndsTheGuaranteeAndStopsVisits() {
+        Map<String, Id> types = workTypes();
+        Account account = customerWithPlans();
+        Date today = Date.today();
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        Id planId = [SELECT Id FROM MaintenancePlan WHERE AccountId = :account.Id].Id;
+        Asset home = homePlan(account.Id);
+        WorkOrderLineItem line = visit(account.Id, planId, home.Id, today.addMonths(1));
+
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(today, today.addDays(5)) });
+        RLM_RTK_Coverage.sync(new Set<Id>{ account.Id });
+
+        Assert.areEqual(today.addDays(5), [SELECT EndDate FROM Entitlement WHERE AssetId = :home.Id].EndDate);
+        Assert.areEqual(0, [SELECT COUNT() FROM WorkOrder WHERE Id = :line.WorkOrderId], 'Visits after the cancellation are removed');
+        Assert.areEqual(0, [SELECT COUNT() FROM MaintenanceAsset WHERE AssetId = :home.Id]);
+        Assert.areEqual(1, [SELECT COUNT() FROM MaintenanceAsset WHERE MaintenancePlanId = :planId], 'The termite plan keeps its visits');
+        Assert.areEqual(types.get('Termite Monitoring'), [SELECT WorkTypeId FROM MaintenancePlan WHERE Id = :planId].WorkTypeId,
+            'The remaining plan leads the visits');
+    }
+
+    @IsTest
+    static void syncRemovesDuplicateGuarantees() {
+        workTypes();
+        Account account = customerWithPlans();
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        Entitlement original = [SELECT Name, AccountId, AssetId, StartDate, RLM_RTK_Covered_Pests__c FROM Entitlement
+            WHERE AccountId = :account.Id AND Name = 'Home Protection Plan guarantee'];
+        insert original.clone(false, true);
+
+        RLM_RTK_Coverage.sync(new Set<Id>{ account.Id });
+
+        Assert.areEqual(1, [SELECT COUNT() FROM Entitlement WHERE AssetId = :original.AssetId]);
+    }
+
+    @IsTest
+    static void planAssetChangesSyncTheCustomer() {
+        workTypes();
+        Account account = customerWithPlans();
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        Asset home = homePlan(account.Id);
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(Date.today(), Date.today()) });
+
+        Test.startTest();
+        update home;
+        Test.stopTest();
+
+        Assert.areEqual(Date.today(), [SELECT EndDate FROM Entitlement WHERE AssetId = :home.Id].EndDate);
+    }
+
+    @IsTest
+    static void nightlySyncCoversEveryCustomer() {
+        workTypes();
+        Account account = customerWithPlans();
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        Asset home = homePlan(account.Id);
+        activeFor(home.Id, new List<RLM_RTK_Coverage.Stretch>{ stretch(Date.today(), Date.today().addDays(10)) });
+
+        Test.startTest();
+        RLM_RTK_Coverage.syncAll();
+        Test.stopTest();
+
+        Assert.areEqual(Date.today().addDays(10), [SELECT EndDate FROM Entitlement WHERE AssetId = :home.Id].EndDate);
+    }
 }
