@@ -64,13 +64,7 @@ export default class RlmRtkInspectionWalk extends LightningElement {
     photoSuggestions = {};
     dictation = '';
     parsing = false;
-    listening = false;
-    speechBlocked = false;
-    speechNote;
     filledBy;
-    _recognition;
-    _wantListening = false;
-    _quickEnds = 0;
 
     connectedCallback() {
         this.load();
@@ -362,14 +356,6 @@ export default class RlmRtkInspectionWalk extends LightningElement {
     }
 
     // ---------- Einstein: voice notes into findings ----------
-    get canListen() {
-        return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-    }
-
-    get listenLabel() {
-        return this.listening ? 'Stop' : 'Speak';
-    }
-
     get fillDisabled() {
         return this.parsing || !this.dictation || !this.dictation.trim();
     }
@@ -382,104 +368,12 @@ export default class RlmRtkInspectionWalk extends LightningElement {
         this.dictation = event.target.value;
     }
 
-    get showSpeak() {
-        return this.canListen && !this.speechBlocked;
-    }
-
-    toggleListening() {
-        if (this.listening) {
-            this.stopListening();
-            return;
-        }
-        this.speechNote = undefined;
-        this._wantListening = true;
-        this._quickEnds = 0;
-        this.startRecognition();
-    }
-
-    startRecognition() {
-        try {
-            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new Recognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
-            recognition.continuous = true;
-            const before = this.dictation ? `${this.dictation.trim()} ` : '';
-            const startedAt = Date.now();
-            let heardSomething = false;
-            let fatal = false;
-            recognition.onresult = (e) => {
-                heardSomething = true;
-                const heard = Array.from(e.results)
-                    .map((r) => r[0].transcript)
-                    .join(' ');
-                this.dictation = `${before}${heard}`.trim();
-            };
-            recognition.onerror = (e) => {
-                const code = e && e.error;
-                if (code === 'no-speech' || code === 'aborted') return;
-                fatal = true;
-                this.blockSpeech(code);
-            };
-            recognition.onend = () => {
-                if (this._recognition !== recognition) return;
-                this._recognition = undefined;
-                if (fatal || !this._wantListening) {
-                    this.listening = false;
-                    return;
-                }
-                // The Field Service app's web view can start and end recognition at once without ever hearing audio.
-                if (!heardSomething && Date.now() - startedAt < 1500) {
-                    this._quickEnds += 1;
-                    if (this._quickEnds >= 2) {
-                        this.blockSpeech('ended-immediately');
-                        return;
-                    }
-                } else {
-                    this._quickEnds = 0;
-                }
-                this.startRecognition();
-            };
-            this._recognition = recognition;
-            recognition.start();
-            this.listening = true;
-        } catch (e) {
-            this.blockSpeech('start-failed');
-        }
-    }
-
-    blockSpeech(code) {
-        this._wantListening = false;
-        this.listening = false;
-        this.speechBlocked = true;
-        const denied = code === 'not-allowed' || code === 'service-not-allowed';
-        this.speechNote = denied
-            ? 'This app isn’t allowed to use the microphone for Speak. Tap the mic on your keyboard to dictate instead.'
-            : 'Speak isn’t available in this app. Tap the mic on your keyboard to dictate instead.';
-    }
-
-    stopListening() {
-        this._wantListening = false;
-        if (this._recognition) {
-            const r = this._recognition;
-            this._recognition = undefined;
-            try {
-                r.stop();
-            } catch (e) {
-                // already stopped
-            }
-        }
-        this.listening = false;
-    }
-
     resetDictation() {
-        this.stopListening();
         this.dictation = '';
         this.filledBy = undefined;
     }
 
     async fillFromNotes() {
-        this.stopListening();
         this.parsing = true;
         try {
             const s = await parseNotes({ notes: this.dictation, zone: this.draft.zone });
@@ -500,10 +394,6 @@ export default class RlmRtkInspectionWalk extends LightningElement {
         } finally {
             this.parsing = false;
         }
-    }
-
-    disconnectedCallback() {
-        this.stopListening();
     }
 
     previewPhoto(event) {
