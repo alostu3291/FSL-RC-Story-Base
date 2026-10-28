@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**227 tasks** across **9 groups**.
+**228 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*146 task(s)*
+*147 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1318,7 +1318,7 @@
 
 ### `deploy_post_pest`
 
-**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, the RLM_RTK_BillExplainer agent action, and Field Service coverage through RLM_RTK_Coverage and the RLM_RTK_WorkOrderTrigger, which on Initial Pest Treatment completion creates a guarantee Entitlement per plan asset (Covered Pests) and one Maintenance Plan with per-plan visit rules, generated through the RLM_RTK_Generate_Maintenance_Visits flow, and marks Pest Re-service Work Orders Covered or Not Covered from their Reported Pest; RLM_RTK_AssetTrigger and the nightly RLM_RTK_Nightly_Coverage_Sync scheduled flow keep the guarantees and visits in step with upgrades, downgrades, pauses, renewals and cancellations, and extend the visit schedule). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest, RLM_RTK_BillExplainerTest and RLM_RTK_CoverageTest.
+**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, the RLM_RTK_BillExplainer agent action, and Field Service coverage through RLM_RTK_Coverage and the RLM_RTK_WorkOrderTrigger, which on Initial Pest Treatment completion creates a guarantee Entitlement per plan asset (Covered Pests) and one Maintenance Plan with per-plan visit rules, generated through the RLM_RTK_Generate_Maintenance_Visits flow, and marks Pest Re-service Work Orders Covered or Not Covered from their Reported Pest, with Covered ones getting the 48-hour Re-service Response milestone from the guarantee's entitlement process that RLM_RTK_ServiceAppointmentTrigger completes when the technician arrives; RLM_RTK_AssetTrigger and the nightly RLM_RTK_Nightly_Coverage_Sync scheduled flow keep the guarantees and visits in step with upgrades, downgrades, pauses, renewals and cancellations, and extend the visit schedule). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest, RLM_RTK_BillExplainerTest and RLM_RTK_CoverageTest.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1365,6 +1365,19 @@
 **Options:**
 
 - `path`: `unpackaged/post_pest_docgen`
+
+---
+
+### `deploy_post_pest_sla`
+
+**Description:** Deploy the Rentokil re-service response SLA (enables Entitlements, adds the "Rentokil Service Days" business hours (Monday to Saturday, Central) alongside an unchanged 24/7 Default, the Re-service Response milestone and the Rentokil Re-service Guarantee Work Order entitlement process with a 48-hour milestone). Skipped when the entitlement process already exists, because the platform rejects redeploying a process in use. Must run before deploy_post_pest, whose RLM_RTK_CoverageTest expects the process.
+
+**Class:** `tasks.rlm_deploy_unless_present.DeployUnlessPresent`
+
+**Options:**
+
+- `path`: `unpackaged/post_pest_sla`
+- `skip_if_soql`: `SELECT Id FROM SlaProcess WHERE Name = 'Rentokil Re-service Guarantee'`
 
 ---
 

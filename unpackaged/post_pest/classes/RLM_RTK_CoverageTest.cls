@@ -97,6 +97,41 @@ private class RLM_RTK_CoverageTest {
     }
 
     @IsTest
+    static void aCoveredReserviceIsDueIn48HoursAndMetWhenTheTechnicianArrives() {
+        Map<String, Id> types = workTypes();
+        Account account = customerWithPlans();
+        RLM_RTK_Coverage.activate(new Set<Id>{ account.Id });
+        SlaProcess process = [SELECT Id FROM SlaProcess WHERE Name = :RLM_RTK_Coverage.RESPONSE_PROCESS AND IsActive = true];
+        for (Entitlement e : [SELECT SlaProcessId FROM Entitlement WHERE AccountId = :account.Id]) {
+            Assert.areEqual(process.Id, e.SlaProcessId);
+        }
+
+        WorkOrder ants = new WorkOrder(AccountId = account.Id, WorkTypeId = types.get('Pest Re-service'), RLM_RTK_Reported_Pest__c = 'Ants');
+        WorkOrder bedBugs = new WorkOrder(AccountId = account.Id, WorkTypeId = types.get('Pest Re-service'), RLM_RTK_Reported_Pest__c = 'Bed Bugs');
+        insert new List<WorkOrder>{ ants, bedBugs };
+        EntityMilestone response = [
+            SELECT MilestoneType.Name, StartDate, TargetDate, IsCompleted FROM EntityMilestone WHERE ParentEntityId = :ants.Id
+        ];
+        Assert.areEqual(RLM_RTK_Coverage.RESPONSE_MILESTONE, response.MilestoneType.Name);
+        Assert.isFalse(response.IsCompleted);
+        Assert.isTrue(response.TargetDate > response.StartDate.addHours(47).addMinutes(58));
+        Assert.areEqual(0, [SELECT COUNT() FROM EntityMilestone WHERE ParentEntityId = :bedBugs.Id]);
+
+        ServiceAppointment sa = new ServiceAppointment(ParentRecordId = ants.Id, Status = 'Scheduled',
+            EarliestStartTime = Datetime.now(), DueDate = Datetime.now().addDays(2));
+        insert sa;
+        sa.Status = 'Dispatched';
+        update sa;
+        Assert.isFalse([SELECT IsCompleted FROM EntityMilestone WHERE Id = :response.Id].IsCompleted);
+        sa.Status = 'In Progress';
+        sa.ActualStartTime = Datetime.now().addMinutes(-5);
+        update sa;
+        response = [SELECT IsCompleted, IsViolated, CompletionDate FROM EntityMilestone WHERE Id = :response.Id];
+        Assert.isTrue(response.IsCompleted);
+        Assert.isFalse(response.IsViolated);
+    }
+
+    @IsTest
     static void visitsCopyTheCustomersTerritoryAddressAndInspection() {
         Map<String, Id> types = workTypes();
         Account account = customerWithPlans();

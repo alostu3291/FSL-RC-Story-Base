@@ -87,6 +87,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
+                <field>MilestoneStatus</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
                 <field>RLM_Billable_Order__c</field>
             </layoutItems>
         </layoutColumns>
@@ -225,6 +229,15 @@
         <fields>Account</fields>
         <fields>EarliestStartTime</fields>
         <relatedList>ServiceAppointments</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>MILESTONE</fields>
+        <fields>TargetDate</fields>
+        <fields>CompletionDate</fields>
+        <fields>TimeRemainingInMins</fields>
+        <fields>IS_VIOLATED_IN</fields>
+        <fields>IS_COMPLETED_IN</fields>
+        <relatedList>RelatedEntityMilestoneList</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>Name</fields>

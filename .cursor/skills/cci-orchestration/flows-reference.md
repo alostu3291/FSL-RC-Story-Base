@@ -366,6 +366,7 @@ Deploy Rentokil residential pest control demo: catalog, location-aware pricing c
 
 **Steps:**
 
+0.5. **task** `deploy_post_pest_sla`  `when: project_config.project__custom__pest`
 1.5. **task** `assign_permission_sets`  `when: project_config.project__custom__pest`
    - `api_names`: `['RLM_Rentokil_Pest']`
 1.6. **task** `deploy_post_pest_ai`  `when: project_config.project__custom__pest and project_config.project__custom__einstein`

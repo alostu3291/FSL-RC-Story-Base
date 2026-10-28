@@ -17,7 +17,9 @@
  *
  * A Pest Re-service Work Order is Covered when an active entitlement on the account lists the
  * reported pest, otherwise Not Covered, which RLM_FSL_Bill_Uncovered_Repair bills as RTK-RESERVICE
- * when the visit is completed.
+ * when the visit is completed. Guarantees run the Rentokil Re-service Guarantee entitlement process,
+ * so a Covered re-service gets a Re-service Response milestone (48 hours, Sundays excluded), which is
+ * met when its appointment is checked in, started or completed (RLM_RTK_ServiceAppointmentTrigger).
  */
 public with sharing class RLM_RTK_Coverage {
     public static final String PLAN_TITLE = 'Rentokil recurring service';
@@ -26,6 +28,9 @@ public with sharing class RLM_RTK_Coverage {
     public static final String COVERED = 'Covered';
     public static final String NOT_COVERED = 'Not Covered';
     public static final String GENERATE_FLOW = 'RLM_RTK_Generate_Maintenance_Visits';
+    public static final String RESPONSE_PROCESS = 'Rentokil Re-service Guarantee';
+    public static final String RESPONSE_MILESTONE = 'Re-service Response';
+    private static final Set<String> ARRIVED = new Set<String>{ 'CheckedIn', 'InProgress', 'Completed' };
 
     public class Cadence {
         public final String workType;
@@ -375,7 +380,7 @@ public with sharing class RLM_RTK_Coverage {
         Map<Id, Map<Date, Entitlement>> existing = new Map<Id, Map<Date, Entitlement>>();
         List<Entitlement> unmatched = new List<Entitlement>();
         for (Entitlement e : [
-            SELECT Id, AssetId, StartDate, EndDate FROM Entitlement
+            SELECT Id, AssetId, StartDate, EndDate, SlaProcessId FROM Entitlement
             WHERE AssetId IN :assetIds AND RLM_RTK_Covered_Pests__c != null
         ]) {
             if (!existing.containsKey(e.AssetId)) {
@@ -387,6 +392,7 @@ public with sharing class RLM_RTK_Coverage {
                 existing.get(e.AssetId).put(e.StartDate, e);
             }
         }
+        Id process = responseProcessId();
         List<Entitlement> changes = new List<Entitlement>();
         for (PlanAsset pa : assets) {
             Map<Date, Entitlement> byStart = existing.containsKey(pa.asset.Id)
@@ -401,10 +407,11 @@ public with sharing class RLM_RTK_Coverage {
                         AssetId = pa.asset.Id,
                         StartDate = s.startDate,
                         EndDate = s.endDate,
-                        RLM_RTK_Covered_Pests__c = pa.cadence.pests
+                        RLM_RTK_Covered_Pests__c = pa.cadence.pests,
+                        SlaProcessId = process
                     ));
-                } else if (e.EndDate != s.endDate) {
-                    changes.add(new Entitlement(Id = e.Id, EndDate = s.endDate));
+                } else if (e.EndDate != s.endDate || (process != null && e.SlaProcessId != process)) {
+                    changes.add(new Entitlement(Id = e.Id, EndDate = s.endDate, SlaProcessId = process ?? e.SlaProcessId));
                 }
             }
             unmatched.addAll(byStart.values());
@@ -780,5 +787,52 @@ public with sharing class RLM_RTK_Coverage {
             }
         }
         return null;
+    }
+
+    // ---------- Re-service response ----------
+
+    private static Id responseProcessId() {
+        List<SlaProcess> processes = [
+            SELECT Id FROM SlaProcess
+            WHERE Name = :RESPONSE_PROCESS AND IsActive = true
+            LIMIT 1
+        ];
+        return processes.isEmpty() ? null : processes[0].Id;
+    }
+
+    /** A covered re-service's response milestone is met when its technician arrives. */
+    public static void appointmentsChanged(List<ServiceAppointment> records, Map<Id, ServiceAppointment> oldMap) {
+        Datetime now = Datetime.now();
+        Map<Id, Datetime> arrivalByWorkOrder = new Map<Id, Datetime>();
+        for (ServiceAppointment sa : records) {
+            ServiceAppointment old = oldMap.get(sa.Id);
+            if (sa.ParentRecordId != null && sa.ParentRecordId.getSobjectType() == WorkOrder.SObjectType
+                    && ARRIVED.contains(sa.StatusCategory) && !ARRIVED.contains(old.StatusCategory)) {
+                Datetime arrival = sa.ActualStartTime ?? now;
+                Datetime earliest = arrivalByWorkOrder.get(sa.ParentRecordId);
+                if (earliest == null || arrival < earliest) {
+                    arrivalByWorkOrder.put(sa.ParentRecordId, arrival);
+                }
+            }
+        }
+        if (arrivalByWorkOrder.isEmpty()) {
+            return;
+        }
+        List<EntityMilestone> met = new List<EntityMilestone>();
+        for (EntityMilestone m : [
+            SELECT Id, ParentEntityId, StartDate FROM EntityMilestone
+            WHERE ParentEntityId IN :arrivalByWorkOrder.keySet() AND MilestoneType.Name = :RESPONSE_MILESTONE
+                AND IsCompleted = false
+        ]) {
+            Datetime arrival = arrivalByWorkOrder.get(m.ParentEntityId);
+            if (arrival > now) {
+                arrival = now;
+            }
+            if (m.StartDate != null && arrival < m.StartDate) {
+                arrival = m.StartDate;
+            }
+            met.add(new EntityMilestone(Id = m.Id, CompletionDate = arrival));
+        }
+        update met;
     }
 }
