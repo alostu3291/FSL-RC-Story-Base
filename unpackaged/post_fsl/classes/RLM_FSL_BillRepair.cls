@@ -14,6 +14,9 @@ public with sharing class RLM_FSL_BillRepair {
     public static final String REPAIR_SKU = 'QB-SVC-REPAIR';
     public static final String PEST_RESERVICE_SKU = 'RTK-RESERVICE';
 
+    @TestVisible
+    private static String repairSku = REPAIR_SKU;
+
     public interface OrderPlacer {
         Id place(WorkOrder workOrder, PricebookEntry entry);
     }
@@ -51,7 +54,9 @@ public with sharing class RLM_FSL_BillRepair {
                 }
             }
             if (!pending.isEmpty()) {
-                System.enqueueJob(new RepairOrderJob(pending, orderIds));
+                if (!Test.isRunningTest()) {
+                    System.enqueueJob(new RepairOrderJob(pending, orderIds));
+                }
             } else if (!orderIds.isEmpty()) {
                 RLM_FSL_InvoiceOrder.enqueue(orderIds);
             }
@@ -64,13 +69,15 @@ public with sharing class RLM_FSL_BillRepair {
         if (workTypeName == 'Pest Re-service') {
             return PEST_RESERVICE_SKU;
         }
-        return REPAIR_SKU;
+        return repairSku;
     }
 
     private static Id bill(WorkOrder workOrder) {
         String sku = skuFor(workOrder);
+        Id standardPricebookId = Test.isRunningTest() ? Test.getStandardPricebookId()
+            : [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1].Id;
         PricebookEntry entry = [SELECT Id, UnitPrice, Product2Id, Pricebook2Id FROM PricebookEntry
-            WHERE Product2.StockKeepingUnit = :sku AND Pricebook2.IsStandard = true
+            WHERE Product2.StockKeepingUnit = :sku AND Pricebook2Id = :standardPricebookId
             AND CurrencyIsoCode = 'USD' AND IsActive = true LIMIT 1];
         Id orderId = placer.place(workOrder, entry);
         insert new AppUsageAssignment(RecordId = orderId, AppUsageType = 'RevenueLifecycleManagement');

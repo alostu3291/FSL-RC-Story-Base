@@ -277,8 +277,8 @@ steps = [
      "Once you accept, we schedule your first visit automatically. Your technician inspects the property, "
      "treats active activity, and seals common entry points."),
     ("2", "Routine protection visits",
-     "Your plan visits follow the schedule described above, such as quarterly general pest service and "
-     "seasonal mosquito treatments from April through October."),
+     "Your plan visits follow the schedule described above: monthly for Home Protection, quarterly for "
+     "Essential, and seasonal mosquito treatments from April through October."),
     ("3", "Free re-service between visits",
      "If covered pests come back between scheduled visits, call us and we will return at no extra charge."),
     ("4", "A report after every visit",

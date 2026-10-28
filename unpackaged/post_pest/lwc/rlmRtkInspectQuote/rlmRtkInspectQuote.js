@@ -21,7 +21,7 @@ const PLANS = [
         name: 'Home Protection Plus',
         price: 79,
         blurb: 'Premium coverage with priority response',
-        features: ['Bi-weekly option', 'Extended pests', 'Priority booking']
+        features: ['Monthly visits', 'Adds wasps and bees', 'Priority booking']
     }
 ];
 

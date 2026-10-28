@@ -1040,7 +1040,7 @@ For details on exporting new models, importing into target orgs, polymorphic ID 
 | [Context Service Utility](docs/references/context-service-utility.md) | Context Service utility usage and plan examples |
 | [DocGen Setup](docs/guides/docgen-setup.md) | Document Generation architecture, deployment flow, Metadata API binary bug, seller token implementation |
 | [Field Service + Rev Cloud Demo](docs/guides/fsl-rev-cloud-demo.md) | `prepare_fsl` build and the nine-scene demo: quote → DRO install Work Order → milestone billing → maintenance, coverage-checked break/fix billing, field-flagged expansion |
-| [Pest Control Demo (Rentokil)](docs/guides/pest-control-demo.md) | `prepare_pest` secondary story: field tablet quote with location pricing → Initial Service DRO → quarterly visits, guarantee re-service, termite upsell, mosquito pause |
+| [Pest Control Demo (Rentokil)](docs/guides/pest-control-demo.md) | `prepare_pest` secondary story: field tablet quote with location pricing → Initial Service DRO → monthly maintenance-plan visits, guarantee re-service, termite upsell, mosquito pause |
 
 ### Analysis & Planning
 

@@ -94,7 +94,7 @@ SAMPLE_OUTPUT = {
     "GrandTotal": "$386.00",
     "WhyThisPlan": "We found rodent droppings in the garage and standing water in the yard. The Home Protection Plan covers the rodents, and the Seasonal Mosquito Plan treats the standing water.",
     "Plan": [
-        {"Name": "Home Protection Plan", "Description": "General pest plus rodent protection, quarterly service.", "Quantity": 1, "MonthlyPrice": "$79.00"},
+        {"Name": "Home Protection Plan", "Description": "General pest plus rodent protection, monthly service.", "Quantity": 1, "MonthlyPrice": "$79.00"},
         {"Name": "Seasonal Mosquito Plan", "Description": "Mosquito protection April through October; pauses in winter.", "Quantity": 1, "MonthlyPrice": "$69.00"},
     ],
     "OneTime": [

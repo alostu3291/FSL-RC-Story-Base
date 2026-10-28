@@ -5,16 +5,23 @@ private class RLM_FSL_ServiceBillingTest {
             Order repairOrder = new Order(AccountId = workOrder.AccountId, Pricebook2Id = entry.Pricebook2Id,
                 EffectiveDate = Date.today(), Status = 'Draft');
             insert repairOrder;
+            OrderAction action = new OrderAction(OrderId = repairOrder.Id, Type = 'Add');
+            insert action;
+            insert new OrderItem(OrderId = repairOrder.Id, OrderActionId = action.Id, PricebookEntryId = entry.Id,
+                Product2Id = entry.Product2Id, Quantity = 1, UnitPrice = entry.UnitPrice, ServiceDate = Date.today());
             return repairOrder.Id;
         }
     }
+
+    // StockKeepingUnit uniqueness is enforced against the org's real products, even in tests.
+    private static final String TEST_REPAIR_SKU = 'QB-SVC-REPAIR-TEST';
 
     @TestSetup
     static void setup() {
         Account account = new Account(Name = 'FSL Billing Test', ShippingStreet = '415 Mission St',
             ShippingCity = 'San Francisco', ShippingState = 'CA', ShippingPostalCode = '94105', ShippingCountry = 'US');
         insert account;
-        Product2 repair = new Product2(Name = 'Break/Fix Repair Service', StockKeepingUnit = RLM_FSL_BillRepair.REPAIR_SKU, IsActive = true);
+        Product2 repair = new Product2(Name = 'Break/Fix Repair Service', StockKeepingUnit = TEST_REPAIR_SKU, IsActive = true);
         insert repair;
         insert new PricebookEntry(Product2Id = repair.Id, Pricebook2Id = Test.getStandardPricebookId(),
             UnitPrice = 1200, IsActive = true, CurrencyIsoCode = 'USD');
@@ -27,6 +34,7 @@ private class RLM_FSL_ServiceBillingTest {
     @IsTest
     static void billsEachUncoveredRepairOnce() {
         RLM_FSL_BillRepair.placer = new StubPlacer();
+        RLM_FSL_BillRepair.repairSku = TEST_REPAIR_SKU;
         List<Id> workOrderIds = new List<Id>(new Map<Id, WorkOrder>([SELECT Id FROM WorkOrder]).keySet());
 
         Test.startTest();
@@ -37,8 +45,32 @@ private class RLM_FSL_ServiceBillingTest {
     }
 
     @IsTest
+    static void lastRepairQueuesTheInvoice() {
+        RLM_FSL_BillRepair.placer = new StubPlacer();
+        RLM_FSL_BillRepair.repairSku = TEST_REPAIR_SKU;
+        WorkOrder workOrder = [SELECT Id FROM WorkOrder LIMIT 1];
+
+        Test.startTest();
+        new RLM_FSL_BillRepair.RepairOrderJob(new List<Id>{ workOrder.Id }, new Set<Id>()).execute(null);
+        Test.stopTest();
+
+        Id orderId = [SELECT RLM_Billable_Order__c FROM WorkOrder WHERE Id = :workOrder.Id].RLM_Billable_Order__c;
+        Assert.isNotNull(orderId, 'The work order links its repair order');
+        Assert.areEqual('Activated', [SELECT Status FROM Order WHERE Id = :orderId].Status, 'The repair order is activated');
+    }
+
+    @IsTest
+    static void pestReserviceBillsTheReserviceProduct() {
+        Assert.areEqual(RLM_FSL_BillRepair.PEST_RESERVICE_SKU,
+            RLM_FSL_BillRepair.skuFor(new WorkOrder(WorkType = new WorkType(Name = 'Pest Re-service'))),
+            'Pest re-service visits bill the re-service product');
+        Assert.areEqual(RLM_FSL_BillRepair.REPAIR_SKU, RLM_FSL_BillRepair.skuFor(new WorkOrder()),
+            'Other work orders bill the break/fix repair');
+    }
+
+    @IsTest
     static void salesTransactionPlacerReportsFailures() {
-        WorkOrder workOrder = [SELECT Id, WorkOrderNumber, AccountId, Account.ShippingStreet, Account.ShippingCity,
+        WorkOrder workOrder = [SELECT Id, WorkOrderNumber, AccountId, ContactId, WorkType.Name, Account.ShippingStreet, Account.ShippingCity,
                 Account.ShippingState, Account.ShippingPostalCode, Account.ShippingCountry, Account.BillingStreet,
                 Account.BillingCity, Account.BillingState, Account.BillingPostalCode, Account.BillingCountry
             FROM WorkOrder LIMIT 1];
