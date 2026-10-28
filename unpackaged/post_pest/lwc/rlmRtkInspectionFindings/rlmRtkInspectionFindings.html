@@ -12,6 +12,12 @@
                     <span class={severityClass}>{severity}</span>
                 </div>
             </header>
+            <template lwc:if={state.planExplanation}>
+                <div class="why">
+                    <p class="why-label">Why we recommend this plan</p>
+                    <p>{state.planExplanation}</p>
+                </div>
+            </template>
             <div class="list">
                 <template for:each={findings} for:item="f">
                     <article key={f.id} class="finding">

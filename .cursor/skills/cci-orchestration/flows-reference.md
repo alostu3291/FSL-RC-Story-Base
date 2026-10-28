@@ -362,12 +362,14 @@ Deploy persona metadata (profiles, permission set groups, permission sets) from 
 
 ### `prepare_pest`
 
-Deploy Rentokil residential pest control demo: catalog, location-aware pricing context, Inspect and Quote field flow, Bloomingdale FSL foundation, Initial Service DRO handoff, and Rentokil-branded proposal and invoice DocGen templates (when docgen=true). Requires fsl=true for Field Service metadata reused from prepare_fsl.
+Deploy Rentokil residential pest control demo: catalog, location-aware pricing context, Inspect and Quote field flow, Bloomingdale FSL foundation, Initial Service DRO handoff, and Rentokil-branded proposal and invoice DocGen templates (when docgen=true). With einstein=true, adds the Einstein prompt templates behind the pest AI features (visit brief, photo and notes findings, plan explanation, product suggestions, visit summary); with agents=true, adds the Rentokil Pest Billing Agent. Requires fsl=true for Field Service metadata reused from prepare_fsl.
 
 **Steps:**
 
 1.5. **task** `assign_permission_sets`  `when: project_config.project__custom__pest`
    - `api_names`: `['RLM_Rentokil_Pest']`
+1.6. **task** `deploy_post_pest_ai`  `when: project_config.project__custom__pest and project_config.project__custom__einstein`
+1.7. **task** `activate_pest_prompt_templates`  `when: project_config.project__custom__pest and project_config.project__custom__einstein`
 8.5. **task** `setup_rtk_dro_steps`  `when: project_config.project__custom__pest and project_config.project__custom__dro`
 11.5. **task** `setup_rtk_inspection_visit`  `when: project_config.project__custom__pest and project_config.project__custom__fsl`
 1. **task** `deploy_post_pest`  `when: project_config.project__custom__pest`
@@ -384,6 +386,11 @@ Deploy Rentokil residential pest control demo: catalog, location-aware pricing c
 12. **task** `deploy_post_pest_docgen`  `when: project_config.project__custom__pest and project_config.project__custom__docgen`
 13. **task** `activate_docgen_templates`  `when: project_config.project__custom__pest and project_config.project__custom__docgen`
 14. **task** `fix_pest_document_template_binaries`  `when: project_config.project__custom__pest and project_config.project__custom__docgen`
+15. **task** `deploy_agents_settings`  `when: project_config.project__custom__pest and project_config.project__custom__agents`
+16. **task** `deploy_post_pest_agent`  `when: project_config.project__custom__pest and project_config.project__custom__agents`
+17. **task** `assign_permission_sets`  `when: project_config.project__custom__pest and project_config.project__custom__agents`
+   - `api_names`: `['RLM_RTK_Pest_Billing_Agent']`
+18. **task** `activate_pest_billing_agent`  `when: project_config.project__custom__pest and project_config.project__custom__agents`
 
 ---
 

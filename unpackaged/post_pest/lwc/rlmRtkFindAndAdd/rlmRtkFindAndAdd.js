@@ -3,6 +3,7 @@ import getState from '@salesforce/apex/RLM_RTK_FieldAddOn.getState';
 import addAddOns from '@salesforce/apex/RLM_RTK_FieldAddOn.addAddOns';
 import removeAddOn from '@salesforce/apex/RLM_RTK_FieldAddOn.removeAddOn';
 import saveFinding from '@salesforce/apex/RLM_RTK_Inspection.saveFinding';
+import aiSuggestions from '@salesforce/apex/RLM_RTK_FieldAddOn.aiSuggestions';
 
 const ZONES = ['Exterior Perimeter', 'Garage', 'Kitchen', 'Bathrooms', 'Living Areas', 'Basement / Crawlspace', 'Attic', 'Yard'];
 const PESTS = ['Ants', 'Spiders', 'Cockroaches', 'Rodents', 'Termites', 'Mosquitoes', 'Wasps / Bees', 'Bed Bugs', 'Other'];
@@ -26,6 +27,10 @@ export default class RlmRtkFindAndAdd extends LightningElement {
     selected = new Set();
     approver = '';
     draft = { zone: null, pest: null, evidence: null, note: '' };
+    /** Einstein's extra picks from the finding notes, sku to reason. Prices and approval are unchanged. */
+    aiPicks = {};
+    aiBusy = false;
+    aiMessage;
 
     connectedCallback() {
         this.load();
@@ -156,17 +161,48 @@ export default class RlmRtkFindAndAdd extends LightningElement {
 
     // ---------- pick + approve ----------
     get addOnsView() {
-        return (this.state ? this.state.addOns : []).map((a) => {
-            const on = this.selected.has(a.sku);
-            return {
-                ...a,
-                priceLabel: money(a.price),
-                cls: `addon${on ? ' on' : ''}${a.added ? ' added' : ''}`,
-                badge: a.added ? 'Added' : a.recommended ? 'Recommended' : null,
-                badgeCls: a.added ? 'badge added' : 'badge',
-                disabled: a.added || !this.canEdit
-            };
-        });
+        const rank = (a) => (a.recommended ? 0 : this.aiPicks[a.sku] ? 1 : 2);
+        return (this.state ? this.state.addOns : [])
+            .map((a) => {
+                const on = this.selected.has(a.sku);
+                const ai = !a.recommended && !a.added && this.aiPicks[a.sku];
+                return {
+                    ...a,
+                    rank: rank(a),
+                    reason: a.reason || this.aiPicks[a.sku],
+                    priceLabel: money(a.price),
+                    cls: `addon${on ? ' on' : ''}${a.added ? ' added' : ''}`,
+                    badge: a.added ? 'Added' : a.recommended ? 'Recommended' : ai ? 'Einstein suggests' : null,
+                    badgeCls: a.added ? 'badge added' : ai ? 'badge ai' : 'badge',
+                    disabled: a.added || !this.canEdit
+                };
+            })
+            .sort((x, y) => x.rank - y.rank);
+    }
+
+    get aiLabel() {
+        return this.aiBusy ? 'Reading the notes…' : 'Ask Einstein';
+    }
+
+    /** Reads the finding notes for services the fixed rules missed; the customer still approves. */
+    async askEinstein() {
+        this.aiBusy = true;
+        this.aiMessage = undefined;
+        try {
+            const picks = await aiSuggestions({ recordId: this.recordId });
+            const next = {};
+            (picks || []).forEach((p) => {
+                next[p.sku] = p.reason;
+            });
+            this.aiPicks = next;
+            this.aiMessage = picks && picks.length
+                ? `Einstein found ${picks.length} more from the notes. The customer still approves.`
+                : 'Einstein didn’t find anything else in the notes.';
+        } catch (e) {
+            this.aiMessage = 'Einstein isn’t available right now. The rules still apply.';
+        } finally {
+            this.aiBusy = false;
+        }
     }
     toggleAddOn(event) {
         const sku = event.currentTarget.dataset.sku;

@@ -277,3 +277,35 @@ p {
     justify-content: space-between;
     font-size: 0.9rem;
 }
+
+.ai-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.ai-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid #5a2ea6;
+    border-radius: 1rem;
+    background: #fff;
+    color: #5a2ea6;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    --slds-c-icon-color-foreground-default: #5a2ea6;
+}
+
+.ai-button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.badge.ai {
+    background: #5a2ea6;
+}

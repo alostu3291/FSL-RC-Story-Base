@@ -244,3 +244,43 @@ p {
     padding: 0;
     cursor: pointer;
 }
+
+.services-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin: 1rem 0 0.5rem;
+}
+
+.services-head h3 {
+    margin: 0;
+}
+
+.ai-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid #5a2ea6;
+    border-radius: 1rem;
+    background: #fff;
+    color: #5a2ea6;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    --slds-c-icon-color-foreground-default: #5a2ea6;
+}
+
+.ai-button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.ai-message {
+    margin-bottom: 0.5rem;
+}
+
+.badge.ai {
+    background: #5a2ea6;
+}

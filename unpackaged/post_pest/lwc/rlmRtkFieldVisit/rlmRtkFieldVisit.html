@@ -25,6 +25,10 @@
             <p class="error" role="alert">{error}</p>
         </template>
 
+        <template lwc:if={showBrief}>
+            <c-rlm-rtk-visit-brief record-id={ctx.workOrderId}></c-rlm-rtk-visit-brief>
+        </template>
+
         <template lwc:if={isLoading}>
             <div class="center"><lightning-spinner alternative-text="Loading" size="small"></lightning-spinner></div>
         </template>
@@ -63,6 +67,18 @@
         </template>
 
         <template lwc:if={isPlan}>
+            <section class="panel why">
+                <p class="why-label">
+                    <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                    Why this plan
+                </p>
+                <template lwc:if={planExplanation}>
+                    <p>{planExplanation}</p>
+                </template>
+                <template lwc:else>
+                    <p class="muted">Writing a plain-language explanation for the customer…</p>
+                </template>
+            </section>
             <c-rlm-rtk-inspect-quote
                 account-name={accountName}
                 postal-code={postalCode}
@@ -183,6 +199,7 @@
                 </template>
                 <template lwc:if={visitCompleted}>
                     <p class="handoff">Inspection visit {visitCompleted} is complete.</p>
+                    <c-rlm-rtk-visit-summary record-id={ctx.workOrderId}></c-rlm-rtk-visit-summary>
                     <div class="bar"><button type="button" class="primary" onclick={close}>Done</button></div>
                 </template>
                 <template lwc:else>

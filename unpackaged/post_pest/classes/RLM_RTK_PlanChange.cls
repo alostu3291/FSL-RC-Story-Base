@@ -87,6 +87,28 @@ public with sharing class RLM_RTK_PlanChange {
         }
     }
 
+    /** Plans the finding notes call for beyond the fixed rules, from RLM_RTK_AI. Empty when AI is unavailable. */
+    @AuraEnabled
+    public static List<RLM_RTK_AI.Pick> aiSuggestions(Id recordId) {
+        try {
+            State state = buildState(contextFor(recordId));
+            List<RLM_RTK_AI.Option> options = new List<RLM_RTK_AI.Option>();
+            List<Plan> plans = new List<Plan>(state.tiers);
+            plans.addAll(state.addOnPlans);
+            for (Plan p : plans) {
+                if (p.current != true && p.recommended != true) {
+                    options.add(new RLM_RTK_AI.Option(p.sku, p.name, p.description));
+                }
+            }
+            if (state.lockedReason != null || state.hasPlans != true) {
+                return new List<RLM_RTK_AI.Pick>();
+            }
+            return RLM_RTK_AI.suggestProducts(state.accountId, options, 'service plans (a home has one tier plan plus optional add-on plans)');
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
     /** Schedules the change to the chosen plan for tomorrow, once the customer has approved it. */
     @AuraEnabled
     public static State applyChange(Id recordId, String sku, String approvedBy) {

@@ -145,3 +145,25 @@
     color: var(--rtk-hot);
     font-size: 0.85rem;
 }
+
+.why {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.8rem;
+    background: var(--rtk-accent-soft);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.why p {
+    margin: 0;
+}
+
+.why .why-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--rtk-accent-deep);
+}

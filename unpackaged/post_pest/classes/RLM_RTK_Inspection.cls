@@ -68,6 +68,8 @@ public with sharing class RLM_RTK_Inspection {
         @AuraEnabled public Integer treatedCount = 0;
         @AuraEnabled public List<FindingView> findings = new List<FindingView>();
         @AuraEnabled public Recommendation recommendation;
+        /** Plain-language "why this plan" from RLM_RTK_AI.explainPlan, when written. */
+        @AuraEnabled public String planExplanation;
     }
 
     public class FindingInput {
@@ -92,7 +94,8 @@ public with sharing class RLM_RTK_Inspection {
             return null;
         }
         List<RLM_RTK_Inspection__c> inspections = [
-            SELECT Id, Name FROM RLM_RTK_Inspection__c WHERE Quote__c = :quoteId ORDER BY CreatedDate DESC LIMIT 1
+            SELECT Id, Name, Plan_Explanation__c FROM RLM_RTK_Inspection__c
+            WHERE Quote__c = :quoteId ORDER BY CreatedDate DESC LIMIT 1
         ];
         if (inspections.isEmpty()) {
             return null;
@@ -100,6 +103,7 @@ public with sharing class RLM_RTK_Inspection {
         List<RLM_RTK_Finding__c> findings = queryFindings(inspections[0].Id);
         InspectionState state = buildState(inspections[0].Id, findings, recommend(findings));
         state.inspectionName = inspections[0].Name;
+        state.planExplanation = inspections[0].Plan_Explanation__c;
         Set<String> quotedSkus = new Set<String>();
         for (QuoteLineItem line : [SELECT Product2.StockKeepingUnit FROM QuoteLineItem WHERE QuoteId = :quoteId]) {
             quotedSkus.add(line.Product2.StockKeepingUnit);
@@ -462,7 +466,7 @@ public with sharing class RLM_RTK_Inspection {
         return text;
     }
 
-    /** Links the inspection to the Quote created from it. */
+    /** Links the inspection to the Quote created from it, and puts the plan explanation on the quote for the proposal. */
     public static void markQuoted(Id inspectionId, Id quoteId, String overrideReason) {
         update new RLM_RTK_Inspection__c(
             Id = inspectionId,
@@ -470,5 +474,12 @@ public with sharing class RLM_RTK_Inspection {
             Status__c = 'Quoted',
             Override_Reason__c = overrideReason
         );
+        if (quoteId == null) {
+            return;
+        }
+        String explanation = [SELECT Plan_Explanation__c FROM RLM_RTK_Inspection__c WHERE Id = :inspectionId].Plan_Explanation__c;
+        if (String.isNotBlank(explanation)) {
+            update new Quote(Id = quoteId, RLM_RTK_Plan_Explanation__c = explanation);
+        }
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Customer email summarizing a completed visit from the checklist, findings and approvals. Saved on the work order. Called from RLM_RTK_AI.summarizeVisit.</description>
+    <developerName>RLM_RTK_Visit_Summary</developerName>
+    <masterLabel>RTK Visit Summary</masterLabel>
+    <templateVersions>
+        <content>Write the visit summary email Rentokil sends a homeowner after today's visit. Use only the facts below.
+Start with "Hi" and the customer's first name. In 80 to 140 words of plain language, cover what we checked and treated, what we found, anything they approved today (extra services or plan changes, by name), anything to keep an eye on or do (such as clearing standing water), and the next visit date if there is one.
+No prices, no internal notes, no promises. End with a new line that says "Rentokil". Reply with the email body only.
+
+{!$Input:Context}</content>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Visit facts</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

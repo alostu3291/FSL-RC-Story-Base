@@ -4,6 +4,14 @@
     <hasActivationRequired>false</hasActivationRequired>
     <label>RLM Rentokil Pest</label>
     <classAccesses>
+        <apexClass>RLM_RTK_AI</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_RTK_BillExplainer</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>RLM_RTK_FieldQuote</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -31,6 +39,41 @@
         <apexClass>RLM_SignAndPay</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>WorkOrder.RLM_RTK_AI_Brief__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>WorkOrder.RLM_RTK_AI_Brief_At__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>WorkOrder.RLM_RTK_Visit_Summary__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>WorkOrder.RLM_RTK_Summary_Sent_At__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_RTK_Inspection__c.Plan_Explanation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_RTK_Inspection__c.Plan_Explanation_Basis__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Quote.RLM_RTK_Plan_Explanation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>WorkOrderLineItem.RLM_RTK_Add_On_Order__c</field>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Rentokil Visit Brief</masterLabel>
+    <description>Pre-visit brief for the technician: why the visit, plan and history, open invoices, what to look for.</description>
+</LightningComponentBundle>

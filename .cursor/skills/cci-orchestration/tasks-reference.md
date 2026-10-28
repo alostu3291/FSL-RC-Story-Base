@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**223 tasks** across **9 groups**.
+**227 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*142 task(s)*
+*146 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -694,6 +694,30 @@
 
 - `operation`: `activate_versions`
 - `metadata_path`: `force-app/main/default/expressionSetDefinition`
+
+---
+
+### `activate_pest_billing_agent`
+
+**Description:** Activate the Rentokil Pest Billing Agent after deploy_post_pest_agent.
+
+**Class:** `tasks.rlm_prompt_templates.ActivateAgents`
+
+**Options:**
+
+- `api_names`: `RLM_RTK_Pest_Billing_Agent`
+
+---
+
+### `activate_pest_prompt_templates`
+
+**Description:** Activate the latest version of the RLM_RTK_* prompt templates after deploy_post_pest_ai (a metadata deploy leaves new versions inactive).
+
+**Class:** `tasks.rlm_prompt_templates.ActivatePromptTemplates`
+
+**Options:**
+
+- `templates_dir`: `unpackaged/post_pest_ai/genAiPromptTemplates`
 
 ---
 
@@ -1294,7 +1318,7 @@
 
 ### `deploy_post_pest`
 
-**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest and RLM_RTK_PlanChangeTest.
+**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, and the RLM_RTK_BillExplainer agent action). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest and RLM_RTK_BillExplainerTest.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1302,7 +1326,33 @@
 
 - `path`: `unpackaged/post_pest`
 - `test_level`: `RunSpecifiedTests`
-- `specified_tests`: `RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest,RLM_RTK_FieldVisitTest,RLM_RTK_FieldAddOnTest,RLM_RTK_PlanChangeTest`
+- `specified_tests`: `RLM_RTK_FieldQuoteTest,RLM_RTK_InspectionTest,RLM_RTK_FieldVisitTest,RLM_RTK_FieldAddOnTest,RLM_RTK_PlanChangeTest,RL...`
+
+---
+
+### `deploy_post_pest_agent`
+
+**Description:** Deploy the Rentokil Pest Billing Agent (Agentforce employee agent with a Pest Bill Questions topic that calls RLM_RTK_BillExplainer, for questions like "why is my bill $366?") and its RLM_RTK_Pest_Billing_Agent permission set. Requires deploy_post_pest and the Agentforce settings from prepare_agents.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_pest_agent`
+
+---
+
+### `deploy_post_pest_ai`
+
+**Description:** Deploy the Rentokil Einstein layer (EinsteinGpt settings, six RLM_RTK_* prompt templates and the RLM_RTK_EinsteinGenerator that RLM_RTK_AI finds at runtime). Without it the pest AI features fall back to the rules. Requires deploy_post_pest and Einstein generative AI (Prompt Builder) licenses. Runs RLM_RTK_EinsteinGeneratorTest.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_pest_ai`
+- `test_level`: `RunSpecifiedTests`
+- `specified_tests`: `RLM_RTK_EinsteinGeneratorTest`
 
 ---
 

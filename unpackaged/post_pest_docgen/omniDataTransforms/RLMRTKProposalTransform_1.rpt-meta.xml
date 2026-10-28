@@ -24,6 +24,7 @@
   "MonthlyTotal": "$187.00",
   "OneTimeTotal": "$199.00",
   "GrandTotal": "$386.00",
+  "WhyThisPlan": "We found rodent droppings in the garage and standing water in the yard. The Home Protection Plan covers the rodents, and the Seasonal Mosquito Plan treats the standing water.",
   "Plan": [
     {
       "Name": "Home Protection Plan",
@@ -354,6 +355,21 @@
     <omniDataTransformItem>
         <disabled>false</disabled>
         <filterGroup>0.0</filterGroup>
+        <globalKey>188a8c5f-029f-5ebe-ad82-e61e8f61e439</globalKey>
+        <inputFieldName>WhyThisPlan</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMRTKProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>WhyThisPlan</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
         <globalKey>4eec40b0-d3dd-5fef-acfc-22e80d922750</globalKey>
         <inputFieldName>Plan:Name</inputFieldName>
         <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
@@ -552,6 +568,7 @@
   "MonthlyTotal": "$187.00",
   "OneTimeTotal": "$199.00",
   "GrandTotal": "$386.00",
+  "WhyThisPlan": "We found rodent droppings in the garage and standing water in the yard. The Home Protection Plan covers the rodents, and the Seasonal Mosquito Plan treats the standing water.",
   "Plan": [
     {
       "Name": "Home Protection Plan",

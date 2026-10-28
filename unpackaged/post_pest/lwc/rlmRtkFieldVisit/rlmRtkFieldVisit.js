@@ -11,6 +11,7 @@ import treatmentSlots from '@salesforce/apex/RLM_RTK_FieldVisit.treatmentSlots';
 import bookTreatment from '@salesforce/apex/RLM_RTK_FieldVisit.bookTreatment';
 import completeVisit from '@salesforce/apex/RLM_RTK_FieldVisit.completeVisit';
 import getState from '@salesforce/apex/RLM_RTK_Inspection.getState';
+import explainPlan from '@salesforce/apex/RLM_RTK_AI.explainPlan';
 
 const STEPS = [
     { key: 'walk', label: 'Walk' },
@@ -49,6 +50,8 @@ export default class RlmRtkFieldVisit extends LightningElement {
     completing = false;
     completeError;
     visitCompleted;
+    planExplanation;
+    _explaining;
 
     @api
     get recordId() {
@@ -185,11 +188,28 @@ export default class RlmRtkFieldVisit extends LightningElement {
             const state = await getState({ inspectionId: this.inspectionId });
             this.rec = state.recommendation || {};
             this.step = 'plan';
+            this.explain();
         } catch (e) {
             this.error = this.message(e);
         } finally {
             this.busy = false;
         }
+    }
+
+    /** Writes the plain-language "why this plan" while the technician reviews the plan; the quote waits for it. */
+    explain() {
+        this.planExplanation = undefined;
+        this._explaining = explainPlan({ inspectionId: this.inspectionId })
+            .then((text) => {
+                this.planExplanation = text;
+            })
+            .catch(() => {
+                this.planExplanation = undefined;
+            });
+    }
+
+    get showBrief() {
+        return (this.isStart || this.isWalk) && this.ctx && this.ctx.workOrderId;
     }
 
     backToWalk() {
@@ -224,6 +244,7 @@ export default class RlmRtkFieldVisit extends LightningElement {
         this.busy = true;
         this.error = undefined;
         try {
+            if (this._explaining) await this._explaining;
             const result = await createQuote({
                 workOrderId: this.ctx.workOrderId,
                 planSku: plan.planSku,

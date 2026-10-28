@@ -29,6 +29,18 @@
                 <p class="muted notice">{lockedReason}</p>
             </template>
 
+            <template lwc:if={canChange}>
+                <div class="ai-row">
+                    <button type="button" class="ai-button" disabled={aiBusy} onclick={askEinstein}>
+                        <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                        {aiLabel}
+                    </button>
+                    <template lwc:if={aiMessage}>
+                        <p class="muted">{aiMessage}</p>
+                    </template>
+                </div>
+            </template>
+
             <template lwc:if={state}>
                 <h3>Plan</h3>
                 <div class="addons">
@@ -45,7 +57,7 @@
                             <template lwc:if={p.changeLabel}>
                                 <span class="change">{p.changeLabel}</span>
                             </template>
-                            <template lwc:if={p.recommended}>
+                            <template lwc:if={p.reason}>
                                 <span class="reason">Because: {p.reason}</span>
                             </template>
                         </button>
@@ -67,7 +79,7 @@
                             <template lwc:if={p.changeLabel}>
                                 <span class="change">{p.changeLabel}</span>
                             </template>
-                            <template lwc:if={p.recommended}>
+                            <template lwc:if={p.reason}>
                                 <span class="reason">Because: {p.reason}</span>
                             </template>
                         </button>

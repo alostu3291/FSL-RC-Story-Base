@@ -202,6 +202,15 @@ cell_text(found.cell(1, 1), "{{Observation}}", 9.5, False, INK)
 cell_text(found.cell(1, 2), "{{Severity}}", 9, True, RED)
 cell_text(found.cell(1, 3), "{{Note}}{{/Finding}}", 9, False, GREY)
 
+# ---------- why this plan ----------
+section_title("Why We Recommend This Plan")
+why = doc.add_table(rows=1, cols=1)
+borders(why, TINT)
+cell_margins(why, 110, 110, 160, 160)
+widths(why, [CONTENT_W])
+shade(why.cell(0, 0), TINT)
+cell_text(why.cell(0, 0), "{{WhyThisPlan}}", 10, False, INK)
+
 # ---------- protection plans ----------
 section_title("Your Protection Plan")
 para(doc, "Ongoing service plans that keep your home protected all year. Billed monthly; cancel any time with 30 days' notice.",

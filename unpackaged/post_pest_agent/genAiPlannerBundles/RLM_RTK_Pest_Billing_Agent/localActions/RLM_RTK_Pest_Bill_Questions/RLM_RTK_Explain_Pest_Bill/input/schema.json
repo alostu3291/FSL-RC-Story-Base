@@ -1,0 +1,34 @@
+{
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "accountId" : {
+      "title" : "Account Id",
+      "description" : "The customer account Id. Use currentRecordId when the user is on an Account record and says 'this customer' or 'my bill'.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "accountName" : {
+      "title" : "Account Name",
+      "description" : "The customer name the user mentioned, for example Sam Patel.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : true
+    },
+    "invoiceNumber" : {
+      "title" : "Invoice Number",
+      "description" : "The invoice document number, for example DOC-000000016, if the user gave one.",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : true
+    },
+    "amount" : {
+      "title" : "Amount",
+      "description" : "The bill amount the user asked about, as a number without the dollar sign, for example 366.",
+      "lightning:type" : "lightning__numberType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : true
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

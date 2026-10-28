@@ -459,3 +459,61 @@
         flex: 1;
     }
 }
+
+/* Einstein: photo suggestions and dictation */
+.ai-suggest,
+.dictate {
+    margin-top: 0.6rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid #ddd2f3;
+    border-radius: 0.8rem;
+    background: #f3eefc;
+}
+
+.ai-label,
+.ai-filled {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #5a2ea6;
+    --slds-c-icon-color-foreground-default: #5a2ea6;
+}
+
+.ai-filled {
+    margin: 0.5rem 0;
+    font-weight: 600;
+}
+
+.ai-what {
+    margin: 0.3rem 0 0;
+    font-size: 0.85rem;
+}
+
+.ai-values {
+    margin: 0.2rem 0 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.ai-actions,
+.dictate-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.dictate-actions .hint {
+    margin: 0 auto 0 0;
+}
+
+.btn.ai {
+    border-color: #5a2ea6;
+    background: #5a2ea6;
+    color: #fff;
+}

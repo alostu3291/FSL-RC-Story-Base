@@ -186,4 +186,21 @@ private class RLM_RTK_PlanChangeTest {
             Assert.isTrue(e.getMessage().contains('already scheduled'), e.getMessage());
         }
     }
+
+    private class StubGenerator implements RLM_RTK_AI.Generator {
+        public String generate(String templateName, Map<String, Object> inputs) {
+            return '{"suggestions":[{"sku":"' + RLM_RTK_PlanChange.TERMITE + '","reason":"Mud tubes on the garage wall"},'
+                + '{"sku":"' + RLM_RTK_PlanChange.ESSENTIAL + '","reason":"Current plan"}]}';
+        }
+    }
+
+    @IsTest
+    static void einsteinSuggestsOnlyPlansTheCustomerCouldAdd() {
+        RLM_RTK_AI.generator = new StubGenerator();
+
+        List<RLM_RTK_AI.Pick> picks = RLM_RTK_PlanChange.aiSuggestions(workOrderId());
+
+        Assert.areEqual(1, picks.size(), 'The current plan is never suggested');
+        Assert.areEqual(RLM_RTK_PlanChange.TERMITE, picks[0].sku);
+    }
 }

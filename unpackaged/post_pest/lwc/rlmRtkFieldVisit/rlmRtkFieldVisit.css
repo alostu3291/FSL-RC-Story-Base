@@ -247,3 +247,22 @@ h2 {
     position: relative;
     min-height: 5rem;
 }
+
+.panel.why {
+    margin-bottom: 1rem;
+    border-color: #ddd2f3;
+    background: linear-gradient(180deg, #f3eefc, #fff 80%);
+}
+
+.panel .why-label {
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #5a2ea6;
+    --slds-c-icon-color-foreground-default: #5a2ea6;
+}

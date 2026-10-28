@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bot xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentType>AgentforceEmployeeAgent</agentType>
+    <botMlDomain>
+        <label>Rentokil Pest Billing Agent</label>
+        <name>RLM_RTK_Pest_Billing_Agent</name>
+    </botMlDomain>
+    <botVersions>
+        <fullName>v1</fullName>
+        <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+        <botDialogs>
+            <botSteps>
+                <botMessages>
+                    <message>Hi! Ask me about a pest customer's bill, for example "Why is Sam Patel's bill $366?"</message>
+                    <messageIdentifier>64ddaa1b-c706-5c55-963d-99cacf5d44eb</messageIdentifier>
+                </botMessages>
+                <stepIdentifier>5975fe7d-fe75-5928-a414-207b19d8981a</stepIdentifier>
+                <type>Message</type>
+            </botSteps>
+            <botSteps>
+                <stepIdentifier>703afae7-6380-5bdc-8a3a-13ba428d4e3a</stepIdentifier>
+                <type>Wait</type>
+            </botSteps>
+            <developerName>Welcome</developerName>
+            <isPlaceholderDialog>false</isPlaceholderDialog>
+            <label>Hi! I&apos;m your helpful bot.</label>
+            <showInFooterMenu>false</showInFooterMenu>
+        </botDialogs>
+        <botDialogs>
+            <botSteps>
+                <botMessages>
+                    <message>Something went wrong. Try again.</message>
+                    <messageIdentifier>36c29058-49e7-56aa-80b9-ef57f0d7ac31</messageIdentifier>
+                </botMessages>
+                <stepIdentifier>8046e6e9-81ef-582b-8e57-52c251519609</stepIdentifier>
+                <type>Message</type>
+            </botSteps>
+            <botSteps>
+                <stepIdentifier>8d9b5956-d829-5aad-965e-29927cebccbe</stepIdentifier>
+                <type>Wait</type>
+            </botSteps>
+            <developerName>Error_Handling</developerName>
+            <isPlaceholderDialog>false</isPlaceholderDialog>
+            <label>Unfortunately, a system error occurred. Let us start again.</label>
+            <showInFooterMenu>false</showInFooterMenu>
+        </botDialogs>
+        <citationsEnabled>false</citationsEnabled>
+        <company>Salesforce</company>
+        <conversationDefinitionPlanners>
+            <genAiPlannerName>RLM_RTK_Pest_Billing_Agent</genAiPlannerName>
+        </conversationDefinitionPlanners>
+        <conversationVariables>
+            <dataType>Text</dataType>
+            <description>Salesforce Application Name.</description>
+            <developerName>currentAppName</developerName>
+            <includeInPrompt>true</includeInPrompt>
+            <label>currentAppName</label>
+            <visibility>External</visibility>
+        </conversationVariables>
+        <conversationVariables>
+            <dataType>Text</dataType>
+            <description>The API name of the Salesforce object (such as Account or Opportunity) associated with the record the user wants to interact with. Do not use this if the user is already talking about another object in the conversation.</description>
+            <developerName>currentObjectApiName</developerName>
+            <includeInPrompt>true</includeInPrompt>
+            <label>currentObjectApiName</label>
+            <visibility>External</visibility>
+        </conversationVariables>
+        <conversationVariables>
+            <dataType>Text</dataType>
+            <description>Type of Salesforce Page.</description>
+            <developerName>currentPageType</developerName>
+            <includeInPrompt>true</includeInPrompt>
+            <label>currentPageType</label>
+            <visibility>External</visibility>
+        </conversationVariables>
+        <conversationVariables>
+            <dataType>Text</dataType>
+            <description>The ID of the record on the user&apos;s screen. It may not relate to the user&apos;s input. Only use this if the user input mentions &apos;this&apos;, &apos;current&apos;, &apos;the record&apos;, etc. If in doubt, don&apos;t use it.</description>
+            <developerName>currentRecordId</developerName>
+            <includeInPrompt>true</includeInPrompt>
+            <label>currentRecordId</label>
+            <visibility>External</visibility>
+        </conversationVariables>
+        <conversationVariables>
+            <dataType>Text</dataType>
+            <description>This variable may also be referred to as VerifiedCustomerId</description>
+            <developerName>VerifiedCustomerId</developerName>
+            <includeInPrompt>false</includeInPrompt>
+            <label>VerifiedCustomerId</label>
+            <visibility>Internal</visibility>
+        </conversationVariables>
+        <entryDialog>Welcome</entryDialog>
+        <intentDisambiguationEnabled>false</intentDisambiguationEnabled>
+        <intentV3Enabled>false</intentV3Enabled>
+        <knowledgeActionEnabled>false</knowledgeActionEnabled>
+        <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+        <role>You help Rentokil pest control staff answer customers' billing questions in plain language, using only the facts on the posted bills.</role>
+        <smallTalkEnabled>false</smallTalkEnabled>
+        <surfacesEnabled>false</surfacesEnabled>
+        <toneType>Casual</toneType>
+    </botVersions>
+    <description>Explains Rentokil residential pest bills: plans, initial service, visit add-ons, plan-change credits, proration and tax.</description>
+    <label>Rentokil Pest Billing Agent</label>
+    <logPrivateConversationData>false</logPrivateConversationData>
+    <richContentEnabled>true</richContentEnabled>
+    <sessionTimeout>0</sessionTimeout>
+    <type>InternalCopilot</type>
+</Bot>

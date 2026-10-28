@@ -100,9 +100,31 @@
                                 label="Add photos"
                                 stage="Before"
                                 record-id={f.id}
+                                data-id={f.id}
                                 onuploaded={handleUploadFinished}
                             ></c-rlm-rtk-photo-capture>
                         </div>
+                        <template lwc:if={f.suggestion}>
+                            <div class="ai-suggest">
+                                <p class="ai-label">
+                                    <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                                    <template lwc:if={f.suggestion.loading}>Einstein is looking at the photo…</template>
+                                    <template lwc:else>Einstein sees</template>
+                                </p>
+                                <template lwc:if={f.suggestion.observation}>
+                                    <p class="ai-what">{f.suggestion.observation}</p>
+                                </template>
+                                <template lwc:if={f.suggestion.ready}>
+                                    <p class="ai-values">{f.suggestion.values}</p>
+                                    <div class="ai-actions">
+                                        <button type="button" class="btn ghost" data-id={f.id} onclick={dismissSuggestion}>Dismiss</button>
+                                        <button type="button" class="btn primary" data-id={f.id} onclick={reviewSuggestion} disabled={editing}>
+                                            Review &amp; apply
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
                     </article>
                 </template>
 
@@ -113,6 +135,32 @@
                 <template lwc:if={editing}>
                     <div class="editor">
                         <h3>{editorTitle}</h3>
+                        <div class="dictate">
+                            <lightning-textarea
+                                label="Describe what you see"
+                                placeholder="Say it or type it, e.g. mud tubes on the garage wall by the water heater, a few, wood touching soil"
+                                value={dictation}
+                                onchange={handleDictation}
+                            ></lightning-textarea>
+                            <div class="dictate-actions">
+                                <template lwc:if={canListen}>
+                                    <button type="button" class="btn ghost" onclick={toggleListening}>
+                                        <lightning-icon icon-name="utility:unmuted" size="x-small" alternative-text=""></lightning-icon>
+                                        {listenLabel}
+                                    </button>
+                                </template>
+                                <template lwc:else>
+                                    <span class="hint">Tap the mic on your keyboard to dictate.</span>
+                                </template>
+                                <button type="button" class="btn ai" onclick={fillFromNotes} disabled={fillDisabled}>{fillLabel}</button>
+                            </div>
+                        </div>
+                        <template lwc:if={filledBy}>
+                            <p class="ai-filled">
+                                <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                                {filledBy}
+                            </p>
+                        </template>
                         <p class="field-label">Pest</p>
                         <div class="chips">
                             <template for:each={pestChips} for:item="c">

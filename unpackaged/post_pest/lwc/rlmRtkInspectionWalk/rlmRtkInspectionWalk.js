@@ -3,6 +3,8 @@ import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
 import getState from '@salesforce/apex/RLM_RTK_Inspection.getState';
 import saveFinding from '@salesforce/apex/RLM_RTK_Inspection.saveFinding';
 import deleteFinding from '@salesforce/apex/RLM_RTK_Inspection.deleteFinding';
+import suggestFromPhoto from '@salesforce/apex/RLM_RTK_AI.suggestFromPhoto';
+import parseNotes from '@salesforce/apex/RLM_RTK_AI.parseNotes';
 
 const ZONES = [
     { value: 'Exterior Perimeter', icon: 'utility:home', hint: 'Foundation, siding, eaves' },
@@ -58,6 +60,13 @@ export default class RlmRtkInspectionWalk extends LightningElement {
     loading = true;
     error;
     viewing;
+    /** Einstein's read of the latest photo on each finding, by finding id, until applied or dismissed. */
+    photoSuggestions = {};
+    dictation = '';
+    parsing = false;
+    listening = false;
+    filledBy;
+    _recognition;
 
     connectedCallback() {
         this.load();
@@ -150,7 +159,8 @@ export default class RlmRtkInspectionWalk extends LightningElement {
                 sevClass: `sev-pill ${(f.severity || 'Light').toLowerCase()}`,
                 hasPhotos: f.photos && f.photos.length > 0,
                 photoCount: f.photos ? f.photos.length : 0,
-                photos: f.photos || []
+                photos: f.photos || [],
+                suggestion: this.suggestionView(this.photoSuggestions[f.id])
             }));
     }
 
@@ -222,6 +232,7 @@ export default class RlmRtkInspectionWalk extends LightningElement {
 
     startFinding() {
         this.draft = emptyDraft(this.activeZone);
+        this.resetDictation();
     }
 
     editFinding(event) {
@@ -241,6 +252,7 @@ export default class RlmRtkInspectionWalk extends LightningElement {
 
     cancelFinding() {
         this.draft = null;
+        this.resetDictation();
     }
 
     pickChip(event) {
@@ -262,6 +274,7 @@ export default class RlmRtkInspectionWalk extends LightningElement {
         try {
             this.apply(await saveFinding({ inspectionId: this.inspectionId, finding: this.draft }));
             this.draft = null;
+            this.resetDictation();
             const next = new Set(this.clearZones);
             next.delete(this.activeZone);
             this.clearZones = next;
@@ -285,8 +298,155 @@ export default class RlmRtkInspectionWalk extends LightningElement {
         }
     }
 
-    async handleUploadFinished() {
+    async handleUploadFinished(event) {
+        const findingId = event.currentTarget.dataset.id;
+        const documentIds = (event.detail && event.detail.documentIds) || [];
         this.apply(await getState({ inspectionId: this.inspectionId }));
+        if (findingId && documentIds.length) {
+            this.suggestFor(findingId, documentIds[documentIds.length - 1]);
+        }
+    }
+
+    // ---------- Einstein: suggestions from photos ----------
+    async suggestFor(findingId, documentId) {
+        this.setSuggestion(findingId, { loading: true });
+        try {
+            const s = await suggestFromPhoto({ findingId, documentId });
+            this.setSuggestion(findingId, s && (s.pest || s.evidence || s.observation) ? s : null);
+        } catch (e) {
+            this.setSuggestion(findingId, null);
+        }
+    }
+
+    setSuggestion(findingId, value) {
+        const next = { ...this.photoSuggestions };
+        if (value) next[findingId] = value;
+        else delete next[findingId];
+        this.photoSuggestions = next;
+    }
+
+    suggestionView(s) {
+        if (!s) return null;
+        return {
+            ...s,
+            ready: !s.loading,
+            values: [s.pest, s.evidence, s.severity].filter(Boolean).join(' · ') || 'No pest sign spotted'
+        };
+    }
+
+    dismissSuggestion(event) {
+        this.setSuggestion(event.currentTarget.dataset.id, null);
+    }
+
+    /** Opens the finding with Einstein's values filled in; the technician checks them and saves. */
+    reviewSuggestion(event) {
+        const id = event.currentTarget.dataset.id;
+        const f = this.findings.find((x) => x.id === id);
+        const s = this.photoSuggestions[id];
+        if (!f || !s) return;
+        this.draft = {
+            id: f.id,
+            zone: f.zone,
+            pest: s.pest || f.pest,
+            evidence: s.evidence || f.evidence,
+            severity: s.severity || f.severity || 'Light',
+            customerNote: f.customerNote || s.customerNote || '',
+            internalNote: f.internalNote || ''
+        };
+        this.filledBy = 'Filled in from the photo. Check it, then save.';
+        this.setSuggestion(id, null);
+    }
+
+    // ---------- Einstein: voice notes into findings ----------
+    get canListen() {
+        return typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    }
+
+    get listenLabel() {
+        return this.listening ? 'Stop' : 'Speak';
+    }
+
+    get fillDisabled() {
+        return this.parsing || !this.dictation || !this.dictation.trim();
+    }
+
+    get fillLabel() {
+        return this.parsing ? 'Filling…' : 'Fill from notes';
+    }
+
+    handleDictation(event) {
+        this.dictation = event.target.value;
+    }
+
+    toggleListening() {
+        if (this.listening) {
+            this.stopListening();
+            return;
+        }
+        try {
+            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new Recognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.continuous = true;
+            const before = this.dictation ? `${this.dictation.trim()} ` : '';
+            recognition.onresult = (e) => {
+                const heard = Array.from(e.results)
+                    .map((r) => r[0].transcript)
+                    .join(' ');
+                this.dictation = `${before}${heard}`.trim();
+            };
+            recognition.onend = () => {
+                this.listening = false;
+            };
+            recognition.onerror = () => {
+                this.listening = false;
+            };
+            recognition.start();
+            this._recognition = recognition;
+            this.listening = true;
+        } catch (e) {
+            this.listening = false;
+        }
+    }
+
+    stopListening() {
+        if (this._recognition) this._recognition.stop();
+        this.listening = false;
+    }
+
+    resetDictation() {
+        this.stopListening();
+        this.dictation = '';
+        this.filledBy = undefined;
+    }
+
+    async fillFromNotes() {
+        this.stopListening();
+        this.parsing = true;
+        try {
+            const s = await parseNotes({ notes: this.dictation, zone: this.draft.zone });
+            this.draft = {
+                ...this.draft,
+                zone: s.zone || this.draft.zone,
+                pest: s.pest || this.draft.pest,
+                evidence: s.evidence || this.draft.evidence,
+                severity: s.severity || this.draft.severity,
+                customerNote: s.customerNote || this.draft.customerNote,
+                internalNote: s.internalNote || this.draft.internalNote
+            };
+            this.filledBy = s.aiGenerated
+                ? 'Filled in by Einstein from your notes. Check it, then save.'
+                : 'Filled in from keywords in your notes. Check it, then save.';
+        } catch (e) {
+            this.error = this.message(e);
+        } finally {
+            this.parsing = false;
+        }
+    }
+
+    disconnectedCallback() {
+        this.stopListening();
     }
 
     previewPhoto(event) {

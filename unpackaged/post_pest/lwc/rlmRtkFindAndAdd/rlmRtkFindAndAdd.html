@@ -73,7 +73,16 @@
                     <button type="button" class="secondary wide" onclick={startLog}>+ Log a finding</button>
                 </template>
 
-                <h3>One-time services</h3>
+                <div class="services-head">
+                    <h3>One-time services</h3>
+                    <button type="button" class="ai-button" disabled={aiBusy} onclick={askEinstein}>
+                        <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                        {aiLabel}
+                    </button>
+                </div>
+                <template lwc:if={aiMessage}>
+                    <p class="muted ai-message">{aiMessage}</p>
+                </template>
                 <div class="addons">
                     <template for:each={addOnsView} for:item="a">
                         <button key={a.sku} type="button" class={a.cls} data-sku={a.sku} disabled={a.disabled} onclick={toggleAddOn}>

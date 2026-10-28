@@ -57,6 +57,7 @@ MAPPINGS = [
     ("Quote:RLM_RTK_Monthly_Total__c", "MonthlyTotal", "Currency"),
     ("Quote:RLM_RTK_One_Time_Total__c", "OneTimeTotal", "Currency"),
     ("Quote:GrandTotal", "GrandTotal", "Currency"),
+    ("Quote:RLM_RTK_Plan_Explanation__c", "WhyThisPlan", "String"),
     ("Quote:Plan:Product:Name", "Plan:Name", "String"),
     ("Quote:Plan:Product:Description", "Plan:Description", "String"),
     ("Quote:Plan:Quantity", "Plan:Quantity", "Integer"),
@@ -91,6 +92,7 @@ SAMPLE_OUTPUT = {
     "MonthlyTotal": "$187.00",
     "OneTimeTotal": "$199.00",
     "GrandTotal": "$386.00",
+    "WhyThisPlan": "We found rodent droppings in the garage and standing water in the yard. The Home Protection Plan covers the rodents, and the Seasonal Mosquito Plan treats the standing water.",
     "Plan": [
         {"Name": "Home Protection Plan", "Description": "General pest plus rodent protection, quarterly service.", "Quantity": 1, "MonthlyPrice": "$79.00"},
         {"Name": "Seasonal Mosquito Plan", "Description": "Mosquito protection April through October; pauses in winter.", "Quantity": 1, "MonthlyPrice": "$69.00"},

@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 import getState from '@salesforce/apex/RLM_RTK_PlanChange.getState';
 import applyChange from '@salesforce/apex/RLM_RTK_PlanChange.applyChange';
+import aiSuggestions from '@salesforce/apex/RLM_RTK_PlanChange.aiSuggestions';
 
 const money = (value) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
@@ -25,6 +26,10 @@ export default class RlmRtkPlanChange extends LightningElement {
     error;
     selectedSku;
     approver = '';
+    /** Einstein's extra picks from the finding notes, sku to reason. Prices and approval are unchanged. */
+    aiPicks = {};
+    aiBusy = false;
+    aiMessage;
 
     connectedCallback() {
         this.load();
@@ -109,13 +114,18 @@ export default class RlmRtkPlanChange extends LightningElement {
                 badgeCls = 'badge current';
             } else if (p.recommended) {
                 badge = 'Recommended';
+            } else if (this.aiPicks[p.sku]) {
+                badge = 'Einstein suggests';
+                badgeCls = 'badge ai';
             }
+            const reason = p.recommended ? p.reason : !p.current && this.aiPicks[p.sku];
             const changeLabel =
                 p.change && p.monthlyChange !== null && p.monthlyChange !== undefined
                     ? `${p.change} · ${monthly(p.monthlyChange)}`
                     : p.change;
             return {
                 ...p,
+                reason,
                 priceLabel: `${money(p.price)}/mo`,
                 changeLabel: p.current && p.change !== 'Remove' ? null : changeLabel,
                 cls: `addon${on ? ' on' : ''}${p.current ? ' current' : ''}`,
@@ -125,6 +135,31 @@ export default class RlmRtkPlanChange extends LightningElement {
             };
         });
     }
+    get aiLabel() {
+        return this.aiBusy ? 'Reading the notes…' : 'Ask Einstein';
+    }
+
+    /** Reads the finding notes for plans the fixed rules missed; the customer still approves. */
+    async askEinstein() {
+        this.aiBusy = true;
+        this.aiMessage = undefined;
+        try {
+            const picks = await aiSuggestions({ recordId: this.recordId });
+            const next = {};
+            (picks || []).forEach((p) => {
+                next[p.sku] = p.reason;
+            });
+            this.aiPicks = next;
+            this.aiMessage = picks && picks.length
+                ? `Einstein found ${picks.length} more from the notes. The customer still approves.`
+                : 'Einstein didn’t find another plan in the notes.';
+        } catch (e) {
+            this.aiMessage = 'Einstein isn’t available right now. The rules still apply.';
+        } finally {
+            this.aiBusy = false;
+        }
+    }
+
     get tiersView() {
         return this.view(this.state ? this.state.tiers : []);
     }

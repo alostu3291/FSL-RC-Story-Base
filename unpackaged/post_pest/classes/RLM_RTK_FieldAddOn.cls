@@ -56,10 +56,31 @@ public with sharing class RLM_RTK_FieldAddOn {
     @TestVisible
     private static OrderPlacer placer = new SalesTransactionPlacer();
 
+    /** Product SKUs are unique org-wide, so tests use suffixed copies of the catalog SKUs. */
+    @TestVisible
+    private static String skuSuffix = '';
+
     @AuraEnabled
     public static State getState(Id recordId) {
         try {
             return buildState(workOrderFor(recordId));
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
+    /** One-time services the finding notes call for beyond the fixed rules, from RLM_RTK_AI. Empty when AI is unavailable. */
+    @AuraEnabled
+    public static List<RLM_RTK_AI.Pick> aiSuggestions(Id recordId) {
+        try {
+            WorkOrder wo = workOrderFor(recordId);
+            List<RLM_RTK_AI.Option> options = new List<RLM_RTK_AI.Option>();
+            for (AddOn a : buildState(wo).addOns) {
+                if (a.added != true && a.recommended != true) {
+                    options.add(new RLM_RTK_AI.Option(a.sku, a.name, a.description));
+                }
+            }
+            return RLM_RTK_AI.suggestProducts(wo.AccountId, options, 'one-time services added to today\'s visit');
         } catch (Exception e) {
             throw auraError(e);
         }
@@ -277,7 +298,7 @@ public with sharing class RLM_RTK_FieldAddOn {
         ]) {
             Line l = new Line();
             l.id = line.Id;
-            l.sku = line.PricebookEntry.Product2.StockKeepingUnit;
+            l.sku = line.PricebookEntry.Product2.StockKeepingUnit?.removeEnd(skuSuffix);
             l.name = line.Subject;
             l.price = line.UnitPrice;
             l.reason = line.Description;
@@ -292,7 +313,7 @@ public with sharing class RLM_RTK_FieldAddOn {
         Map<String, Suggestion> suggestions = suggest(wo.RLM_RTK_Inspection__c);
         for (PricebookEntry entry : entriesBySku().values()) {
             AddOn a = new AddOn();
-            a.sku = entry.Product2.StockKeepingUnit;
+            a.sku = entry.Product2.StockKeepingUnit.removeEnd(skuSuffix);
             a.name = entry.Product2.Name;
             a.description = entry.Product2.Description;
             a.price = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
@@ -378,7 +399,7 @@ public with sharing class RLM_RTK_FieldAddOn {
             WHERE Product2Id IN :productIds AND Pricebook2Id = :standardId AND CurrencyIsoCode = 'USD'
                 AND IsActive = true AND Product2.IsActive = true
         ]) {
-            entries.put(entry.Product2.StockKeepingUnit, entry);
+            entries.put(entry.Product2.StockKeepingUnit.removeEnd(skuSuffix), entry);
         }
         return entries;
     }

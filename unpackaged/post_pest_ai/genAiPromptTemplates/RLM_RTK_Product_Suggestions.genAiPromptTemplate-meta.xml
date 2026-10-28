@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Suggests one-time services or plans the finding notes call for beyond the fixed rules. Prices stay rule based and the customer approves. Called from RLM_RTK_AI.suggestProducts.</description>
+    <developerName>RLM_RTK_Product_Suggestions</developerName>
+    <masterLabel>RTK Product Suggestions</masterLabel>
+    <templateVersions>
+        <content>You help a Rentokil pest control technician spot services a customer may need that the fixed rules missed.
+Read the findings and every note, including technician and treatment notes. Suggest an option only when its coverage clearly matches something written there (for example, mud tubes point to termite protection; a nest under an eave points to wasp nest removal). Never suggest something the notes don't support, and never suggest an option to say it isn't needed. Each reason must name the pest or evidence that was actually found. An empty list is the right answer when nothing in the notes points to an option.
+
+{!$Input:Context}
+
+Reply with only a JSON object, no other text, with at most 3 items:
+{"suggestions": []} or {"suggestions": [{"sku": "exact SKU from the list", "reason": "under 15 words on what was found and where"}]}</content>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Options and findings</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

@@ -486,6 +486,22 @@
     <omniDataTransformItem>
         <disabled>false</disabled>
         <filterGroup>0.0</filterGroup>
+        <globalKey>1efbdabf-9b1c-50e0-a74e-f5f9a0b3f8e4</globalKey>
+        <inputFieldName>Quote:RLM_RTK_Plan_Explanation__c</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMRTKProposalExtract</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldFormat>String</outputFieldFormat>
+        <outputFieldName>WhyThisPlan</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
         <globalKey>1a3b27f8-2e53-5c39-9862-011b18ed0e32</globalKey>
         <inputFieldName>Quote:Plan:Product:Name</inputFieldName>
         <inputObjectQuerySequence>0.0</inputObjectQuerySequence>

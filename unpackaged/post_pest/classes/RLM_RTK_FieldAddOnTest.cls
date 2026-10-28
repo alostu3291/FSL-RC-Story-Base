@@ -9,6 +9,12 @@ private class RLM_RTK_FieldAddOnTest {
         }
     }
 
+    private static final String SUFFIX = '-FATEST';
+
+    static {
+        RLM_RTK_FieldAddOn.skuSuffix = SUFFIX;
+    }
+
     @TestSetup
     static void setup() {
         ProductCatalog catalog = new ProductCatalog(Name = 'Field Add-on Test', Code = 'CAT-RTK-TEST');
@@ -17,15 +23,15 @@ private class RLM_RTK_FieldAddOnTest {
             CatalogId = catalog.Id);
         insert category;
         List<Product2> products = new List<Product2>{
-            new Product2(Name = 'Wasp & Hornet Nest Removal', StockKeepingUnit = RLM_RTK_FieldAddOn.WASP_NEST, IsActive = true),
-            new Product2(Name = 'Attic Sanitation', StockKeepingUnit = RLM_RTK_FieldAddOn.ATTIC_SANITATION, IsActive = true)
+            new Product2(Name = 'Wasp & Hornet Nest Removal', StockKeepingUnit = RLM_RTK_FieldAddOn.WASP_NEST + SUFFIX, IsActive = true),
+            new Product2(Name = 'Attic Sanitation', StockKeepingUnit = RLM_RTK_FieldAddOn.ATTIC_SANITATION + SUFFIX, IsActive = true)
         };
         insert products;
         List<PricebookEntry> entries = new List<PricebookEntry>();
         List<ProductCategoryProduct> links = new List<ProductCategoryProduct>();
         for (Product2 p : products) {
             entries.add(new PricebookEntry(Product2Id = p.Id, Pricebook2Id = Test.getStandardPricebookId(),
-                UnitPrice = p.StockKeepingUnit == RLM_RTK_FieldAddOn.WASP_NEST ? 179 : 499,
+                UnitPrice = p.StockKeepingUnit == RLM_RTK_FieldAddOn.WASP_NEST + SUFFIX ? 179 : 499,
                 IsActive = true, CurrencyIsoCode = 'USD'));
             links.add(new ProductCategoryProduct(ProductCategoryId = category.Id, ProductId = p.Id));
         }
@@ -109,5 +115,23 @@ private class RLM_RTK_FieldAddOnTest {
         Test.stopTest();
 
         Assert.areEqual(0, [SELECT COUNT() FROM Order]);
+    }
+
+    private class StubGenerator implements RLM_RTK_AI.Generator {
+        public String generate(String templateName, Map<String, Object> inputs) {
+            return '{"suggestions":[{"sku":"' + RLM_RTK_FieldAddOn.ATTIC_SANITATION + '","reason":"Droppings noted in the attic"},'
+                + '{"sku":"' + RLM_RTK_FieldAddOn.WASP_NEST + '","reason":"Already recommended"}]}';
+        }
+    }
+
+    @IsTest
+    static void einsteinSuggestsOnlyAddOnsTheRulesDidNot() {
+        RLM_RTK_AI.generator = new StubGenerator();
+
+        List<RLM_RTK_AI.Pick> picks = RLM_RTK_FieldAddOn.aiSuggestions(workOrder().Id);
+
+        Assert.areEqual(1, picks.size(), 'The rules already recommend the wasp nest removal');
+        Assert.areEqual(RLM_RTK_FieldAddOn.ATTIC_SANITATION, picks[0].sku);
+        Assert.areEqual('Droppings noted in the attic', picks[0].reason);
     }
 }

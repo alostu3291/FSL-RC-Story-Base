@@ -13,7 +13,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 | Flag | Default | Used in `when:` clauses |
 |------|---------|------------------------|
-| `agents` | `False` | 4 flow step(s) |
+| `agents` | `False` | 8 flow step(s) |
 | `analytics` | `True` | 2 flow step(s) |
 | `approvals` | `True` | 4 flow step(s) |
 | `billing` | `True` | 21 flow step(s) |
@@ -30,13 +30,13 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `dev_ed` | `False` | 1 flow step(s) |
 | `docgen` | `True` | 13 flow step(s) |
 | `dro` | `True` | 12 flow step(s) |
-| `einstein` | `True` | 3 flow step(s) |
+| `einstein` | `True` | 5 flow step(s) |
 | `fsl` | `False` | 17 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
-| `pest` | `False` | 17 flow step(s) |
+| `pest` | `False` | 23 flow step(s) |
 | `prm` | `True` | 9 flow step(s) |
 | `prm_exp_bundle` | `True` | 4 flow step(s) |
 | `procedure_plan_definition_version_active` | `False` | — |
@@ -61,6 +61,10 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 ### `agents` (default: `False`)
 
+- `prepare_pest` step 15 → `deploy_agents_settings`
+- `prepare_pest` step 16 → `deploy_post_pest_agent`
+- `prepare_pest` step 17 → `assign_permission_sets`
+- `prepare_pest` step 18 → `activate_pest_billing_agent`
 - `prepare_agents` step 1 → `assign_permission_set_groups`
 - `prepare_agents` step 2 → `deploy_agents_settings`
 - `prepare_agents` step 3 → `deploy_agents`
@@ -204,6 +208,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `assign_feature_psls` step 2 → `assign_permission_set_licenses`
 - `assign_feature_permission_sets` step 2 → `assign_permission_sets`
 - `assign_feature_permission_sets` step 3 → `assign_permission_sets`
+- `prepare_pest` step 1.6 → `deploy_post_pest_ai`
+- `prepare_pest` step 1.7 → `activate_pest_prompt_templates`
 
 ### `fsl` (default: `False`)
 
@@ -247,6 +253,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 - `prepare_pest` step 1 → `deploy_post_pest`
 - `prepare_pest` step 1.5 → `assign_permission_sets`
+- `prepare_pest` step 1.6 → `deploy_post_pest_ai`
+- `prepare_pest` step 1.7 → `activate_pest_prompt_templates`
 - `prepare_pest` step 2 → `apply_context_pest_location`
 - `prepare_pest` step 3 → `insert_pest_pcm_data`
 - `prepare_pest` step 4 → `insert_pest_pricing_data`
@@ -262,6 +270,10 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 12 → `deploy_post_pest_docgen`
 - `prepare_pest` step 13 → `activate_docgen_templates`
 - `prepare_pest` step 14 → `fix_pest_document_template_binaries`
+- `prepare_pest` step 15 → `deploy_agents_settings`
+- `prepare_pest` step 16 → `deploy_post_pest_agent`
+- `prepare_pest` step 17 → `assign_permission_sets`
+- `prepare_pest` step 18 → `activate_pest_billing_agent`
 
 ### `prm` (default: `True`)
 
