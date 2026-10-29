@@ -100,16 +100,124 @@ public with sharing class RLM_RTK_FieldVisit {
         }
     }
 
-    /** Creates the inspection for this visit and links it to the work order, or returns the existing one. */
+    public class VisitTiming {
+        @AuraEnabled public Id workOrderId;
+        @AuraEnabled public Id appointmentId;
+        @AuraEnabled public String appointmentNumber;
+        @AuraEnabled public Datetime startedAt;
+        @AuraEnabled public Boolean completed = false;
+    }
+
+    /** When the technician started this visit, if they have. */
+    @AuraEnabled
+    public static VisitTiming getVisitTiming(Id recordId) {
+        try {
+            WorkOrder wo = workOrderFor(recordId);
+            return timingFor(wo, appointmentFor(recordId, wo.Id));
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
+    /**
+     * Starts the visit: the appointment goes In Progress with its actual start time, and the work
+     * order goes In Progress with its start date. Calling it again keeps the first start.
+     */
+    @AuraEnabled
+    public static VisitTiming startVisit(Id recordId) {
+        try {
+            WorkOrder wo = workOrderFor(recordId);
+            ServiceAppointment sa = start(wo, appointmentFor(recordId, wo.Id));
+            return timingFor(workOrderFor(wo.Id), sa);
+        } catch (Exception e) {
+            throw auraError(e);
+        }
+    }
+
+    private static ServiceAppointment start(WorkOrder wo, ServiceAppointment sa) {
+        Datetime now = Datetime.now();
+        if (sa != null && !FINISHED.contains(sa.StatusCategory)) {
+            Boolean changed = false;
+            if (sa.StatusCategory != 'InProgress') {
+                sa.Status = 'In Progress';
+                changed = true;
+            }
+            if (sa.ActualStartTime == null) {
+                sa.ActualStartTime = now;
+                changed = true;
+            }
+            if (changed) {
+                update sa;
+            }
+        }
+        Datetime startedAt = sa?.ActualStartTime ?? now;
+        if (wo.StatusCategory == 'New' || wo.StartDate == null) {
+            WorkOrder started = new WorkOrder(Id = wo.Id);
+            if (wo.StatusCategory == 'New') {
+                started.Status = 'In Progress';
+            }
+            if (wo.StartDate == null) {
+                started.StartDate = startedAt;
+            }
+            update started;
+        }
+        return sa;
+    }
+
+    private static final Set<String> FINISHED = new Set<String>{ 'Completed', 'Canceled', 'CannotComplete' };
+
+    /** The appointment the action was opened from, else the user's open one on the work order, else its first open one. */
+    private static ServiceAppointment appointmentFor(Id recordId, Id workOrderId) {
+        Set<Id> mine = new Set<Id>();
+        for (AssignedResource ar : [
+            SELECT ServiceAppointmentId FROM AssignedResource
+            WHERE ServiceAppointment.ParentRecordId = :workOrderId AND ServiceResource.RelatedRecordId = :UserInfo.getUserId()
+        ]) {
+            mine.add(ar.ServiceAppointmentId);
+        }
+        ServiceAppointment first;
+        ServiceAppointment firstOpen;
+        ServiceAppointment myOpen;
+        for (ServiceAppointment sa : [
+            SELECT Id, AppointmentNumber, Status, StatusCategory, ActualStartTime, ActualEndTime
+            FROM ServiceAppointment WHERE ParentRecordId = :workOrderId
+            ORDER BY SchedStartTime ASC NULLS LAST, CreatedDate ASC
+        ]) {
+            if (sa.Id == recordId) {
+                return sa;
+            }
+            first = first ?? sa;
+            if (!FINISHED.contains(sa.StatusCategory)) {
+                firstOpen = firstOpen ?? sa;
+                if (myOpen == null && mine.contains(sa.Id)) {
+                    myOpen = sa;
+                }
+            }
+        }
+        return myOpen ?? firstOpen ?? first;
+    }
+
+    private static VisitTiming timingFor(WorkOrder wo, ServiceAppointment sa) {
+        VisitTiming t = new VisitTiming();
+        t.workOrderId = wo.Id;
+        t.appointmentId = sa?.Id;
+        t.appointmentNumber = sa?.AppointmentNumber;
+        t.startedAt = sa?.ActualStartTime ?? (wo.StatusCategory == 'New' ? null : wo.StartDate);
+        t.completed = wo.StatusCategory == 'Completed' || wo.StatusCategory == 'Closed';
+        return t;
+    }
+
+    /** Starts the visit, then creates the inspection and links it to the work order, or returns the existing one. */
     @AuraEnabled
     public static Id startInspection(Id workOrderId) {
         try {
             WorkOrder wo = workOrderFor(workOrderId);
+            if (wo.RLM_RTK_Inspection__c == null && (wo.RLM_Order__c != null || wo.AccountId == null)) {
+                throw new VisitException('Inspect & Quote runs from an inspection visit, not a treatment work order.');
+            }
+            start(wo, appointmentFor(workOrderId, wo.Id));
             if (wo.RLM_RTK_Inspection__c != null) {
                 return wo.RLM_RTK_Inspection__c;
-            }
-            if (wo.RLM_Order__c != null || wo.AccountId == null) {
-                throw new VisitException('Inspect & Quote runs from an inspection visit, not a treatment work order.');
             }
             RLM_RTK_Inspection__c inspection = new RLM_RTK_Inspection__c(
                 Account__c = wo.AccountId,
@@ -429,11 +537,16 @@ public with sharing class RLM_RTK_FieldVisit {
                 WHERE ParentRecordId = :wo.Id AND Status NOT IN ('Completed', 'Canceled', 'Cannot Complete')
             ];
             Datetime now = Datetime.now();
+            Datetime startedAt = wo.StartDate;
             for (ServiceAppointment sa : open) {
                 sa.Status = 'Completed';
                 sa.ActualEndTime = now;
                 if (sa.ActualStartTime == null) {
                     sa.ActualStartTime = now;
+                }
+                sa.ActualDuration = Math.max(1, (now.getTime() - sa.ActualStartTime.getTime()) / 60000);
+                if (startedAt == null || sa.ActualStartTime < startedAt) {
+                    startedAt = sa.ActualStartTime;
                 }
             }
             update open;
@@ -445,7 +558,7 @@ public with sharing class RLM_RTK_FieldVisit {
                 line.Status = 'Completed';
             }
             update addOns;
-            update new WorkOrder(Id = wo.Id, Status = 'Completed');
+            update new WorkOrder(Id = wo.Id, Status = 'Completed', StartDate = startedAt ?? now, EndDate = now);
             return wo.WorkOrderNumber;
         } catch (Exception e) {
             throw auraError(e);
@@ -528,7 +641,7 @@ public with sharing class RLM_RTK_FieldVisit {
         return [
             SELECT Id, WorkOrderNumber, AccountId, Account.Name, Account.ShippingStreet, Account.ShippingCity,
                 Account.ShippingState, Account.ShippingPostalCode, Street, City, State, PostalCode,
-                RLM_Order__c, RLM_RTK_Inspection__c, RLM_RTK_Inspection__r.Quote__c
+                RLM_Order__c, RLM_RTK_Inspection__c, RLM_RTK_Inspection__r.Quote__c, StatusCategory, StartDate
             FROM WorkOrder WHERE Id = :workOrderId
         ];
     }

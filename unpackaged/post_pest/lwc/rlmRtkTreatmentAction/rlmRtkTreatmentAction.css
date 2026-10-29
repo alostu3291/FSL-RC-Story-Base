@@ -30,6 +30,16 @@
     text-align: center;
 }
 
+.started {
+    margin: 0.75rem 0 0;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.6rem;
+    background: #e7f3ec;
+    color: #145c38;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
 .done {
     margin: 0;
     color: #145c38;

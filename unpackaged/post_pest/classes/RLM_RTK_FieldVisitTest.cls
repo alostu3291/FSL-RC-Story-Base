@@ -175,6 +175,46 @@ private class RLM_RTK_FieldVisitTest {
     }
 
     @IsTest
+    static void startingTheInspectionStartsTheAppointmentAndWorkOrder() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+        Assert.isNull(RLM_RTK_FieldVisit.getVisitTiming(sa.Id).startedAt);
+
+        RLM_RTK_FieldVisit.startInspection(wo.Id);
+
+        ServiceAppointment started = [SELECT Status, ActualStartTime FROM ServiceAppointment WHERE Id = :sa.Id];
+        Assert.areEqual('In Progress', started.Status);
+        Assert.isNotNull(started.ActualStartTime);
+        WorkOrder visit = [SELECT Status, StartDate FROM WorkOrder WHERE Id = :wo.Id];
+        Assert.areEqual('In Progress', visit.Status);
+        Assert.areEqual(started.ActualStartTime, visit.StartDate);
+        Assert.areEqual(started.ActualStartTime, RLM_RTK_FieldVisit.getVisitTiming(wo.Id).startedAt);
+    }
+
+    @IsTest
+    static void startingTreatmentKeepsTheFirstStartAndCompletionRecordsTheEnd() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+        update new ServiceAppointment(Id = sa.Id, Status = 'In Progress', ActualStartTime = Datetime.now().addMinutes(-30));
+        Datetime arrived = [SELECT ActualStartTime FROM ServiceAppointment WHERE Id = :sa.Id].ActualStartTime;
+
+        RLM_RTK_FieldVisit.VisitTiming timing = RLM_RTK_FieldVisit.startVisit(sa.Id);
+        Assert.areEqual(arrived, timing.startedAt);
+        Assert.areEqual(sa.Id, timing.appointmentId);
+        Assert.areEqual(arrived, [SELECT StartDate FROM WorkOrder WHERE Id = :wo.Id].StartDate);
+
+        RLM_RTK_FieldVisit.completeVisit(wo.Id);
+        ServiceAppointment done = [SELECT ActualStartTime, ActualEndTime, ActualDuration FROM ServiceAppointment WHERE Id = :sa.Id];
+        Assert.areEqual(arrived, done.ActualStartTime);
+        Assert.isTrue(done.ActualDuration >= 29, String.valueOf(done.ActualDuration));
+        WorkOrder closed = [SELECT Status, StartDate, EndDate FROM WorkOrder WHERE Id = :wo.Id];
+        Assert.areEqual('Completed', closed.Status);
+        Assert.areEqual(arrived, closed.StartDate);
+        Assert.areEqual(done.ActualEndTime, closed.EndDate);
+        Assert.isTrue(RLM_RTK_FieldVisit.getVisitTiming(wo.Id).completed);
+    }
+
+    @IsTest
     static void otherRecordsAreRejected() {
         WorkOrder wo = inspectionVisit();
         try {
