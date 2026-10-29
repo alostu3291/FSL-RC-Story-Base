@@ -1,7 +1,15 @@
 feature: pest
 feature_flag: pest
-# Treatment checklist (inspection findings, before/after photos) at the top of the Work Order page.
+# Treatment checklist (inspection findings, before/after photos) at the top of the Work Order page,
+# and the re-service response milestone tracker under Service Appointments.
 patches:
+  - type: add_component
+    region: sidebar
+    component: "support:milestones"
+    identifier: support_milestones
+    after_identifier: force_relatedListSingleContainer_serviceAppointments
+    properties:
+      hideMarkCompleteButton: "false"
   - type: insert_action
     after: "WorkOrder.RLM_Flag_Expansion"
     actions:
