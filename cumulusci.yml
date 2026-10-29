@@ -1769,6 +1769,22 @@ tasks:
     options:
       path: scripts/apex/setupRtkInspectionVisit.apex
 
+  seed_rtk_prospect_inspection:
+    group: Revenue Lifecycle Management
+    description: Idempotently book a free Pest Inspection for a new prospect (account_name, street, optional phone, hour, days_ahead), dispatched to the running user, for the Inspect and Quote flow. Creates the Bloomingdale account and contact if missing, refuses an account that already has plans, and reports the work order and appointment it booked.
+    class_path: tasks.rlm_rtk_seed_visit.SeedRtkVisit
+    options:
+      path: scripts/apex/seedRtkProspectInspection.apex
+      hour: 10
+
+  seed_rtk_reservice:
+    group: Revenue Lifecycle Management
+    description: Idempotently book a Pest Re-service for an existing customer (account_name, pest, hour, days_ahead), dispatched to the running user, for the Covered re-service and Change the plan flow. Fails unless an active guarantee covers the pest (require_coverage false allows a Not Covered visit), and reports the guarantee and response milestone.
+    class_path: tasks.rlm_rtk_seed_visit.SeedRtkVisit
+    options:
+      path: scripts/apex/seedRtkReservice.apex
+      hour: 8
+
   setup_rtk_dro_steps:
     group: Revenue Lifecycle Management
     description: Idempotently create Rentokil Initial Treatment DRO step definitions (AutoTask/ManualTask/Milestone) and dependencies. Use when SFDMU StepType values do not match the org picklist.

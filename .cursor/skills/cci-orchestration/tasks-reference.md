@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**228 tasks** across **9 groups**.
+**230 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*147 task(s)*
+*149 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -2391,6 +2391,32 @@
 **Description:** Restore the placeholder siteAdmin and siteGuestRecordDefaultOwner in Payments_Webhook.site-meta.xml after deploy_post_payments_site so the repo never stores the target org's real username. Run AFTER deploy_post_payments_site.
 
 **Class:** `tasks.rlm_community.RevertPaymentsSiteAfterDeploy`
+
+---
+
+### `seed_rtk_prospect_inspection`
+
+**Description:** Idempotently book a free Pest Inspection for a new prospect (account_name, street, optional phone, hour, days_ahead), dispatched to the running user, for the Inspect and Quote flow. Creates the Bloomingdale account and contact if missing, refuses an account that already has plans, and reports the work order and appointment it booked.
+
+**Class:** `tasks.rlm_rtk_seed_visit.SeedRtkVisit`
+
+**Options:**
+
+- `path`: `scripts/apex/seedRtkProspectInspection.apex`
+- `hour`: `10`
+
+---
+
+### `seed_rtk_reservice`
+
+**Description:** Idempotently book a Pest Re-service for an existing customer (account_name, pest, hour, days_ahead), dispatched to the running user, for the Covered re-service and Change the plan flow. Fails unless an active guarantee covers the pest (require_coverage false allows a Not Covered visit), and reports the guarantee and response milestone.
+
+**Class:** `tasks.rlm_rtk_seed_visit.SeedRtkVisit`
+
+**Options:**
+
+- `path`: `scripts/apex/seedRtkReservice.apex`
+- `hour`: `8`
 
 ---
 

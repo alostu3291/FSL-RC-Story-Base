@@ -175,6 +175,8 @@ that topic.
 | Write Robot Framework tests | `.cursor/skills/robot-testing/SKILL.md` |
 | Capture/apply UX drift from org | `docs/features/dynamic-ux-assembly.md` |
 | Debug a build/deploy failure | `.cursor/skills/troubleshooting/SKILL.md` |
+| Deploy or repair the pest / FSL demo in an existing org | `.cursor/skills/pest-demo-org-deploy/SKILL.md` |
+| Seed pest demo visits (prospect inspection, Covered re-service) | `.cursor/skills/pest-demo-seed-visits/SKILL.md` |
 
 Each skill has a **Quick Rules** section at the top for fast reference,
 and a **DO NOT** section listing critical safety constraints for that area.
