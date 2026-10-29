@@ -1,0 +1,70 @@
+.card {
+    margin-top: 0.75rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.8rem;
+    border: 1px solid #b9dcc8;
+    background: #f1f8f4;
+    --accent: #1f7a4d;
+}
+
+.card.soon {
+    border-color: #f2cf8a;
+    background: #fff8eb;
+    --accent: #b86e00;
+}
+
+.card.overdue,
+.card.late {
+    border-color: #f1b4ae;
+    background: #fdf1f0;
+    --accent: #b42318;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.title {
+    margin: 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1d2b23;
+}
+
+.subtitle {
+    margin: 0.1rem 0 0;
+    font-size: 0.78rem;
+    color: #5b6b62;
+}
+
+.headline {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.track {
+    margin-top: 0.6rem;
+    height: 0.4rem;
+    border-radius: 0.2rem;
+    background: rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    border-radius: 0.2rem;
+    background: var(--accent);
+}
+
+.detail {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: #3d4b43;
+}

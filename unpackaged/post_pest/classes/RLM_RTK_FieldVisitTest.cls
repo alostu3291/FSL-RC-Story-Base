@@ -189,6 +189,7 @@ private class RLM_RTK_FieldVisitTest {
         Assert.areEqual('In Progress', visit.Status);
         Assert.areEqual(started.ActualStartTime, visit.StartDate);
         Assert.areEqual(started.ActualStartTime, RLM_RTK_FieldVisit.getVisitTiming(wo.Id).startedAt);
+        Assert.isNull(RLM_RTK_FieldVisit.getVisitTiming(wo.Id).response, 'An inspection has no response guarantee');
     }
 
     @IsTest

@@ -106,6 +106,17 @@ public with sharing class RLM_RTK_FieldVisit {
         @AuraEnabled public String appointmentNumber;
         @AuraEnabled public Datetime startedAt;
         @AuraEnabled public Boolean completed = false;
+        @AuraEnabled public ResponseGuarantee response;
+    }
+
+    /** The Covered re-service's Re-service Response milestone, if the work order has one. */
+    public class ResponseGuarantee {
+        @AuraEnabled public String guaranteeName;
+        @AuraEnabled public String reportedPest;
+        @AuraEnabled public Datetime requestedAt;
+        @AuraEnabled public Datetime dueBy;
+        @AuraEnabled public Datetime metAt;
+        @AuraEnabled public Boolean violated = false;
     }
 
     /** When the technician started this visit, if they have. */
@@ -204,6 +215,24 @@ public with sharing class RLM_RTK_FieldVisit {
         t.appointmentNumber = sa?.AppointmentNumber;
         t.startedAt = sa?.ActualStartTime ?? (wo.StatusCategory == 'New' ? null : wo.StartDate);
         t.completed = wo.StatusCategory == 'Completed' || wo.StatusCategory == 'Closed';
+        List<EntityMilestone> milestones = [
+            SELECT StartDate, TargetDate, CompletionDate, IsViolated
+            FROM EntityMilestone
+            WHERE ParentEntityId = :wo.Id AND MilestoneType.Name = :RLM_RTK_Coverage.RESPONSE_MILESTONE
+            ORDER BY StartDate DESC
+            LIMIT 1
+        ];
+        if (!milestones.isEmpty()) {
+            EntityMilestone m = milestones[0];
+            WorkOrder reservice = [SELECT Entitlement.Name, RLM_RTK_Reported_Pest__c FROM WorkOrder WHERE Id = :wo.Id];
+            t.response = new ResponseGuarantee();
+            t.response.guaranteeName = reservice.Entitlement?.Name;
+            t.response.reportedPest = reservice.RLM_RTK_Reported_Pest__c;
+            t.response.requestedAt = m.StartDate;
+            t.response.dueBy = m.TargetDate;
+            t.response.metAt = m.CompletionDate;
+            t.response.violated = m.IsViolated;
+        }
         return t;
     }
 

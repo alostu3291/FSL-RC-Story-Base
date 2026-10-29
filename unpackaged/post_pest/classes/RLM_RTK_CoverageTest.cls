@@ -116,6 +116,12 @@ private class RLM_RTK_CoverageTest {
         Assert.isFalse(response.IsCompleted);
         Assert.isTrue(response.TargetDate > response.StartDate.addHours(47).addMinutes(58));
         Assert.areEqual(0, [SELECT COUNT() FROM EntityMilestone WHERE ParentEntityId = :bedBugs.Id]);
+        RLM_RTK_FieldVisit.ResponseGuarantee card = RLM_RTK_FieldVisit.getVisitTiming(ants.Id).response;
+        Assert.areEqual(response.TargetDate, card.dueBy);
+        Assert.areEqual('Ants', card.reportedPest);
+        Assert.areEqual('Home Protection Plan guarantee', card.guaranteeName);
+        Assert.isNull(card.metAt);
+        Assert.isNull(RLM_RTK_FieldVisit.getVisitTiming(bedBugs.Id).response, 'Not Covered has no SLA to meet');
 
         ServiceAppointment sa = new ServiceAppointment(ParentRecordId = ants.Id, Status = 'Scheduled',
             EarliestStartTime = Datetime.now(), DueDate = Datetime.now().addDays(2));
@@ -129,6 +135,7 @@ private class RLM_RTK_CoverageTest {
         response = [SELECT IsCompleted, IsViolated, CompletionDate FROM EntityMilestone WHERE Id = :response.Id];
         Assert.isTrue(response.IsCompleted);
         Assert.isFalse(response.IsViolated);
+        Assert.areEqual(response.CompletionDate, RLM_RTK_FieldVisit.getVisitTiming(ants.Id).response.metAt);
     }
 
     @IsTest

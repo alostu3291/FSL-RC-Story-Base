@@ -1,6 +1,9 @@
 <template>
     <template lwc:if={recordId}>
         <c-rlm-rtk-visit-brief record-id={recordId}></c-rlm-rtk-visit-brief>
+        <template lwc:if={response}>
+            <c-rlm-rtk-response-guarantee response={response}></c-rlm-rtk-response-guarantee>
+        </template>
         <template lwc:if={started}>
             <p class="started">{startedLabel}</p>
             <c-rlm-rtk-treatment-checklist class="checklist" record-id={recordId}></c-rlm-rtk-treatment-checklist>

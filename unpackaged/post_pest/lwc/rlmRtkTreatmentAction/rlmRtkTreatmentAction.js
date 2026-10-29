@@ -34,6 +34,9 @@ export default class RlmRtkTreatmentAction extends LightningElement {
     get loaded() {
         return !!this.timing;
     }
+    get response() {
+        return this.timing && this.timing.response;
+    }
     get started() {
         return !!(this.timing && this.timing.startedAt);
     }
