@@ -18,6 +18,12 @@
                     <p>{state.planExplanation}</p>
                 </div>
             </template>
+            <template lwc:if={state.priceNote}>
+                <div class="why">
+                    <p class="why-label">How your price is set</p>
+                    <p>{state.priceNote}</p>
+                </div>
+            </template>
             <div class="list">
                 <template for:each={findings} for:item="f">
                     <article key={f.id} class="finding">

@@ -9,7 +9,7 @@
  * The order is activated and its first bill invoiced. Changes start tomorrow: an amendment that
  * starts on an asset's start date fails assetization. New plans are priced at list price times
  * the customer's service zone multiplier, the same as the field quote. A new tier also carries the
- * property uplift (home size and severity) the customer pays on their current tier.
+ * size and severity adjustment the customer pays on their current tier.
  */
 public with sharing class RLM_RTK_PlanChange {
     public static final String PLANS_CATEGORY = 'PC-RTK-PLANS';
@@ -30,6 +30,9 @@ public with sharing class RLM_RTK_PlanChange {
         @AuraEnabled public String name;
         @AuraEnabled public String description;
         @AuraEnabled public Decimal price;
+        /** Zone list price; for a tier, price is this plus the size and severity adjustment. */
+        @AuraEnabled public Decimal listPrice;
+        @AuraEnabled public Decimal adjustment = 0;
         @AuraEnabled public Boolean current = false;
         @AuraEnabled public Boolean recommended = false;
         @AuraEnabled public String reason;
@@ -55,6 +58,10 @@ public with sharing class RLM_RTK_PlanChange {
         @AuraEnabled public Date startDate;
         @AuraEnabled public Boolean hasPlans = false;
         @AuraEnabled public String lockedReason;
+        /** Size and severity adjustment in the current tier's price, carried to any new tier. */
+        @AuraEnabled public Decimal adjustment = 0;
+        /** What the adjustment is for, from the inspection that priced the plan; null when unknown. */
+        @AuraEnabled public String adjustmentReasons;
         @AuraEnabled public List<Plan> tiers = new List<Plan>();
         @AuraEnabled public List<Plan> addOnPlans = new List<Plan>();
         @AuraEnabled public List<Scheduled> scheduled = new List<Scheduled>();
@@ -375,6 +382,10 @@ public with sharing class RLM_RTK_PlanChange {
 
         Map<String, String> reasons = recommend(context.inspectionId, tier == null ? null : tier.sku);
         Map<String, PricebookEntry> entries = entriesBySku();
+        state.adjustment = adjustmentOf(tier, entries, multiplier);
+        if (state.adjustment > 0) {
+            state.adjustmentReasons = adjustmentReasons(context.account.Id, state.adjustment);
+        }
         for (String sku : planSkus()) {
             PricebookEntry entry = entries.get(sku);
             if (entry == null) {
@@ -393,6 +404,8 @@ public with sharing class RLM_RTK_PlanChange {
             } else {
                 p.price = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
             }
+            p.listPrice = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier).setScale(2, RoundingMode.HALF_UP);
+            p.adjustment = isTier(sku) && p.price != null ? (p.price - p.listPrice).setScale(2) : 0;
             p.reason = reasons.get(sku);
             p.recommended = p.reason != null && !p.current;
             if (isTier(sku)) {
@@ -415,15 +428,35 @@ public with sharing class RLM_RTK_PlanChange {
      * and severity) they pay on their current tier, which Inspect & Quote adds to the tier only.
      */
     private static Decimal tierPrice(PricebookEntry entry, Decimal multiplier, Holding current, Map<String, PricebookEntry> entries) {
-        Decimal price = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
+        return (RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier) + adjustmentOf(current, entries, multiplier))
+            .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /** The size and severity adjustment in the current tier's price: what it costs above the zone list price. */
+    private static Decimal adjustmentOf(Holding current, Map<String, PricebookEntry> entries, Decimal multiplier) {
         PricebookEntry currentEntry = current == null ? null : entries.get(current.sku);
-        if (current?.price != null && currentEntry != null) {
-            Decimal uplift = current.price - RLM_RTK_ZonePricing.apply(currentEntry.UnitPrice, multiplier);
-            if (uplift > 0) {
-                price += uplift;
+        if (current?.price == null || currentEntry == null) {
+            return 0;
+        }
+        Decimal uplift = current.price - RLM_RTK_ZonePricing.apply(currentEntry.UnitPrice, multiplier);
+        return uplift > 0 ? uplift.setScale(2, RoundingMode.HALF_UP) : 0;
+    }
+
+    /**
+     * "2,000–3,500 sq ft +$10, Moderate severity +$10" from the inspection that priced the plan, when it
+     * accounts for the adjustment. Customers quoted before the inspection kept these get no reasons.
+     */
+    private static String adjustmentReasons(Id accountId, Decimal adjustment) {
+        for (RLM_RTK_Inspection__c inspection : [
+            SELECT Home_Size__c, Priced_Severity__c, Size_Severity_Adjustment__c FROM RLM_RTK_Inspection__c
+            WHERE Account__c = :accountId AND Size_Severity_Adjustment__c != null
+            ORDER BY CreatedDate DESC LIMIT 1
+        ]) {
+            if (inspection.Size_Severity_Adjustment__c == adjustment) {
+                return RLM_RTK_FieldQuote.adjustmentReasons(inspection.Priced_Severity__c, inspection.Home_Size__c);
             }
         }
-        return price.setScale(2, RoundingMode.HALF_UP);
+        return null;
     }
 
     /** Which plans the inspection's findings call for, given the customer's current tier. */

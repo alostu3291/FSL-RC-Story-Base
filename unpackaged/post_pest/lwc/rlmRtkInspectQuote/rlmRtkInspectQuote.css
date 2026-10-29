@@ -181,9 +181,82 @@
     color: var(--rtk-accent-deep);
 }
 
-.plan-per {
+.plan-per,
+.plan-from {
     color: var(--rtk-muted);
     font-size: 0.85rem;
+}
+
+.plan-from {
+    margin-right: 0.2rem;
+}
+
+.sqft-readout .adj,
+.sev-adj {
+    display: inline-block;
+    margin-top: 0.2rem;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: var(--rtk-accent-soft);
+    color: var(--rtk-accent-deep);
+    font-size: 0.72rem;
+    font-weight: 650;
+}
+
+.sqft-readout .adj {
+    display: block;
+    width: max-content;
+    margin-left: auto;
+}
+
+.price-box {
+    border: 1.5px solid var(--rtk-line);
+    border-radius: var(--rtk-radius);
+    background: var(--rtk-panel);
+    padding: 1rem;
+}
+
+.price-lines {
+    margin: 0;
+}
+
+.price-lines > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--rtk-line);
+    font-size: 0.9rem;
+}
+
+.price-lines > div:last-child {
+    border-bottom: 0;
+}
+
+.price-lines dt {
+    color: var(--rtk-ink);
+}
+
+.price-lines dd {
+    margin: 0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.price-lines .sub {
+    display: block;
+    color: var(--rtk-muted);
+    font-size: 0.78rem;
+    font-weight: 400;
+}
+
+.price-lines .total {
+    font-weight: 700;
+    color: var(--rtk-accent-deep);
+}
+
+.price-lines .one-time {
+    color: var(--rtk-muted);
 }
 
 .plan-blurb {

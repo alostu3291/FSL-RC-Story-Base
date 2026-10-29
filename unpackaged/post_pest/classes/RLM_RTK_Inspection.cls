@@ -70,6 +70,8 @@ public with sharing class RLM_RTK_Inspection {
         @AuraEnabled public Recommendation recommendation;
         /** Plain-language "why this plan" from RLM_RTK_AI.explainPlan, when written. */
         @AuraEnabled public String planExplanation;
+        /** How the quoted plan price is built, when it includes a size and severity adjustment. */
+        @AuraEnabled public String priceNote;
     }
 
     public class FindingInput {
@@ -94,19 +96,27 @@ public with sharing class RLM_RTK_Inspection {
             return null;
         }
         List<RLM_RTK_Inspection__c> inspections = [
-            SELECT Id, Name, Plan_Explanation__c FROM RLM_RTK_Inspection__c
+            SELECT Id, Name, Plan_Explanation__c, Home_Size__c, Priced_Severity__c, Size_Severity_Adjustment__c
+            FROM RLM_RTK_Inspection__c
             WHERE Quote__c = :quoteId ORDER BY CreatedDate DESC LIMIT 1
         ];
         if (inspections.isEmpty()) {
             return null;
         }
-        List<RLM_RTK_Finding__c> findings = queryFindings(inspections[0].Id);
-        InspectionState state = buildState(inspections[0].Id, findings, recommend(findings));
-        state.inspectionName = inspections[0].Name;
-        state.planExplanation = inspections[0].Plan_Explanation__c;
+        RLM_RTK_Inspection__c inspection = inspections[0];
+        List<RLM_RTK_Finding__c> findings = queryFindings(inspection.Id);
+        InspectionState state = buildState(inspection.Id, findings, recommend(findings));
+        state.inspectionName = inspection.Name;
+        state.planExplanation = inspection.Plan_Explanation__c;
         Set<String> quotedSkus = new Set<String>();
-        for (QuoteLineItem line : [SELECT Product2.StockKeepingUnit FROM QuoteLineItem WHERE QuoteId = :quoteId]) {
-            quotedSkus.add(line.Product2.StockKeepingUnit);
+        for (QuoteLineItem line : [
+            SELECT Product2.StockKeepingUnit, Product2.Name, UnitPrice FROM QuoteLineItem WHERE QuoteId = :quoteId
+        ]) {
+            String sku = line.Product2.StockKeepingUnit;
+            quotedSkus.add(sku);
+            if (sku == ESSENTIAL || sku == HOME_PROT || sku == HOME_PROT_PLUS) {
+                state.priceNote = priceNote(line.Product2.Name, line.UnitPrice, inspection);
+            }
         }
         for (FindingView v : state.findings) {
             v.internalNote = null;
@@ -116,6 +126,18 @@ public with sharing class RLM_RTK_Inspection {
             }
         }
         return state;
+    }
+
+    @TestVisible
+    private static String priceNote(String planName, Decimal unitPrice, RLM_RTK_Inspection__c inspection) {
+        Decimal adjustment = inspection.Size_Severity_Adjustment__c;
+        if (adjustment == null || adjustment <= 0) {
+            return null;
+        }
+        return 'Your ' + planName + ' price of ' + RLM_RTK_FieldQuote.money(unitPrice)
+            + '/mo includes a ' + RLM_RTK_FieldQuote.money(adjustment) + '/mo size and severity adjustment ('
+            + RLM_RTK_FieldQuote.adjustmentReasons(inspection.Priced_Severity__c, inspection.Home_Size__c)
+            + '). It stays with your home if you change plans later.';
     }
 
     /** Technician view of the inspection a work order treats, including internal notes and after photos. */

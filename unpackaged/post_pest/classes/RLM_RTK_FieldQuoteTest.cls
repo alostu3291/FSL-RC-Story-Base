@@ -46,6 +46,30 @@ private class RLM_RTK_FieldQuoteTest {
     }
 
     @IsTest
+    static void theAdjustmentIsExplainedPartByPart() {
+        Assert.areEqual(20, RLM_RTK_FieldQuote.adjustmentFor('Moderate', '2000to3500'));
+        Assert.areEqual(45, RLM_RTK_FieldQuote.adjustmentFor('Heavy', 'Over3500'));
+        Assert.areEqual(0, RLM_RTK_FieldQuote.adjustmentFor(null, null));
+        Assert.areEqual(
+            '2,000–3,500 sq ft +$10, Moderate severity +$10',
+            RLM_RTK_FieldQuote.adjustmentReasons('Moderate', '2000to3500')
+        );
+        Assert.areEqual('Heavy severity +$25', RLM_RTK_FieldQuote.adjustmentReasons('Heavy', 'Under2000'));
+        Assert.areEqual('', RLM_RTK_FieldQuote.adjustmentReasons('Light', 'Under2000'));
+        Assert.areEqual('$70.80', RLM_RTK_FieldQuote.money(70.8));
+        Assert.areEqual('$79', RLM_RTK_FieldQuote.money(79));
+    }
+
+    @IsTest
+    static void pricingForGivesTheZoneAndTheAdjustmentRules() {
+        RLM_RTK_FieldQuote.Pricing pricing = RLM_RTK_FieldQuote.pricingFor('60140');
+        Assert.areEqual('Rural Fox Valley', pricing.zoneName);
+        Assert.areEqual(1.20, pricing.zoneMultiplier);
+        Assert.areEqual(10, pricing.sizeAdjustments.get('2000to3500'));
+        Assert.areEqual(25, pricing.severityAdjustments.get('Heavy'));
+    }
+
+    @IsTest
     static void invocable_zoneResolve() {
         RLM_RTK_ZonePricing.ZoneRequest request = new RLM_RTK_ZonePricing.ZoneRequest();
         request.postalCode = '60108';

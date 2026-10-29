@@ -62,7 +62,7 @@ public with sharing class RLM_RTK_FieldQuote {
 
             Map<String, PricebookEntry> entries = new Map<String, PricebookEntry>();
             for (PricebookEntry entry : [
-                SELECT Id, UnitPrice, Product2Id, Pricebook2Id, Product2.StockKeepingUnit,
+                SELECT Id, UnitPrice, Product2Id, Pricebook2Id, Product2.StockKeepingUnit, Product2.Description,
                     ProductSellingModel.SellingModelType
                 FROM PricebookEntry
                 WHERE Product2.StockKeepingUnit IN :skus AND Pricebook2.IsStandard = true
@@ -112,6 +112,7 @@ public with sharing class RLM_RTK_FieldQuote {
                 new List<RevSalesTrxn.RecordWithReferenceRequest>{
                     new RevSalesTrxn.RecordWithReferenceRequest('refQuote', quoteRecord)
                 };
+            Decimal adjustment = adjustmentFor(request.severity, request.squareFootage);
             Integer i = 1;
             for (String sku : skus) {
                 PricebookEntry entry = entries.get(sku);
@@ -119,8 +120,13 @@ public with sharing class RLM_RTK_FieldQuote {
                     continue;
                 }
                 Decimal unitPrice = RLM_RTK_ZonePricing.apply(entry.UnitPrice, zone.multiplier);
+                String description = entry.Product2.Description == null ? '' : entry.Product2.Description;
                 if (sku == request.planSku) {
                     unitPrice = applyAttributeUplift(unitPrice, request.severity, request.squareFootage);
+                    if (adjustment > 0) {
+                        description = (description + ' Includes a ' + money(adjustment)
+                            + '/mo size and severity adjustment (' + adjustmentReasons(request.severity, request.squareFootage) + ').').trim();
+                    }
                 }
                 RevSalesTrxn.RecordResource line = new RevSalesTrxn.RecordResource(QuoteLineItem.SObjectType, 'POST');
                 Map<String, Object> fields = new Map<String, Object>{
@@ -129,7 +135,8 @@ public with sharing class RLM_RTK_FieldQuote {
                     'PricebookEntryId' => entry.Id,
                     'Quantity' => '1',
                     'UnitPrice' => String.valueOf(unitPrice),
-                    'StartDate' => today
+                    'StartDate' => today,
+                    'Description' => description.abbreviate(255)
                 };
                 if (entry.ProductSellingModel != null && entry.ProductSellingModel.SellingModelType == 'Evergreen') {
                     fields.put('PeriodBoundary', 'Anniversary');
@@ -160,6 +167,8 @@ public with sharing class RLM_RTK_FieldQuote {
             response.quoteId = pstResponse.salesTransactionId;
             if (request.inspectionId != null) {
                 RLM_RTK_Inspection.markQuoted(request.inspectionId, response.quoteId, request.overrideReason);
+                update new RLM_RTK_Inspection__c(Id = request.inspectionId, Home_Size__c = request.squareFootage,
+                    Priced_Severity__c = request.severity, Size_Severity_Adjustment__c = adjustment);
             }
             response.success = true;
             response.message = 'Quote created with zone ' + zone.zoneCode + ' x' + String.valueOf(zone.multiplier);
@@ -169,19 +178,85 @@ public with sharing class RLM_RTK_FieldQuote {
         return response;
     }
 
+    // ---------- size and severity adjustment ----------
+
+    /** Monthly amount added to the plan tier for the home's size bucket. */
+    public static final Map<String, Decimal> SIZE_ADJUSTMENTS = new Map<String, Decimal>{
+        'Under2000' => 0, '2000to3500' => 10, 'Over3500' => 20
+    };
+    /** Monthly amount added to the plan tier for the infestation severity. */
+    public static final Map<String, Decimal> SEVERITY_ADJUSTMENTS = new Map<String, Decimal>{
+        'Light' => 0, 'Moderate' => 10, 'Heavy' => 25
+    };
+    private static final Map<String, String> SIZE_LABELS = new Map<String, String>{
+        'Under2000' => 'under 2,000 sq ft', '2000to3500' => '2,000–3,500 sq ft', 'Over3500' => 'over 3,500 sq ft'
+    };
+
+    public static Decimal adjustmentFor(String severity, String squareFootage) {
+        Decimal size = SIZE_ADJUSTMENTS.get(squareFootage);
+        Decimal sev = SEVERITY_ADJUSTMENTS.get(severity);
+        return ((size == null ? 0 : size) + (sev == null ? 0 : sev)).setScale(2);
+    }
+
+    /** "2,000–3,500 sq ft +$10, Moderate severity +$10", listing only the parts that add to the price. */
+    public static String adjustmentReasons(String severity, String squareFootage) {
+        List<String> parts = new List<String>();
+        Decimal size = SIZE_ADJUSTMENTS.get(squareFootage);
+        if (size != null && size > 0) {
+            parts.add(SIZE_LABELS.get(squareFootage) + ' +' + money(size));
+        }
+        Decimal sev = SEVERITY_ADJUSTMENTS.get(severity);
+        if (sev != null && sev > 0) {
+            parts.add(severity + ' severity +' + money(sev));
+        }
+        return String.join(parts, ', ');
+    }
+
+    public static String money(Decimal amount) {
+        Decimal rounded = amount.setScale(2);
+        return '$' + (rounded == rounded.setScale(0, RoundingMode.DOWN) ? String.valueOf(rounded.setScale(0)) : String.valueOf(rounded));
+    }
+
     @TestVisible
     private static Decimal applyAttributeUplift(Decimal base, String severity, String squareFootage) {
-        Decimal price = base == null ? 0 : base;
-        if (severity == 'Moderate') {
-            price += 10;
-        } else if (severity == 'Heavy') {
-            price += 25;
-        }
-        if (squareFootage == '2000to3500') {
-            price += 10;
-        } else if (squareFootage == 'Over3500') {
-            price += 20;
-        }
-        return price.setScale(2, RoundingMode.HALF_UP);
+        return ((base == null ? 0 : base) + adjustmentFor(severity, squareFootage)).setScale(2, RoundingMode.HALF_UP);
     }
+
+    public class Pricing {
+        @AuraEnabled public String zoneName;
+        @AuraEnabled public Decimal zoneMultiplier;
+        /** SKU to monthly (or one-time) price for the zone, before any size and severity adjustment. */
+        @AuraEnabled public Map<String, Decimal> zonePrices = new Map<String, Decimal>();
+        @AuraEnabled public Map<String, Decimal> listPrices = new Map<String, Decimal>();
+        @AuraEnabled public Map<String, Decimal> sizeAdjustments = SIZE_ADJUSTMENTS;
+        @AuraEnabled public Map<String, Decimal> severityAdjustments = SEVERITY_ADJUSTMENTS;
+    }
+
+    /** What the quote screen needs to show how the price is built for this service ZIP. */
+    @AuraEnabled(cacheable=true)
+    public static Pricing pricingFor(String postalCode) {
+        try {
+            RLM_RTK_ZonePricing.ZoneResult zone = RLM_RTK_ZonePricing.resolve(postalCode);
+            Pricing pricing = new Pricing();
+            pricing.zoneName = zone.zoneName;
+            pricing.zoneMultiplier = zone.multiplier;
+            for (PricebookEntry entry : [
+                SELECT UnitPrice, Product2.StockKeepingUnit FROM PricebookEntry
+                WHERE Product2.StockKeepingUnit IN :QUOTE_SKUS AND Pricebook2.IsStandard = true
+                    AND CurrencyIsoCode = 'USD' AND IsActive = true
+            ]) {
+                pricing.listPrices.put(entry.Product2.StockKeepingUnit, entry.UnitPrice);
+                pricing.zonePrices.put(entry.Product2.StockKeepingUnit, RLM_RTK_ZonePricing.apply(entry.UnitPrice, zone.multiplier));
+            }
+            return pricing;
+        } catch (Exception e) {
+            AuraHandledException error = new AuraHandledException(e.getMessage());
+            error.setMessage(e.getMessage());
+            throw error;
+        }
+    }
+
+    private static final List<String> QUOTE_SKUS = new List<String>{
+        'RTK-ESSENTIAL', 'RTK-HOME-PROT', 'RTK-HOME-PROT-PLUS', 'RTK-MOSQUITO', 'RTK-TERMITE', INITIAL_SKU
+    };
 }

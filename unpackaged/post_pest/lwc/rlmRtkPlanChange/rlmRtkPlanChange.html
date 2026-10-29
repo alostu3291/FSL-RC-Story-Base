@@ -43,6 +43,9 @@
 
             <template lwc:if={state}>
                 <h3>Plan</h3>
+                <template lwc:if={hasAdjustment}>
+                    <p class="adjustment-note">{adjustmentNote}</p>
+                </template>
                 <div class="addons">
                     <template for:each={tiersView} for:item="p">
                         <button key={p.sku} type="button" class={p.cls} data-sku={p.sku} disabled={p.disabled} onclick={choose}>
@@ -50,6 +53,9 @@
                                 <span class="addon-name">{p.name}</span>
                                 <span class="price">{p.priceLabel}</span>
                             </span>
+                            <template lwc:if={p.splitLabel}>
+                                <span class="split">= {p.splitLabel}</span>
+                            </template>
                             <template lwc:if={p.badge}>
                                 <span class={p.badgeCls}>{p.badge}</span>
                             </template>
@@ -89,6 +95,7 @@
 
             <template lwc:if={hasSelection}>
                 <div class="approve">
+                    <p class="change-line">{changeLine}</p>
                     <div class="totals">
                         <span>Now</span>
                         <span class="price">{currentTotalLabel}</span>

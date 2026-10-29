@@ -34,10 +34,13 @@
                             <span class="rec-pill">Recommended</span>
                         </template>
                         <span class="plan-name">{plan.name}</span>
-                        <span class="plan-price"
-                            ><span class="plan-amount">{plan.priceLabel}</span
-                            ><span class="plan-per">/mo</span></span
-                        >
+                        <template lwc:if={plan.hasPrice}>
+                            <span class="plan-price"
+                                ><span class="plan-from">from</span
+                                ><span class="plan-amount">{plan.priceLabel}</span
+                                ><span class="plan-per">/mo</span></span
+                            >
+                        </template>
                         <span class="plan-blurb">{plan.blurb}</span>
                         <ul class="plan-features">
                             <template for:each={plan.features} for:item="feat">
@@ -86,11 +89,12 @@
             <div class="section-head row">
                 <div>
                     <h2>Home size</h2>
-                    <p>Slide to estimate square footage — snaps to pricing buckets.</p>
+                    <p>Slide to estimate square footage. Larger homes add a size adjustment to the plan.</p>
                 </div>
                 <div class="sqft-readout">
                     <strong>{sqftDisplay}</strong>
                     <span>{sqftBucketLabel}</span>
+                    <span class="adj">{sizeAdjustmentLabel}</span>
                 </div>
             </div>
             <div class="slider-wrap">
@@ -136,10 +140,44 @@
                     >
                         <span class="sev-label">{sev.label}</span>
                         <span class="sev-hint">{sev.hint}</span>
+                        <span class="sev-adj">{sev.adjustment}</span>
                     </button>
                 </template>
             </div>
         </section>
+
+        <template lwc:if={hasPricing}>
+            <section class="section price-box" aria-label="Price for this home">
+                <div class="section-head">
+                    <h2>Price for this home</h2>
+                    <p>How the monthly plan price is built. The size and severity adjustment stays with this home if the plan changes later.</p>
+                </div>
+                <dl class="price-lines">
+                    <div><dt>{breakdown.planName} list price</dt><dd>{breakdown.list}/mo</dd></div>
+                    <div><dt>Zone: {breakdown.zoneLabel}</dt><dd>{breakdown.zoneAmount}</dd></div>
+                    <div><dt>Home size: {breakdown.sizeLabel}</dt><dd>{breakdown.sizeAmount}</dd></div>
+                    <div><dt>Severity: {breakdown.severityLabel}</dt><dd>{breakdown.severityAmount}</dd></div>
+                    <div class="total">
+                        <dt>
+                            {breakdown.planName}
+                            <template lwc:if={breakdown.hasAdjustment}>
+                                <span class="sub">includes {breakdown.adjustment}/mo size and severity adjustment</span>
+                            </template>
+                        </dt>
+                        <dd>{breakdown.planPrice}/mo</dd>
+                    </div>
+                    <template for:each={breakdown.addOns} for:item="a">
+                        <div key={a.key}><dt>{a.label} <span class="sub">no size or severity adjustment</span></dt><dd>{a.amount}</dd></div>
+                    </template>
+                    <template lwc:if={breakdown.hasAddOns}>
+                        <div class="total"><dt>Monthly total</dt><dd>{breakdown.monthly}/mo</dd></div>
+                    </template>
+                    <template lwc:if={breakdown.initial}>
+                        <div class="one-time"><dt>Initial Service, one time</dt><dd>{breakdown.initial}</dd></div>
+                    </template>
+                </dl>
+            </section>
+        </template>
 
         <section class="section">
             <div class="section-head">

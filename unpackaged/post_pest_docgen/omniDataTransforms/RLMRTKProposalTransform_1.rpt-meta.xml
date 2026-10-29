@@ -28,7 +28,7 @@
   "Plan": [
     {
       "Name": "Home Protection Plan",
-      "Description": "General pest plus rodent protection, monthly service.",
+      "Description": "General pest plus rodent protection, monthly service. Includes a $20/mo size and severity adjustment (2,000\u20133,500 sq ft +$10, Moderate severity +$10).",
       "Quantity": 1,
       "MonthlyPrice": "$79.00"
     },
@@ -572,7 +572,7 @@
   "Plan": [
     {
       "Name": "Home Protection Plan",
-      "Description": "General pest plus rodent protection, monthly service.",
+      "Description": "General pest plus rodent protection, monthly service. Includes a $20/mo size and severity adjustment (2,000\u20133,500 sq ft +$10, Moderate severity +$10).",
       "Quantity": 1,
       "MonthlyPrice": "$79.00"
     },

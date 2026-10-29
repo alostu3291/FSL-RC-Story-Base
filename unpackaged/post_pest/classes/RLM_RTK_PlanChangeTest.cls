@@ -147,6 +147,18 @@ private class RLM_RTK_PlanChangeTest {
         Assert.areEqual('Downgrade', essential.change);
         Assert.areEqual(PRICES.get(RLM_RTK_PlanChange.TERMITE), plan(state.addOnPlans, RLM_RTK_PlanChange.TERMITE).price,
             'Add-on plans have no uplift');
+        Assert.areEqual(20, state.adjustment);
+        Assert.isNull(state.adjustmentReasons, 'No inspection recorded what the adjustment is for');
+        Assert.areEqual(79, plus.listPrice);
+        Assert.areEqual(20, plus.adjustment);
+        RLM_RTK_PlanChange.Plan current = plan(state.tiers, RLM_RTK_PlanChange.HOME_PROTECTION);
+        Assert.areEqual(59, current.listPrice);
+        Assert.areEqual(20, current.adjustment);
+
+        update new RLM_RTK_Inspection__c(Id = [SELECT Id FROM RLM_RTK_Inspection__c LIMIT 1].Id,
+            Home_Size__c = '2000to3500', Priced_Severity__c = 'Moderate', Size_Severity_Adjustment__c = 20);
+        state = RLM_RTK_PlanChange.getState(workOrderId());
+        Assert.areEqual('2,000–3,500 sq ft +$10, Moderate severity +$10', state.adjustmentReasons);
 
         RLM_RTK_PlanChange.applyChange(workOrderId(), RLM_RTK_PlanChange.HOME_PROTECTION_PLUS, 'Quinn Harper');
         Assert.areEqual(99, stub.placed.unitPrice);

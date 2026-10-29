@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Priced_Severity__c</fullName>
+    <description>Infestation severity the plan was priced at (Light, Moderate or Heavy). Can differ from Overall Severity when the technician changes it on the quote.</description>
+    <label>Priced Severity</label>
+    <length>20</length>
+    <type>Text</type>
+</CustomField>

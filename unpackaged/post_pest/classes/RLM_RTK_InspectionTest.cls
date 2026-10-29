@@ -147,6 +147,20 @@ private class RLM_RTK_InspectionTest {
     }
 
     @IsTest
+    static void thePriceNoteExplainsTheSizeAndSeverityAdjustment() {
+        RLM_RTK_Inspection__c priced = new RLM_RTK_Inspection__c(
+            Home_Size__c = '2000to3500', Priced_Severity__c = 'Moderate', Size_Severity_Adjustment__c = 20
+        );
+        Assert.areEqual(
+            'Your Home Protection Plan price of $79/mo includes a $20/mo size and severity adjustment '
+                + '(2,000–3,500 sq ft +$10, Moderate severity +$10). It stays with your home if you change plans later.',
+            RLM_RTK_Inspection.priceNote('Home Protection Plan', 79, priced)
+        );
+        priced.Size_Severity_Adjustment__c = 0;
+        Assert.isNull(RLM_RTK_Inspection.priceNote('Home Protection Plan', 59, priced), 'No note without an adjustment');
+    }
+
+    @IsTest
     static void workOrderTreatmentAndAfterPhotos() {
         Id inspectionId = newInspection();
         RLM_RTK_Inspection.InspectionState walk = RLM_RTK_Inspection.saveFinding(

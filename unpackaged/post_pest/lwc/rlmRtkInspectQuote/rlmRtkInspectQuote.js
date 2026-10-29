@@ -1,29 +1,33 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
+import pricingFor from '@salesforce/apex/RLM_RTK_FieldQuote.pricingFor';
 
 const PLANS = [
     {
         sku: 'RTK-ESSENTIAL',
         name: 'Essential',
-        price: 45,
         blurb: 'General pest coverage for smaller homes',
         features: ['Quarterly visits', 'Ants, spiders, roaches']
     },
     {
         sku: 'RTK-HOME-PROT',
         name: 'Home Protection',
-        price: 59,
         blurb: 'Best for most single-family homes',
         features: ['Monthly visits', 'Broader pest list', 'Re-service guarantee']
     },
     {
         sku: 'RTK-HOME-PROT-PLUS',
         name: 'Home Protection Plus',
-        price: 79,
         blurb: 'Premium coverage with priority response',
         features: ['Monthly visits', 'Adds wasps and bees', 'Priority booking']
     }
 ];
+
+const money = (n) => {
+    const v = Math.round(Number(n) * 100) / 100;
+    return Number.isInteger(v) ? `$${v}` : `$${v.toFixed(2)}`;
+};
+const plusMoney = (n) => (n > 0 ? `+${money(n)}/mo` : 'No adjustment');
 
 const PROPERTIES = [
     { value: 'SingleFamily', label: 'Single family', icon: 'utility:home', hint: 'Detached house' },
@@ -56,6 +60,71 @@ export default class RlmRtkInspectQuote extends LightningElement {
     _rec;
     _overrideNote = '';
     sqftSlider = 1600;
+    pricing;
+
+    @wire(pricingFor, { postalCode: '$postalCode' })
+    wiredPricing({ data }) {
+        this.pricing = data;
+    }
+
+    zonePrice(sku) {
+        const prices = this.pricing && this.pricing.zonePrices;
+        return prices && prices[sku] !== undefined ? Number(prices[sku]) : null;
+    }
+
+    get sizeAdjustment() {
+        const map = this.pricing && this.pricing.sizeAdjustments;
+        return map ? Number(map[this._squareFootage] || 0) : 0;
+    }
+
+    get severityAdjustment() {
+        const map = this.pricing && this.pricing.severityAdjustments;
+        return map ? Number(map[this._severity] || 0) : 0;
+    }
+
+    get hasPricing() {
+        return this.zonePrice(this._planSku) !== null;
+    }
+
+    get sizeAdjustmentLabel() {
+        return this.pricing ? plusMoney(this.sizeAdjustment) : '';
+    }
+
+    get breakdown() {
+        const sku = this._planSku;
+        const list = Number(this.pricing.listPrices[sku]);
+        const zoned = this.zonePrice(sku);
+        const zoneDelta = Math.round((zoned - list) * 100) / 100;
+        const adjustment = this.sizeAdjustment + this.severityAdjustment;
+        const planPrice = zoned + adjustment;
+        const addOns = [];
+        if (this._includeMosquito && this.zonePrice('RTK-MOSQUITO') !== null) {
+            addOns.push({ key: 'mosquito', label: 'Seasonal mosquito', amount: this.zonePrice('RTK-MOSQUITO') });
+        }
+        if (this._includeTermite && this.zonePrice('RTK-TERMITE') !== null) {
+            addOns.push({ key: 'termite', label: 'Termite plan', amount: this.zonePrice('RTK-TERMITE') });
+        }
+        const monthly = addOns.reduce((sum, a) => sum + a.amount, planPrice);
+        const initial = this.zonePrice('RTK-INITIAL');
+        const multiplier = Number(this.pricing.zoneMultiplier || 1);
+        return {
+            planName: this.selectedPlanName,
+            list: money(list),
+            zoneLabel: `${this.pricing.zoneName || 'Service zone'} ×${multiplier.toFixed(2)}`,
+            zoneAmount: zoneDelta === 0 ? 'No change' : `${zoneDelta > 0 ? '+' : '−'}${money(Math.abs(zoneDelta))}`,
+            sizeLabel: this.sqftBucketLabel + ' sq ft',
+            sizeAmount: plusMoney(this.sizeAdjustment),
+            severityLabel: `${this._severity} severity`,
+            severityAmount: plusMoney(this.severityAdjustment),
+            hasAdjustment: adjustment > 0,
+            adjustment: money(adjustment),
+            planPrice: money(planPrice),
+            addOns: addOns.map((a) => ({ ...a, amount: `${money(a.amount)}/mo` })),
+            hasAddOns: addOns.length > 0,
+            monthly: money(monthly),
+            initial: initial === null ? null : money(initial)
+        };
+    }
 
     @api
     get recommendationJson() {
@@ -223,7 +292,8 @@ export default class RlmRtkInspectQuote extends LightningElement {
             hasBecause: p.sku === recSku && this.reasonsFor(p.sku).length > 0,
             selected: p.sku === this._planSku,
             cardClass: p.sku === this._planSku ? 'plan-card selected' : 'plan-card',
-            priceLabel: `$${p.price}`,
+            priceLabel: this.zonePrice(p.sku) === null ? '' : money(this.zonePrice(p.sku)),
+            hasPrice: this.zonePrice(p.sku) !== null,
             ariaPressed: p.sku === this._planSku ? 'true' : 'false'
         }));
     }
@@ -238,8 +308,10 @@ export default class RlmRtkInspectQuote extends LightningElement {
     }
 
     get severities() {
+        const map = this.pricing && this.pricing.severityAdjustments;
         return SEVERITIES.map((s) => ({
             ...s,
+            adjustment: map ? plusMoney(Number(map[s.value] || 0)) : '',
             selected: s.value === this._severity,
             chipClass:
                 s.value === this._severity

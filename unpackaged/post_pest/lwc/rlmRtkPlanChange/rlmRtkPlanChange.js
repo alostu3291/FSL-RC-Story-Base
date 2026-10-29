@@ -3,8 +3,16 @@ import getState from '@salesforce/apex/RLM_RTK_PlanChange.getState';
 import applyChange from '@salesforce/apex/RLM_RTK_PlanChange.applyChange';
 import aiSuggestions from '@salesforce/apex/RLM_RTK_PlanChange.aiSuggestions';
 
-const money = (value) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
+const money = (value) => {
+    const cents = Math.round((value || 0) * 100) / 100;
+    const digits = Number.isInteger(cents) ? 0 : 2;
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+    }).format(cents);
+};
 
 const monthly = (value) => `${value < 0 ? '−' : '+'}${money(Math.abs(value))}/mo`;
 
@@ -127,6 +135,7 @@ export default class RlmRtkPlanChange extends LightningElement {
                 ...p,
                 reason,
                 priceLabel: `${money(p.price)}/mo`,
+                splitLabel: p.adjustment > 0 ? `${money(p.listPrice)} list + ${money(p.adjustment)} size and severity adjustment` : null,
                 changeLabel: p.current && p.change !== 'Remove' ? null : changeLabel,
                 cls: `addon${on ? ' on' : ''}${p.current ? ' current' : ''}`,
                 badge,
@@ -160,6 +169,15 @@ export default class RlmRtkPlanChange extends LightningElement {
         }
     }
 
+    get hasAdjustment() {
+        return !!(this.state && this.state.adjustment > 0);
+    }
+    get adjustmentNote() {
+        const amount = money(this.state.adjustment);
+        const why = this.state.adjustmentReasons ? ` (${this.state.adjustmentReasons})` : ' for home size and severity';
+        return `This home's plan price includes a ${amount}/mo size and severity adjustment${why}. It stays the same when the plan changes; only the list price moves.`;
+    }
+
     get tiersView() {
         return this.view(this.state ? this.state.tiers : []);
     }
@@ -186,6 +204,19 @@ export default class RlmRtkPlanChange extends LightningElement {
     }
     get newTotalLabel() {
         return `${money(this.newTotal)}/mo`;
+    }
+    /** "Home Protection $79 → Home Protection Plus $99 (+$20/mo; adjustment unchanged)" */
+    get changeLine() {
+        const p = this.selected;
+        if (!p) return '';
+        const isTier = this.state.tiers.some((t) => t.sku === p.sku);
+        const from = isTier ? this.state.tiers.find((t) => t.current) : null;
+        if (from) {
+            const kept = p.adjustment > 0 ? '; adjustment unchanged' : '';
+            return `${from.name} ${money(from.price)} → ${p.name} ${money(p.price)} (${monthly(p.monthlyChange || 0)}${kept})`;
+        }
+        if (p.change === 'Remove') return `Removing ${p.name} (${monthly(-p.price)})`;
+        return `Adding ${p.name} (${monthly(p.price)})`;
     }
     get startLabel() {
         return day(this.state && this.state.startDate);

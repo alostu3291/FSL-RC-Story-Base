@@ -519,7 +519,7 @@
         <disabled>false</disabled>
         <filterGroup>0.0</filterGroup>
         <globalKey>66867029-3ceb-50c2-95f0-88bbe7b5fead</globalKey>
-        <inputFieldName>Quote:Plan:Product:Description</inputFieldName>
+        <inputFieldName>Quote:Plan:Description</inputFieldName>
         <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
         <linkedObjectSequence>0.0</linkedObjectSequence>
         <name>RLMRTKProposalExtract</name>

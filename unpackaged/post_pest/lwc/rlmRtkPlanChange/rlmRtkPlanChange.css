@@ -264,6 +264,27 @@ p {
     color: var(--rtk-muted);
 }
 
+.split {
+    font-size: 0.78rem;
+    color: var(--rtk-muted);
+}
+
+.adjustment-note {
+    margin: 0 0 0.5rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.6rem;
+    background: var(--rtk-soft);
+    color: var(--rtk-ink);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.change-line {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
 .scheduled {
     margin-top: 0.75rem;
     padding: 0.75rem;
