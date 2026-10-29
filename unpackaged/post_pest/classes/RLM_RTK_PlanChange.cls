@@ -8,7 +8,8 @@
  * DowngradeFrom/DowngradeTo subtypes, so assetization records them as upgrades or downgrades.
  * The order is activated and its first bill invoiced. Changes start tomorrow: an amendment that
  * starts on an asset's start date fails assetization. New plans are priced at list price times
- * the customer's service zone multiplier, the same as the field quote.
+ * the customer's service zone multiplier, the same as the field quote. A new tier also carries the
+ * property uplift (home size and severity) the customer pays on their current tier.
  */
 public with sharing class RLM_RTK_PlanChange {
     public static final String PLANS_CATEGORY = 'PC-RTK-PLANS';
@@ -144,7 +145,7 @@ public with sharing class RLM_RTK_PlanChange {
                 change.quantityChange = -1;
                 summary = 'Remove ' + existing.name;
             } else if (isTier(sku) && tier != null) {
-                Decimal price = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
+                Decimal price = tierPrice(entry, multiplier, tier, entries);
                 String direction = price >= tier.price ? 'Upgrade' : 'Downgrade';
                 change.assetId = tier.assetId;
                 change.quantityChange = -1;
@@ -385,9 +386,13 @@ public with sharing class RLM_RTK_PlanChange {
             p.name = entry.Product2.Name;
             p.description = entry.Product2.Description;
             p.current = held != null;
-            p.price = held != null && held.price != null
-                ? held.price
-                : RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
+            if (held != null && held.price != null) {
+                p.price = held.price;
+            } else if (isTier(sku)) {
+                p.price = tierPrice(entry, multiplier, tier, entries);
+            } else {
+                p.price = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
+            }
             p.reason = reasons.get(sku);
             p.recommended = p.reason != null && !p.current;
             if (isTier(sku)) {
@@ -403,6 +408,22 @@ public with sharing class RLM_RTK_PlanChange {
             }
         }
         return state;
+    }
+
+    /**
+     * A tier's price for this customer: list price for their zone plus the property uplift (home size
+     * and severity) they pay on their current tier, which Inspect & Quote adds to the tier only.
+     */
+    private static Decimal tierPrice(PricebookEntry entry, Decimal multiplier, Holding current, Map<String, PricebookEntry> entries) {
+        Decimal price = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
+        PricebookEntry currentEntry = current == null ? null : entries.get(current.sku);
+        if (current?.price != null && currentEntry != null) {
+            Decimal uplift = current.price - RLM_RTK_ZonePricing.apply(currentEntry.UnitPrice, multiplier);
+            if (uplift > 0) {
+                price += uplift;
+            }
+        }
+        return price.setScale(2, RoundingMode.HALF_UP);
     }
 
     /** Which plans the inspection's findings call for, given the customer's current tier. */

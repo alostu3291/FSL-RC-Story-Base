@@ -60,11 +60,15 @@ private class RLM_RTK_PlanChangeTest {
     }
 
     private static Id hold(String sku, Date startDate) {
+        return hold(sku, startDate, PRICES.get(sku));
+    }
+
+    private static Id hold(String sku, Date startDate, Decimal monthlyPrice) {
         Account account = [SELECT Id FROM Account LIMIT 1];
         Product2 product = [SELECT Id FROM Product2 WHERE StockKeepingUnit = :(sku + SUFFIX)];
         Asset asset = new Asset(Name = sku, AccountId = account.Id, Product2Id = product.Id);
         insert asset;
-        insert new AssetStatePeriod(AssetId = asset.Id, StartDate = startDate, Quantity = 1, Mrr = PRICES.get(sku), Amount = 0);
+        insert new AssetStatePeriod(AssetId = asset.Id, StartDate = startDate, Quantity = 1, Mrr = monthlyPrice, Amount = 0);
         return asset.Id;
     }
 
@@ -123,6 +127,29 @@ private class RLM_RTK_PlanChangeTest {
         Assert.isNotNull(o.BillToContactId);
         Assert.areEqual(1, state.scheduled.size());
         Assert.isNotNull(state.lockedReason, 'A scheduled change locks further changes');
+    }
+
+    @IsTest
+    static void thePropertyUpliftCarriesToTheNewTier() {
+        StubPlacer stub = new StubPlacer();
+        RLM_RTK_PlanChange.placer = stub;
+        delete [SELECT Id FROM Asset];
+        // Home Protection lists at $59; this home pays $79 for its size and severity.
+        hold(RLM_RTK_PlanChange.HOME_PROTECTION, Date.today(), 79);
+
+        RLM_RTK_PlanChange.State state = RLM_RTK_PlanChange.getState(workOrderId());
+        RLM_RTK_PlanChange.Plan plus = plan(state.tiers, RLM_RTK_PlanChange.HOME_PROTECTION_PLUS);
+        Assert.areEqual(99, plus.price);
+        Assert.areEqual(20, plus.monthlyChange);
+        Assert.areEqual('Upgrade', plus.change);
+        RLM_RTK_PlanChange.Plan essential = plan(state.tiers, RLM_RTK_PlanChange.ESSENTIAL);
+        Assert.areEqual(65, essential.price);
+        Assert.areEqual('Downgrade', essential.change);
+        Assert.areEqual(PRICES.get(RLM_RTK_PlanChange.TERMITE), plan(state.addOnPlans, RLM_RTK_PlanChange.TERMITE).price,
+            'Add-on plans have no uplift');
+
+        RLM_RTK_PlanChange.applyChange(workOrderId(), RLM_RTK_PlanChange.HOME_PROTECTION_PLUS, 'Quinn Harper');
+        Assert.areEqual(99, stub.placed.unitPrice);
     }
 
     @IsTest
