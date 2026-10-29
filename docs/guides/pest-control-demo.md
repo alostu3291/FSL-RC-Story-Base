@@ -75,6 +75,8 @@ Demo proof: quote Michael at 60108, then change shipping ZIP to 60140 and show t
 
 ## Field Service mobile app
 
+App login, the edit and status settings, and licensing are in `docs/guides/fsl-mobile-setup.md`; building actions for the app is in `.cursor/skills/fsl-mobile-lwc/SKILL.md`.
+
 No treatment work order exists until the customer has been inspected, quoted and has signed. The visit itself is a lightweight **Pest Inspection** work order, because the app's Schedule tab only shows appointments whose parent is a work order.
 
 - **Setup:** with `fsl: true` and `pest: true`, `prepare_pest` step 11.5 (`setup_rtk_inspection_visit`) creates **Priya Nair** (142 Lakeview Ct, Bloomingdale IL 60108), an open "Free Pest Inspection" work order and a Dispatched appointment tomorrow at 10:00 assigned to the running user. For fresh runs later, `seed_rtk_prospect_inspection` books a new prospect's inspection (`-o account_name … -o street … -o hour …`) and `seed_rtk_reservice` books a re-service for an existing customer (`-o account_name … -o pest …`; fails unless a guarantee covers the pest). Both report what they booked; see `.cursor/skills/pest-demo-seed-visits/SKILL.md`. To check what an org is missing before deploying, run `python scripts/ai/pest_org_inventory.py --target-org <username>` (`.cursor/skills/pest-demo-org-deploy/SKILL.md`). `ps_fsl` assigns `RLM_FSL_Mobile_Extensions` (Lightning SDK for Field Service Mobile), which LWC quick actions need in the app.

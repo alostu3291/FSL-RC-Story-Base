@@ -177,6 +177,9 @@ that topic.
 | Debug a build/deploy failure | `.cursor/skills/troubleshooting/SKILL.md` |
 | Deploy or repair the pest / FSL demo in an existing org | `.cursor/skills/pest-demo-org-deploy/SKILL.md` |
 | Seed pest demo visits (prospect inspection, Covered re-service) | `.cursor/skills/pest-demo-seed-visits/SKILL.md` |
+| Build or debug LWC actions for the Field Service mobile app | `.cursor/skills/fsl-mobile-lwc/SKILL.md` |
+| Set up Field Service mobile login, settings and licensing | `docs/guides/fsl-mobile-setup.md` |
+| Revise a demo deck or replace its screenshots | `.cursor/skills/demo-deck-refresh/SKILL.md` |
 
 Each skill has a **Quick Rules** section at the top for fast reference,
 and a **DO NOT** section listing critical safety constraints for that area.
@@ -215,6 +218,7 @@ same guidance, or use the parent skill which covers the same content:
 | `.cursor/rules/apex-scripts.mdc` | `scripts/apex/**/*.apex` | `troubleshooting/SKILL.md` |
 | `.cursor/rules/ux-templates.mdc` | `templates/**` | `repo-integration/SKILL.md` |
 | `.cursor/rules/robot-tests.mdc` | `robot/**/*.robot` | `robot-testing/SKILL.md` |
+| `.cursor/rules/fsl-mobile-lwc.mdc` | pest/FSL `lwc/**`, Work Order and Service Appointment quick actions | `fsl-mobile-lwc/SKILL.md` |
 
 ### AI Utility Scripts
 
@@ -224,6 +228,8 @@ Scripts in `scripts/ai/` help agents query project data:
 python scripts/ai/query_erd.py describe Product2           # Query RLM data model
 python scripts/ai/query_erd.py domain Pricing               # List domain objects
 python scripts/ai/generate_cci_reference.py                 # Regenerate CCI docs
+python scripts/ai/pest_org_inventory.py --target-org <user>  # What the pest demo is missing in an org
+python scripts/ai/capture_org_screenshots.py --target-org <user> --out-dir /tmp/shots name=/lightning/r/...  # Page screenshots
 ```
 
 ---

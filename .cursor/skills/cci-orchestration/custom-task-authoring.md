@@ -99,6 +99,21 @@ Option values can be:
 - Lists (YAML sequences) — accessed from `self.options` as Python lists
 - YAML anchor references (`*anchor_name`) — resolved by YAML loader
 
+When subclassing a CCI task that already has options (for example
+`AnonymousApexTask`'s `path` and `apex`), merge with the parent's dict instead of
+replacing it, or the task loses the parent's options:
+
+```python
+class SeedRtkVisit(AnonymousApexTask):
+    task_options = {
+        **getattr(AnonymousApexTask, "task_options", {}),
+        "account_name": {"description": "Customer name", "required": True},
+    }
+```
+
+`tasks/rlm_rtk_seed_visit.py` also shows filling `%%%OPTION%%%` tokens in an Apex
+script, escaped for Apex string literals.
+
 ---
 
 ## `_run_task()` — The Main Entry Point

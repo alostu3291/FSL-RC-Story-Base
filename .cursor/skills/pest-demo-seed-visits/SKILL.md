@@ -21,7 +21,10 @@ the open visit to the new time instead of booking another.
 2. A new prospect needs a new name and its own street (duplicate rules match on address).
 3. A re-service is only Covered when an active guarantee covers the reported pest.
 4. Avoid the same hour as another visit for the running user tomorrow.
-5. Report back the work order and appointment numbers, times in Central, and what the
+5. A plan change takes effect the next day, so a customer who ran Change the plan today is
+   on the new tier tomorrow. A customer moved to Home Protection Plus has no upgrade left to
+   demo; seed a Home Protection customer instead.
+6. Report back the work order and appointment numbers, times in Central, and what the
    user will see.
 
 ## DO NOT

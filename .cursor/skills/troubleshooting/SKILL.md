@@ -402,6 +402,100 @@ in Setup.
 
 ---
 
+## Transaction & Amendment Errors
+
+### Place Sales Transaction: "Could not find product with ID"
+
+**Cause:** `Price_Book_Entry_Decision_Table_v2` hasn't finished refreshing
+after products or price book entries were loaded (often 2–5 minutes).
+
+**Fix:** Wait for the refresh to complete, then retry. Check status with
+`cci task run manage_decision_tables -o operation list --org <alias>`.
+
+### Amendment fails assetization
+
+**Cause:** An amendment that starts on the asset's start date (for example,
+same day as the original order) can't be assetized.
+
+**Fix:** Start amendments tomorrow or later. Also: one pending change at a
+time per asset, and a plan added mid-term bills on its own day of the month
+(no co-terming).
+
+### Data mappings show IsActive = false after deploy
+
+**Cause:** Normal. Every RLM data mapping reports inactive after a metadata
+deploy. Not an error.
+
+### New prompt template or docgen template version is inactive
+
+**Cause:** Deploying creates a new inactive or draft version.
+
+**Fix:** Run `activate_pest_prompt_templates` or `activate_docgen_templates`
+after every deploy of those components.
+
+### Active bot version can't be redeployed
+
+**Cause:** The active version of an Agentforce bot is locked.
+
+**Fix:** Expected; `scripts/ai/pest_org_inventory.py` lists it under
+`KNOWN_FAILURES`. Deploy a new version instead of overwriting the active one.
+
+---
+
+## Field Service Errors
+
+### Generate Work Orders from Apex
+
+**Cause:** Apex can't call the standard Generate Work Orders action, and a
+maintenance plan with auto-generation on blocks manual generation.
+
+**Fix:** Call it from a flow (`RLM_RTK_Generate_Maintenance_Visits`) and keep
+auto-generation off; a scheduled sync generates instead.
+
+### Covered re-service has no milestone
+
+**Cause:** The guarantee entitlement has no `SlaProcessId`, usually because
+coverage was built before the entitlement process was deployed.
+
+**Fix:** Deploy `deploy_post_pest_sla`, then run `RLM_RTK_Coverage.syncAll();`.
+Milestones count on business hours and are met by the appointment trigger when
+the visit starts.
+
+### LWC action works on desktop but not in the Field Service app
+
+See `.cursor/skills/fsl-mobile-lwc/SKILL.md` (unsupported components, file
+URLs, the mobile permission set) and `docs/guides/fsl-mobile-setup.md` (login,
+layouts, settings).
+
+---
+
+## Apex Gotchas
+
+### Map lookup misses with Decimal keys
+
+**Cause:** `Decimal` keys compare with scale, so `10` and `10.00` are
+different keys.
+
+**Fix:** Key maps on `Integer` (or `setScale` both sides).
+
+### Callout after DML
+
+**Cause:** A callout (including Einstein prompt templates) can't follow DML in
+the same transaction.
+
+**Fix:** Make every AI or HTTP call first, then write.
+
+### Class doesn't compile in orgs without a feature
+
+**Cause:** Code that references `ConnectApi.EinsteinLLM` (or other
+feature-gated APIs) fails to compile where the feature is off.
+
+**Fix:** Put that code in a separate bundle deployed only when the feature flag
+is on, and find the class at runtime with `Type.forName`, falling back when it's
+missing (`RLM_RTK_AI` → `RLM_RTK_EinsteinGenerator`).
+
+---
+
 ## Timeout Reference
 
 | Operation | Default Timeout |
