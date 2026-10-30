@@ -119,7 +119,9 @@ save, reload from Apex rather than trusting cached wire data.
 
 ## Testing on a device
 
-1. Deploy, then log out of the app and back in.
+1. Deploy, then log out of the app and back in. If the app can't sign in at all
+   (`oauth_approval_error_generic`), turn on **Require PKCE** in Setup → OAuth and OpenID
+   Connect Settings (see `docs/guides/fsl-mobile-setup.md`).
 2. Seed a visit dispatched to your user (`pest-demo-seed-visits` skill). The app only lists
    appointments assigned to you, Scheduled or Dispatched, with a start time.
 3. Open the appointment or work order, then the action.

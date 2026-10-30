@@ -18,6 +18,11 @@ Feature guide: `docs/guides/pest-control-demo.md`.
    the safe way to patch an existing org.
 4. Some orgs skip Apex tests on deploy. Always run the pest tests afterwards (step 5).
 5. A deploy is done when the live check passes, not when the CLI says Succeeded.
+6. For the Field Service mobile app in an org created from Winter '27 on, turn on **Require
+   Proof Key for Code Exchange (PKCE) Extension for Supported Authorization Flows** (Setup →
+   OAuth and OpenID Connect Settings). Without it the iOS app fails with
+   `oauth_approval_error_generic`, because Allow OAuth User-Agent Flows is locked off.
+   Confirmed Oct 30, 2026 (`docs/guides/fsl-mobile-setup.md`).
 
 ## DO NOT
 

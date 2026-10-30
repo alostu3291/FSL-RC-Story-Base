@@ -461,6 +461,17 @@ coverage was built before the entitlement process was deployed.
 Milestones count on business hours and are met by the appointment trigger when
 the visit starts.
 
+### Field Service mobile app: `oauth_approval_error_generic` on sign-in
+
+**Cause:** The org (created Winter '27 or later) has Allow OAuth User-Agent
+Flows locked off by Salesforce, and the iOS app signs in with that flow by
+default. Login History shows "User-Agent Flow Disabled".
+
+**Fix:** Setup → OAuth and OpenID Connect Settings → turn on **Require Proof
+Key for Code Exchange (PKCE) Extension for Supported Authorization Flows**,
+then sign in again. Confirmed Oct 30, 2026. The stored setting
+`blockOAuthUsrAgtFlow` still reads `false` in locked orgs, so don't rely on it.
+
 ### LWC action works on desktop but not in the Field Service app
 
 See `.cursor/skills/fsl-mobile-lwc/SKILL.md` (unsupported components, file
