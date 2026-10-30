@@ -283,23 +283,49 @@ for (Product2 p : initialProducts) {
 }
 update initialProducts;
 
-// Copy tax / billing policy from a known-good product onto all RTK catalog products
+// Copy tax / billing policy from a known-good product onto all RTK catalog products.
+// Prefer QuantumBit template products; in demo-template (SDO) orgs without them,
+// fall back to the first active BillingPolicy and TaxPolicy (e.g. Cirrus).
+Id templateBillingPolicyId;
+Id templateTaxPolicyId;
 List<Product2> template = [
     SELECT BillingPolicyId, TaxPolicyId FROM Product2
     WHERE StockKeepingUnit IN ('QB-SVC-REPAIR', 'QB-SRV-OG-PSH') AND BillingPolicyId != null
     ORDER BY CreatedDate DESC LIMIT 1
 ];
 if (!template.isEmpty()) {
+    templateBillingPolicyId = template[0].BillingPolicyId;
+    templateTaxPolicyId = template[0].TaxPolicyId;
+} else {
+    List<BillingPolicy> activePolicies = [
+        SELECT Id FROM BillingPolicy WHERE Status = 'Active' ORDER BY CreatedDate ASC LIMIT 1
+    ];
+    if (!activePolicies.isEmpty()) {
+        templateBillingPolicyId = activePolicies[0].Id;
+    }
+    List<TaxPolicy> activeTax = [
+        SELECT Id FROM TaxPolicy WHERE Status = 'Active' ORDER BY CreatedDate ASC LIMIT 1
+    ];
+    if (!activeTax.isEmpty()) {
+        templateTaxPolicyId = activeTax[0].Id;
+    }
+    System.debug(LoggingLevel.WARN,
+        'No QuantumBit policy template product; falling back to org BillingPolicy='
+        + templateBillingPolicyId + ' TaxPolicy=' + templateTaxPolicyId);
+}
+if (templateBillingPolicyId != null || templateTaxPolicyId != null) {
     List<Product2> toUpdate = [
-        SELECT Id, BillingPolicyId, TaxPolicyId FROM Product2
+        SELECT Id, StockKeepingUnit, BillingPolicyId, TaxPolicyId FROM Product2
         WHERE StockKeepingUnit LIKE 'RTK-%'
     ];
     for (Product2 p : toUpdate) {
-        if (p.BillingPolicyId == null) {
-            p.BillingPolicyId = template[0].BillingPolicyId;
+        // Keep RTK-INITIAL on its milestone billing policy; still apply tax.
+        if (p.BillingPolicyId == null && templateBillingPolicyId != null
+                && p.StockKeepingUnit != 'RTK-INITIAL') {
+            p.BillingPolicyId = templateBillingPolicyId;
         }
-        if (p.TaxPolicyId == null) {
-            p.TaxPolicyId = template[0].TaxPolicyId;
+        if (p.TaxPolicyId == null && templateTaxPolicyId != null) {
+            p.TaxPolicyId = templateTaxPolicyId;
         }
     }
     update toUpdate;

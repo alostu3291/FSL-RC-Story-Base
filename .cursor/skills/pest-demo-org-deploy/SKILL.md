@@ -139,6 +139,9 @@ inventory and confirm the gaps are gone.
 ## Additional resources
 
 - Known deploy and runtime failures with fixes: [debugging.md](debugging.md)
+- Org built from the Salesforce demo template (SDO / `RC_*` names, no `prepare_rlm_org`)?
+  Read `docs/analysis/sdo-org-pest-overlay-findings.md` first: the context, billing
+  policy, sequence policy and layout gaps all need handling before the story works.
 - A clean deploy doesn't mean the phone works. For mobile app login, the edit and status
   settings, and licensing, see `docs/guides/fsl-mobile-setup.md`; for actions that work on
   desktop but not in the app, see `.cursor/skills/fsl-mobile-lwc/SKILL.md`.

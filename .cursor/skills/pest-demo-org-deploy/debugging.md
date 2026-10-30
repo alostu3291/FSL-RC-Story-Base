@@ -56,8 +56,20 @@ and Field Service under `RC_*` names and Cirrus policies. They have never run
 | Invoice Status = Error after initial treatment; Revenue Transaction Error Log says "no active or effective sequence policy" | The template has no `SequencePolicy` for Invoice / CreditMemo, so posting can't number the invoice | `cci task run create_sequence_policies -o plan_dir <dir>` with a copy of `qb-billing/SequencePolicies.json` trimmed to the org's legal entities. Then recover one schedule per errored invoice (`POST commerce/invoicing/billing-schedules/collection/actions/recover`, one id per call — it cancels the invoice and frees all its schedules) and run `RLM_FSL_InvoiceOrder.enqueue` once per account |
 | `OrderToAsset` / `AssetizationFailed` "couldn't find order products eligible to be converted to assets" after the initial treatment | `RC_Assetize_Order` already assetized the order at activation; DRO tries again when the plan completes | Harmless — check the plan asset exists |
 | CCI `BaseTask` rejects `--org` | Some custom tasks declare `access_token` or malformed option defaults | `cci org default <alias>` then run the task without `--org` |
+| CCI says "No git repository" | Workspace was unpacked from a zip | `git init` and make a commit |
+| Context API: "Many-to-one mapping isn't allowed" | Template already maps `ShippingPostalCode` from Quote / Order | Use the `__c` tag with no mappings |
+| Layout deploy: "Element layoutSections is duplicated" | New section inserted after `<miniLayout>` | Put new `layoutSections` before `<miniLayout>` |
+| Revenue Cloud app pages lack WO / SA / Maintenance Plan / Entitlement lists | Template pages `RC_Account_Record_Page` and `RC_Asset_Record_Page` don't include them | Add `lst:dynamicRelatedList` items to `relatedTabContent`. Column names per list are in [the findings report](../../../docs/analysis/sdo-org-pest-overlay-findings.md#related-list-details) |
+| Account Service Appointments list is empty | `ServiceAppointments` matches `ParentRecordId`; pest SAs have a Work Order parent | Use `ServiceAppointmentAccount` (matches `AccountId`) |
+| `dynamicRelatedList` deploy: "Could not find column [X] in related list" | Each list has its own column names (`Name` for WO number, `ENTITLEMENT.*` for Entitlements) | Copy the field names from the object's page layout related list |
+| Invoice API: "can't post more than 1 invoice per attempt", "Provide only one billing schedule id", "All billing schedules must be related to the same account" | Per-call limits on post, recover and generate | Call per invoice / schedule; enqueue `RLM_FSL_InvoiceOrder` once per account |
+| Errored invoice can't be posted ("isn't in Draft status") | Error invoices aren't retried | Recover a schedule (cancels the invoice), then generate again |
+| `PaymentScheduleGeneration` log: payment schedule in Draft | Customer has no saved payment method | Expected until a payment is taken |
 
 Deploy order that worked on fieldrev: `deploy_pre_fsl` → `deploy_post_fsl` + FSL PSG/PS
 → Sign & Pay subset + charge-type field → `deploy_post_pest_sla` → `deploy_post_pest` →
-pest AI → context / catalog / pricing / FSL / DRO / `setup_rtk_*` → pest docgen → pest agent →
-patch SDO layouts → seed visits.
+pest AI → context / catalog / pricing / FSL / DRO / `setup_rtk_*` → `create_sequence_policies` →
+pest docgen → pest agent → patch SDO layouts and RC record pages → seed visits.
+
+Full write-up, including what the template already has and open items:
+[docs/analysis/sdo-org-pest-overlay-findings.md](../../../docs/analysis/sdo-org-pest-overlay-findings.md).
