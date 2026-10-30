@@ -30,21 +30,27 @@ Mobile). Without it, LWC quick actions don't appear in the app.
 
 ### "oauth_approval_error_generic" and the user-agent flow
 
-The Field Service iOS app (version 264.1.1, Oct 2026) still signs in with the OAuth
-user-agent flow, which Salesforce is retiring.
+Salesforce is retiring the OAuth user-agent flow. Orgs created from Winter '27 on have
+**Allow OAuth User-Agent Flows** (Setup → OAuth and OpenID Connect Settings) locked off
+("This setting has been disabled by Salesforce and cannot be changed"), and the Field
+Service iOS app (version 264.1.1, Oct 2026) fails to sign in to them as set up by default.
 
-- Orgs created from Winter '27 on have **Allow OAuth User-Agent Flows** (Setup → OAuth and
-  OpenID Connect Settings) locked off. The app can't sign in to them, and nothing in the org
-  fixes it. This is why `fsl-rc` can't use the app.
-- In older orgs the toggle can still be turned on, until Salesforce's enforcement date
-  (announced as Feb 20, 2027).
+**Fix:** in the same Setup page, turn on **Require Proof Key for Code Exchange (PKCE)
+Extension for Supported Authorization Flows** (`isPkceRequired` in `OauthOidcSettings`).
+Confirmed on Oct 30, 2026 in an org created Oct 29: with PKCE required, the app signed in
+(Login History: "Salesforce Field Service for iOS", Success). `fsl-rc` likely needs the
+same; it hasn't been tried there.
+
+- The org's settings still report `blockOAuthUsrAgtFlow` as `false` when Salesforce has
+  locked it, so the setting value doesn't tell you whether the org is affected. Look at the
+  Setup page or Login History.
 - **Login History** shows the cause: an entry for the Field Service app with
   "User-Agent Flow Disabled". If there's no entry at all, the attempt went to another org
-  or domain.
+  or domain (check **Use Custom Domain**).
+- New orgs also block the OAuth username-password flow (`blockOAuthUnPwFlow`), so scripts
+  can't log in with a password; use `sf org login web`.
 
-Workarounds: use an older org with the toggle on (the demo uses
-`rc-apr8-customer-template`), run the technician screens in a phone browser, or open a
-Salesforce support case about the iOS app.
+If the app still can't sign in, run the technician screens in a phone browser.
 
 ## What shows up in the app
 
