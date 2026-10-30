@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentAccesses>
+        <agentName>RLM_RTK_Pest_Billing_Agent</agentName>
+        <enabled>true</enabled>
+    </agentAccesses>
+    <classAccesses>
+        <apexClass>RLM_RTK_BillExplainer</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <description>Access to the Rentokil Pest Billing Agent and its bill explanation action.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>RLM Rentokil Pest Billing Agent</label>
+</PermissionSet>

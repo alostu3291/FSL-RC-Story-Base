@@ -1,0 +1,217 @@
+<template>
+    <div class="visit">
+        <header class="top">
+            <div>
+                <p class="eyebrow">Rentokil · Inspection visit {workOrderNumber}</p>
+                <h1>{accountName}</h1>
+                <template lwc:if={serviceAddress}>
+                    <p class="address">{serviceAddress}</p>
+                </template>
+            </div>
+        </header>
+
+        <template lwc:if={showSteps}>
+            <ol class="steps">
+                <template for:each={steps} for:item="s">
+                    <li key={s.key} class={s.cls}>
+                        <span class="dot">{s.number}</span>
+                        <span class="label">{s.label}</span>
+                    </li>
+                </template>
+            </ol>
+        </template>
+
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+
+        <template lwc:if={showBrief}>
+            <c-rlm-rtk-visit-brief record-id={ctx.workOrderId}></c-rlm-rtk-visit-brief>
+        </template>
+
+        <template lwc:if={isLoading}>
+            <div class="center"><lightning-spinner alternative-text="Loading" size="small"></lightning-spinner></div>
+        </template>
+
+        <template lwc:if={isBlocked}>
+            <section class="panel">
+                <h2>Inspect &amp; Quote isn't available here</h2>
+                <p>Run it from a pest inspection appointment. Treatment work orders use the Treatment Checklist instead.</p>
+                <div class="bar"><button type="button" class="secondary" onclick={close}>Close</button></div>
+            </section>
+        </template>
+
+        <template lwc:if={isStart}>
+            <section class="panel">
+                <h2>Start the inspection</h2>
+                <p>
+                    Walk each area of the property and log what you find, with photos. The findings pick the
+                    recommended plan, then the customer reviews and signs on this device.
+                </p>
+                <div class="bar">
+                    <button type="button" class="secondary" onclick={close}>Not now</button>
+                    <button type="button" class="primary" disabled={busy} onclick={begin}>Start inspection</button>
+                </div>
+            </section>
+        </template>
+
+        <template lwc:if={isWalk}>
+            <c-rlm-rtk-inspection-walk
+                inspection-id={inspectionId}
+                account-name={accountName}
+                service-address={serviceAddress}
+            ></c-rlm-rtk-inspection-walk>
+            <div class="bar sticky">
+                <button type="button" class="primary" disabled={busy} onclick={toPlan}>Review plan</button>
+            </div>
+        </template>
+
+        <template lwc:if={isPlan}>
+            <section class="panel why">
+                <p class="why-label">
+                    <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                    Why this plan
+                </p>
+                <template lwc:if={planExplanation}>
+                    <p>{planExplanation}</p>
+                </template>
+                <template lwc:else>
+                    <p class="muted">Writing a plain-language explanation for the customer…</p>
+                </template>
+            </section>
+            <c-rlm-rtk-inspect-quote
+                account-name={accountName}
+                postal-code={postalCode}
+                recommendation-json={recommendationJson}
+                plan-sku={recPlanSku}
+                severity={recSeverity}
+                include-mosquito={recMosquito}
+                include-termite={recTermite}
+            ></c-rlm-rtk-inspect-quote>
+            <div class="bar sticky">
+                <button type="button" class="secondary" disabled={busy} onclick={backToWalk}>Back</button>
+                <button type="button" class="primary" disabled={busy} onclick={quote}>
+                    <template lwc:if={busy}>Pricing…</template>
+                    <template lwc:else>Create quote</template>
+                </button>
+            </div>
+        </template>
+
+        <template lwc:if={isCustomer}>
+            <p class="handoff">
+                <lightning-icon icon-name="utility:change_owner" size="x-small" alternative-text=""></lightning-icon>
+                Hand the device to the customer to review the findings and sign.
+            </p>
+            <c-rlm-rtk-inspection-findings quote-id={quoteId}></c-rlm-rtk-inspection-findings>
+            <template lwc:if={proposalGenerating}>
+                <div class="panel waiting">
+                    <lightning-spinner alternative-text="Preparing proposal" size="small"></lightning-spinner>
+                    <p>Preparing the proposal…</p>
+                </div>
+            </template>
+            <template lwc:if={proposalFailed}>
+                <section class="panel">
+                    <p class="error">{proposal.message}</p>
+                    <div class="bar"><button type="button" class="primary" onclick={retryProposal}>Try again</button></div>
+                </section>
+            </template>
+            <template lwc:if={proposalReady}>
+                <c-rlm-sign-and-pay
+                    quote-id={quoteId}
+                    content-document-id={proposalDocId}
+                    document-title={proposalTitle}
+                    embedded={embedded}
+                    onaccepted={handleAccepted}
+                ></c-rlm-sign-and-pay>
+            </template>
+        </template>
+
+        <template lwc:if={isBooking}>
+            <section class="panel waiting">
+                <lightning-spinner alternative-text="Booking" size="small"></lightning-spinner>
+                <p>{bookingLabel}</p>
+                <template lwc:if={error}>
+                    <div class="bar"><button type="button" class="primary" onclick={retryBooking}>Try again</button></div>
+                </template>
+            </section>
+        </template>
+
+        <template lwc:if={isDone}>
+            <section class="panel done">
+                <lightning-icon icon-name="utility:success" size="small" alternative-text=""></lightning-icon>
+                <h2>{doneTitle}</h2>
+                <template lwc:if={signMessage}>
+                    <p>{signMessage}</p>
+                </template>
+                <dl>
+                    <dt>Order</dt>
+                    <dd>{orderNumber}</dd>
+                    <template lwc:if={treatmentNumber}>
+                        <dt>Treatment work order</dt>
+                        <dd>{treatmentNumber}</dd>
+                    </template>
+                    <template lwc:if={treatmentWhen}>
+                        <dt>First visit</dt>
+                        <dd>{treatmentWhen}</dd>
+                    </template>
+                    <template lwc:elseif={treatmentNumber}>
+                        <dt>First visit</dt>
+                        <dd>Awaiting dispatch</dd>
+                    </template>
+                </dl>
+                <template lwc:if={showSlots}>
+                    <div class="slots">
+                        <h3>Book the first treatment</h3>
+                        <p class="muted">Pick a time with the customer. It's dispatched to you.</p>
+                        <template lwc:if={slotsLoading}>
+                            <div class="center"><lightning-spinner alternative-text="Finding times" size="small"></lightning-spinner></div>
+                        </template>
+                        <template lwc:elseif={hasSlots}>
+                            <div class="slot-grid">
+                                <template for:each={slotOptions} for:item="s">
+                                    <button key={s.key} type="button" class="slot" data-start={s.start}
+                                        disabled={slotBusy} onclick={pickSlot}>
+                                        <span class="slot-day">{s.day}</span>
+                                        <span class="slot-time">{s.time}</span>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                        <template lwc:elseif={noSlots}>
+                            <p class="muted">No open times this week.</p>
+                        </template>
+                        <template lwc:if={slotError}>
+                            <p class="error">{slotError}</p>
+                        </template>
+                        <div class="bar">
+                            <button type="button" class="secondary" disabled={slotBusy} onclick={leaveForDispatch}>Leave for dispatch</button>
+                        </div>
+                    </div>
+                </template>
+                <template lwc:elseif={treatmentWhen}>
+                    <p class="muted">The first treatment is on your schedule.</p>
+                </template>
+                <template lwc:elseif={treatmentNumber}>
+                    <p class="muted">The treatment visit shows on the schedule once it's dispatched.</p>
+                </template>
+                <template lwc:else>
+                    <p class="muted">The order is active. The treatment work order appears once fulfillment creates it.</p>
+                </template>
+                <template lwc:if={visitCompleted}>
+                    <p class="handoff">Inspection visit {visitCompleted} is complete.</p>
+                    <c-rlm-rtk-visit-summary record-id={ctx.workOrderId}></c-rlm-rtk-visit-summary>
+                    <div class="bar"><button type="button" class="primary" onclick={close}>Done</button></div>
+                </template>
+                <template lwc:else>
+                    <template lwc:if={completeError}>
+                        <p class="error">{completeError}</p>
+                    </template>
+                    <div class="bar">
+                        <button type="button" class="secondary" onclick={close}>Close</button>
+                        <button type="button" class="primary" disabled={completing} onclick={completeInspection}>Complete visit</button>
+                    </div>
+                </template>
+            </section>
+        </template>
+    </div>
+</template>

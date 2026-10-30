@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Suggests pest, evidence and severity from an inspection photo for the technician to accept or edit. Called from RLM_RTK_AI.suggestFromPhoto.</description>
+    <developerName>RLM_RTK_Photo_Finding</developerName>
+    <masterLabel>RTK Photo Finding</masterLabel>
+    <templateVersions>
+        <content>You help a Rentokil pest control technician log an inspection finding from a photo taken at a customer's home.
+
+Photo: {!$Input:Photo}
+
+{!$Input:Context}
+
+Identify the most likely pest and the evidence the photo shows. Use only values from the allowed lists, exactly as written, or null when the photo doesn't show it.
+Severity: Light for a single sign, Moderate for several signs or a small nest, Heavy for widespread activity or damage.
+If the photo shows no sign of pests, set pest and evidence to null and say so in observation.
+
+Reply with only a JSON object, no other text:
+{"pest": "...", "evidence": "...", "severity": "...", "observation": "what you see, under 12 words", "customerNote": "one plain sentence for the homeowner on what was found and where, no jargon, no prices"}</content>
+        <inputs>
+            <apiName>Photo</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Photo</masterLabel>
+            <referenceName>Input:Photo</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Finding context</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

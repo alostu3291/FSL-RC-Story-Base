@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Rentokil Visit Summary</masterLabel>
+    <description>Writes the customer visit summary once the visit is complete, saves it on the work order and emails it.</description>
+</LightningComponentBundle>

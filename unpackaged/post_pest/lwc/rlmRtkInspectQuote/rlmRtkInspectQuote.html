@@ -1,0 +1,252 @@
+<template>
+    <div class="shell">
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Field inspect &amp; quote</p>
+                <h1 class="title">{accountName}</h1>
+                <p class="subtitle">Walk the property, capture findings, and price the plan on site.</p>
+            </div>
+            <div if:true={hasZip} class="zip-badge" title="Service ZIP drives location pricing">
+                <lightning-icon icon-name="utility:checkin" size="x-small" alternative-text=""></lightning-icon>
+                <div>
+                    <span class="zip-label">Service ZIP</span>
+                    <strong class="zip-value">{postalCode}</strong>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-head">
+                <h2>Choose a plan</h2>
+                <p>{planSubtitle}</p>
+            </div>
+            <div class="plan-grid" role="listbox" aria-label="Recommended plan">
+                <template for:each={plans} for:item="plan">
+                    <button
+                        key={plan.sku}
+                        type="button"
+                        class={plan.cardClass}
+                        data-sku={plan.sku}
+                        aria-pressed={plan.ariaPressed}
+                        onclick={selectPlan}
+                    >
+                        <template if:true={plan.recommended}>
+                            <span class="rec-pill">Recommended</span>
+                        </template>
+                        <span class="plan-name">{plan.name}</span>
+                        <template lwc:if={plan.hasPrice}>
+                            <span class="plan-price"
+                                ><span class="plan-from">from</span
+                                ><span class="plan-amount">{plan.priceLabel}</span
+                                ><span class="plan-per">/mo</span></span
+                            >
+                        </template>
+                        <span class="plan-blurb">{plan.blurb}</span>
+                        <ul class="plan-features">
+                            <template for:each={plan.features} for:item="feat">
+                                <li key={feat}>{feat}</li>
+                            </template>
+                        </ul>
+                        <template lwc:if={plan.hasBecause}>
+                            <div class="because">
+                                <span class="because-label">Because</span>
+                                <ul>
+                                    <template for:each={plan.because} for:item="b">
+                                        <li key={b.key}>{b.text}</li>
+                                    </template>
+                                </ul>
+                            </div>
+                        </template>
+                    </button>
+                </template>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <h2>Property type</h2>
+                <p>Icon tiles — pick what you are standing in front of.</p>
+            </div>
+            <div class="prop-grid" role="group" aria-label="Property type">
+                <template for:each={properties} for:item="prop">
+                    <button
+                        key={prop.value}
+                        type="button"
+                        class={prop.tileClass}
+                        data-value={prop.value}
+                        aria-pressed={prop.ariaPressed}
+                        onclick={selectProperty}
+                    >
+                        <lightning-icon icon-name={prop.icon} size="medium" alternative-text=""></lightning-icon>
+                        <span class="prop-label">{prop.label}</span>
+                        <span class="prop-hint">{prop.hint}</span>
+                    </button>
+                </template>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head row">
+                <div>
+                    <h2>Home size</h2>
+                    <p>Slide to estimate square footage. Larger homes add a size adjustment to the plan.</p>
+                </div>
+                <div class="sqft-readout">
+                    <strong>{sqftDisplay}</strong>
+                    <span>{sqftBucketLabel}</span>
+                    <span class="adj">{sizeAdjustmentLabel}</span>
+                </div>
+            </div>
+            <div class="slider-wrap">
+                <input
+                    type="range"
+                    class="sqft-slider"
+                    min="800"
+                    max="6000"
+                    step="50"
+                    value={sqftSlider}
+                    aria-label="Square footage"
+                    oninput={handleSqft}
+                    onchange={handleSqft}
+                />
+                <div class="slider-ticks">
+                    <span>800</span>
+                    <span>2,000</span>
+                    <span>3,500</span>
+                    <span>6,000</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-head">
+                <h2>Infestation severity</h2>
+                <template lwc:if={severityFromInspection}>
+                    <p>Inspection rated this <strong>{severityFromInspection}</strong> (worst finding).</p>
+                </template>
+                <template lwc:else>
+                    <p>Heat scale — how bad is what you found?</p>
+                </template>
+            </div>
+            <div class="sev-meter" role="group" aria-label="Infestation severity">
+                <template for:each={severities} for:item="sev">
+                    <button
+                        key={sev.value}
+                        type="button"
+                        class={sev.chipClass}
+                        data-value={sev.value}
+                        aria-pressed={sev.ariaPressed}
+                        onclick={selectSeverity}
+                    >
+                        <span class="sev-label">{sev.label}</span>
+                        <span class="sev-hint">{sev.hint}</span>
+                        <span class="sev-adj">{sev.adjustment}</span>
+                    </button>
+                </template>
+            </div>
+        </section>
+
+        <template lwc:if={hasPricing}>
+            <section class="section price-box" aria-label="Price for this home">
+                <div class="section-head">
+                    <h2>Price for this home</h2>
+                    <p>How the monthly plan price is built. The size and severity adjustment stays with this home if the plan changes later.</p>
+                </div>
+                <dl class="price-lines">
+                    <div><dt>{breakdown.planName} list price</dt><dd>{breakdown.list}/mo</dd></div>
+                    <div><dt>Zone: {breakdown.zoneLabel}</dt><dd>{breakdown.zoneAmount}</dd></div>
+                    <div><dt>Home size: {breakdown.sizeLabel}</dt><dd>{breakdown.sizeAmount}</dd></div>
+                    <div><dt>Severity: {breakdown.severityLabel}</dt><dd>{breakdown.severityAmount}</dd></div>
+                    <div class="total">
+                        <dt>
+                            {breakdown.planName}
+                            <template lwc:if={breakdown.hasAdjustment}>
+                                <span class="sub">includes {breakdown.adjustment}/mo size and severity adjustment</span>
+                            </template>
+                        </dt>
+                        <dd>{breakdown.planPrice}/mo</dd>
+                    </div>
+                    <template for:each={breakdown.addOns} for:item="a">
+                        <div key={a.key}><dt>{a.label} <span class="sub">no size or severity adjustment</span></dt><dd>{a.amount}</dd></div>
+                    </template>
+                    <template lwc:if={breakdown.hasAddOns}>
+                        <div class="total"><dt>Monthly total</dt><dd>{breakdown.monthly}/mo</dd></div>
+                    </template>
+                    <template lwc:if={breakdown.initial}>
+                        <div class="one-time"><dt>Initial Service, one time</dt><dd>{breakdown.initial}</dd></div>
+                    </template>
+                </dl>
+            </section>
+        </template>
+
+        <section class="section">
+            <div class="section-head">
+                <h2>Add-ons</h2>
+                <p>Toggle cards — Initial Service is always added automatically.</p>
+            </div>
+            <div class="addon-grid">
+                <button type="button" class={mosquitoCardClass} aria-pressed={includeMosquito} onclick={toggleMosquito}>
+                    <div class="addon-icon mosquito" aria-hidden="true">
+                        <lightning-icon icon-name="utility:world" size="small" alternative-text=""></lightning-icon>
+                    </div>
+                    <div class="addon-copy">
+                        <strong>Seasonal mosquito</strong>
+                        <span>Yard treatments while the season is on</span>
+                        <template lwc:if={hasMosquitoReasons}>
+                            <ul class="because-inline">
+                                <template for:each={mosquitoReasons} for:item="b">
+                                    <li key={b.key}>{b.text}</li>
+                                </template>
+                            </ul>
+                        </template>
+                    </div>
+                    <span class="addon-switch" aria-hidden="true">
+                        <span class="knob"></span>
+                    </span>
+                </button>
+                <button type="button" class={termiteCardClass} aria-pressed={includeTermite} onclick={toggleTermite}>
+                    <div class="addon-icon termite" aria-hidden="true">
+                        <lightning-icon icon-name="utility:warning" size="small" alternative-text=""></lightning-icon>
+                    </div>
+                    <div class="addon-copy">
+                        <strong>Termite plan now</strong>
+                        <span>Add if you already see mud tubes</span>
+                        <template lwc:if={hasTermiteReasons}>
+                            <ul class="because-inline">
+                                <template for:each={termiteReasons} for:item="b">
+                                    <li key={b.key}>{b.text}</li>
+                                </template>
+                            </ul>
+                        </template>
+                    </div>
+                    <span class="addon-switch" aria-hidden="true">
+                        <span class="knob"></span>
+                    </span>
+                </button>
+            </div>
+        </section>
+
+        <template lwc:if={isOverridden}>
+            <section class="section override">
+                <div class="section-head">
+                    <h2>Changed from the inspection</h2>
+                    <p>{changeSummary}</p>
+                </div>
+                <lightning-textarea
+                    label="Why are you changing the recommendation?"
+                    required
+                    value={overrideNote}
+                    onchange={handleOverride}
+                ></lightning-textarea>
+            </section>
+        </template>
+
+        <footer class="summary">
+            <div>
+                <span class="summary-label">Ready to quote</span>
+                <p class="summary-bits">{summaryBits}</p>
+            </div>
+            <p class="summary-hint">Tap <strong>Create Quote</strong> below — Initial Service is included.</p>
+        </footer>
+    </div>
+</template>

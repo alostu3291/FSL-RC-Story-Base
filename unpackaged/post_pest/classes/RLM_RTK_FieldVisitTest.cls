@@ -1,0 +1,257 @@
+@IsTest
+private class RLM_RTK_FieldVisitTest {
+    private static WorkOrder inspectionVisit() {
+        Account account = new Account(
+            Name = 'Field Visit Test',
+            ShippingStreet = '142 Lakeview Ct',
+            ShippingCity = 'Bloomingdale',
+            ShippingState = 'IL',
+            ShippingPostalCode = '60108'
+        );
+        insert account;
+        WorkOrder wo = new WorkOrder(AccountId = account.Id, Subject = 'Free Pest Inspection');
+        insert wo;
+        return wo;
+    }
+
+    private static ServiceAppointment appointmentFor(Id workOrderId) {
+        ServiceAppointment sa = new ServiceAppointment(
+            ParentRecordId = workOrderId,
+            EarliestStartTime = Datetime.now(),
+            DueDate = Datetime.now().addDays(1)
+        );
+        insert sa;
+        return sa;
+    }
+
+    private static Quote quoteFor(Id accountId) {
+        Opportunity opportunity = new Opportunity(
+            Name = 'Field Visit Opp',
+            StageName = 'Prospecting',
+            CloseDate = Date.today().addDays(30),
+            AccountId = accountId
+        );
+        insert opportunity;
+        Quote q = new Quote(Name = 'Field Visit Quote', OpportunityId = opportunity.Id,
+            Pricebook2Id = Test.getStandardPricebookId());
+        insert q;
+        return q;
+    }
+
+    @IsTest
+    static void appointmentResolvesToItsWorkOrder() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+
+        RLM_RTK_FieldVisit.VisitContext ctx = RLM_RTK_FieldVisit.getContext(sa.Id);
+
+        Assert.areEqual(wo.Id, ctx.workOrderId);
+        Assert.areEqual('start', ctx.stage);
+        Assert.isTrue(ctx.canInspect);
+        Assert.areEqual('Field Visit Test', ctx.accountName);
+        Assert.areEqual('60108', ctx.postalCode);
+        Assert.areEqual('142 Lakeview Ct, Bloomingdale, IL 60108', ctx.serviceAddress);
+    }
+
+    @IsTest
+    static void startInspectionIsIdempotent() {
+        WorkOrder wo = inspectionVisit();
+
+        Id first = RLM_RTK_FieldVisit.startInspection(wo.Id);
+        Id second = RLM_RTK_FieldVisit.startInspection(wo.Id);
+
+        Assert.areEqual(first, second);
+        Assert.areEqual(1, [SELECT COUNT() FROM RLM_RTK_Inspection__c WHERE Account__c = :wo.AccountId]);
+        RLM_RTK_FieldVisit.VisitContext ctx = RLM_RTK_FieldVisit.getContext(wo.Id);
+        Assert.areEqual('walk', ctx.stage);
+        Assert.areEqual(first, ctx.inspectionId);
+    }
+
+    @IsTest
+    static void quotedInspectionMovesToCustomerThenOrder() {
+        WorkOrder wo = inspectionVisit();
+        Id inspectionId = RLM_RTK_FieldVisit.startInspection(wo.Id);
+        Quote q = quoteFor(wo.AccountId);
+        RLM_RTK_Inspection.markQuoted(inspectionId, q.Id, null);
+
+        Assert.areEqual('customer', RLM_RTK_FieldVisit.getContext(wo.Id).stage);
+
+        update new Quote(Id = q.Id, RLM_Demo_Signed_At__c = Datetime.now(), RLM_Demo_Signed_By__c = 'Test');
+        RLM_RTK_FieldVisit.VisitContext ctx = RLM_RTK_FieldVisit.getContext(wo.Id);
+        Assert.areEqual('order', ctx.stage);
+        Assert.isTrue(ctx.signed);
+        Assert.areEqual('Creating', RLM_RTK_FieldVisit.orderStatus(q.Id).status);
+    }
+
+    @IsTest
+    static void existingQuoteIsReturnedInsteadOfCreatingAnother() {
+        WorkOrder wo = inspectionVisit();
+        Id inspectionId = RLM_RTK_FieldVisit.startInspection(wo.Id);
+        Quote q = quoteFor(wo.AccountId);
+        RLM_RTK_Inspection.markQuoted(inspectionId, q.Id, null);
+
+        RLM_RTK_FieldVisit.QuoteResult result = RLM_RTK_FieldVisit.createQuote(
+            wo.Id, 'RTK-ESSENTIAL', 'SingleFamily', 'Under2000', 'Light', false, false, null);
+
+        Assert.areEqual(q.Id, result.quoteId);
+    }
+
+    @IsTest
+    static void quoteNeedsAnInspection() {
+        WorkOrder wo = inspectionVisit();
+        try {
+            RLM_RTK_FieldVisit.createQuote(wo.Id, 'RTK-ESSENTIAL', 'SingleFamily', 'Under2000', 'Light', false, false, null);
+            Assert.fail('Expected an error without an inspection');
+        } catch (AuraHandledException e) {
+            Assert.isTrue(e.getMessage().contains('Walk the property'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void unsignedQuoteCannotBeOrdered() {
+        WorkOrder wo = inspectionVisit();
+        Quote q = quoteFor(wo.AccountId);
+        try {
+            RLM_RTK_FieldVisit.placeOrder(q.Id);
+            Assert.fail('Expected an error for an unsigned quote');
+        } catch (AuraHandledException e) {
+            Assert.isTrue(e.getMessage().contains('not signed'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void draftOrderNeedsACustomerContact() {
+        WorkOrder wo = inspectionVisit();
+        Quote q = quoteFor(wo.AccountId);
+        insert new Order(AccountId = wo.AccountId, QuoteId = q.Id, Status = 'Draft',
+            EffectiveDate = Date.today(), Pricebook2Id = Test.getStandardPricebookId());
+        try {
+            RLM_RTK_FieldVisit.orderStatus(q.Id);
+            Assert.fail('Expected an error without a contact');
+        } catch (AuraHandledException e) {
+            Assert.isTrue(e.getMessage().contains('Add a contact to Field Visit Test'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void firstTreatmentIsBookedAtAPickedSlot() {
+        ServiceResource tech = new ServiceResource(Name = 'Field Visit Tech', RelatedRecordId = UserInfo.getUserId(),
+            ResourceType = 'T', IsActive = true);
+        insert tech;
+        // The managed Field Service package only assigns resources who are members of a territory.
+        OperatingHours hours = new OperatingHours(Name = 'Field Visit Test Hours');
+        insert hours;
+        ServiceTerritory territory = new ServiceTerritory(Name = 'Field Visit Test Territory',
+            OperatingHoursId = hours.Id, IsActive = true);
+        insert territory;
+        insert new ServiceTerritoryMember(ServiceResourceId = tech.Id, ServiceTerritoryId = territory.Id,
+            EffectiveStartDate = Datetime.now().addDays(-1), TerritoryType = 'P');
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = new ServiceAppointment(ParentRecordId = wo.Id, EarliestStartTime = Datetime.now(),
+            DueDate = Datetime.now().addDays(7), Duration = 1, DurationType = 'Hours',
+            ServiceTerritoryId = territory.Id);
+        insert sa;
+        Quote q = quoteFor(wo.AccountId);
+
+        List<RLM_RTK_FieldVisit.Slot> slots = RLM_RTK_FieldVisit.treatmentSlots(sa.Id);
+        Assert.areEqual(6, slots.size());
+        Assert.isTrue(slots[0].startTime > Datetime.now());
+        Assert.areEqual(slots[0].startTime.addHours(1), slots[0].endTime);
+
+        RLM_RTK_FieldVisit.bookTreatment(sa.Id, slots[0].startTime, q.Id);
+
+        ServiceAppointment booked = [
+            SELECT Status, SchedStartTime, (SELECT Id FROM ServiceResources) FROM ServiceAppointment WHERE Id = :sa.Id
+        ];
+        Assert.areEqual('Dispatched', booked.Status);
+        Assert.areEqual(slots[0].startTime, booked.SchedStartTime);
+        Assert.areEqual(1, booked.ServiceResources.size());
+        Assert.areNotEqual(slots[0].startTime, RLM_RTK_FieldVisit.treatmentSlots(sa.Id)[0].startTime);
+    }
+
+    @IsTest
+    static void completingTheVisitClosesAppointmentAndWorkOrder() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+
+        String completedNumber = RLM_RTK_FieldVisit.completeVisit(sa.Id);
+
+        WorkOrder done = [SELECT WorkOrderNumber, Status FROM WorkOrder WHERE Id = :wo.Id];
+        Assert.areEqual(done.WorkOrderNumber, completedNumber);
+        Assert.areEqual('Completed', done.Status);
+        ServiceAppointment closed = [SELECT Status, ActualEndTime FROM ServiceAppointment WHERE Id = :sa.Id];
+        Assert.areEqual('Completed', closed.Status);
+        Assert.isNotNull(closed.ActualEndTime);
+    }
+
+    @IsTest
+    static void startingTheInspectionStartsTheAppointmentAndWorkOrder() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+        Assert.isNull(RLM_RTK_FieldVisit.getVisitTiming(sa.Id).startedAt);
+
+        RLM_RTK_FieldVisit.startInspection(wo.Id);
+
+        ServiceAppointment started = [SELECT Status, ActualStartTime FROM ServiceAppointment WHERE Id = :sa.Id];
+        Assert.areEqual('In Progress', started.Status);
+        Assert.isNotNull(started.ActualStartTime);
+        WorkOrder visit = [SELECT Status, StartDate FROM WorkOrder WHERE Id = :wo.Id];
+        Assert.areEqual('In Progress', visit.Status);
+        Assert.areEqual(started.ActualStartTime, visit.StartDate);
+        Assert.areEqual(started.ActualStartTime, RLM_RTK_FieldVisit.getVisitTiming(wo.Id).startedAt);
+        Assert.isNull(RLM_RTK_FieldVisit.getVisitTiming(wo.Id).response, 'An inspection has no response guarantee');
+    }
+
+    @IsTest
+    static void startingTreatmentKeepsTheFirstStartAndCompletionRecordsTheEnd() {
+        WorkOrder wo = inspectionVisit();
+        ServiceAppointment sa = appointmentFor(wo.Id);
+        RLM_RTK_FieldVisit.stepToward(new List<ServiceAppointment>{ sa }, 'In Progress');
+        update new ServiceAppointment(Id = sa.Id, Status = 'In Progress', ActualStartTime = Datetime.now().addMinutes(-30));
+        Datetime arrived = [SELECT ActualStartTime FROM ServiceAppointment WHERE Id = :sa.Id].ActualStartTime;
+
+        RLM_RTK_FieldVisit.VisitTiming timing = RLM_RTK_FieldVisit.startVisit(sa.Id);
+        Assert.areEqual(arrived, timing.startedAt);
+        Assert.areEqual(sa.Id, timing.appointmentId);
+        Assert.areEqual(arrived, [SELECT StartDate FROM WorkOrder WHERE Id = :wo.Id].StartDate);
+
+        RLM_RTK_FieldVisit.completeVisit(wo.Id);
+        ServiceAppointment done = [SELECT ActualStartTime, ActualEndTime, ActualDuration FROM ServiceAppointment WHERE Id = :sa.Id];
+        Assert.areEqual(arrived, done.ActualStartTime);
+        Assert.isTrue(done.ActualDuration >= 29, String.valueOf(done.ActualDuration));
+        WorkOrder closed = [SELECT Status, StartDate, EndDate FROM WorkOrder WHERE Id = :wo.Id];
+        Assert.areEqual('Completed', closed.Status);
+        Assert.areEqual(arrived, closed.StartDate);
+        Assert.areEqual(done.ActualEndTime, closed.EndDate);
+        Assert.isTrue(RLM_RTK_FieldVisit.getVisitTiming(wo.Id).completed);
+    }
+
+    @IsTest
+    static void otherRecordsAreRejected() {
+        WorkOrder wo = inspectionVisit();
+        try {
+            RLM_RTK_FieldVisit.getContext(wo.AccountId);
+            Assert.fail('Expected an error for an account id');
+        } catch (AuraHandledException e) {
+            Assert.isTrue(e.getMessage().contains('service appointment or work order'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void uploadedPhotosLandInTheRightStage() {
+        WorkOrder wo = inspectionVisit();
+        Id inspectionId = RLM_RTK_FieldVisit.startInspection(wo.Id);
+        RLM_RTK_Finding__c finding = new RLM_RTK_Finding__c(
+            Inspection__c = inspectionId, Zone__c = 'Garage', Pest__c = 'Rodents', Severity__c = 'Light');
+        insert finding;
+        String data = EncodingUtil.base64Encode(Blob.valueOf('fake jpeg bytes'));
+
+        RLM_RTK_Inspection.uploadPhoto(finding.Id, 'garage.jpg', data, 'Before');
+        RLM_RTK_Inspection.uploadPhoto(finding.Id, 'garage-after.jpg', data, 'After');
+
+        RLM_RTK_Inspection.InspectionState state = RLM_RTK_Inspection.getWorkOrderFindings(wo.Id);
+        Assert.areEqual(1, state.findings[0].photos.size());
+        Assert.areEqual(1, state.findings[0].afterPhotos.size());
+        Assert.areEqual('garage', state.findings[0].photos[0].title);
+    }
+}

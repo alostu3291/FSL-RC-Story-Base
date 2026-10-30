@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_RTK_Approved_At__c</fullName>
+    <description>When the customer approved this field add-on. Only approved add-ons are billed.</description>
+    <label>RTK Approved At</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>
