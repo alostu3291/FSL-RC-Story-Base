@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_RTK_Reported_Pest__c</fullName>
+    <description>Pest the customer reported for a re-service visit. Decides whether a plan guarantee covers the visit.</description>
+    <inlineHelpText>The pest the customer says is back. Covered by an active plan guarantee means no charge; otherwise the re-service visit is billed on completion.</inlineHelpText>
+    <label>Reported Pest</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+                <value>
+                    <fullName>Ants</fullName>
+                    <default>false</default>
+                    <label>Ants</label>
+                </value>
+                <value>
+                    <fullName>Spiders</fullName>
+                    <default>false</default>
+                    <label>Spiders</label>
+                </value>
+                <value>
+                    <fullName>Cockroaches</fullName>
+                    <default>false</default>
+                    <label>Cockroaches</label>
+                </value>
+                <value>
+                    <fullName>Rodents</fullName>
+                    <default>false</default>
+                    <label>Rodents</label>
+                </value>
+                <value>
+                    <fullName>Termites</fullName>
+                    <default>false</default>
+                    <label>Termites</label>
+                </value>
+                <value>
+                    <fullName>Mosquitoes</fullName>
+                    <default>false</default>
+                    <label>Mosquitoes</label>
+                </value>
+                <value>
+                    <fullName>Wasps / Bees</fullName>
+                    <default>false</default>
+                    <label>Wasps / Bees</label>
+                </value>
+                <value>
+                    <fullName>Bed Bugs</fullName>
+                    <default>false</default>
+                    <label>Bed Bugs</label>
+                </value>
+                <value>
+                    <fullName>Other</fullName>
+                    <default>false</default>
+                    <label>Other</label>
+                </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

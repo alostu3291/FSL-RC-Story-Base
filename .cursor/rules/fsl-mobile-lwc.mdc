@@ -1,0 +1,27 @@
+---
+description: Constraints for LWCs and quick actions that run in the Field Service mobile app
+globs:
+  - unpackaged/post_pest/lwc/**
+  - unpackaged/post_fsl/**/lwc/**
+  - unpackaged/**/quickActions/WorkOrder.*
+  - unpackaged/**/quickActions/ServiceAppointment.*
+---
+
+# Field Service Mobile LWCs
+
+Full guide: `.cursor/skills/fsl-mobile-lwc/SKILL.md`.
+
+## DO NOT
+
+- Use `lightning-file-upload`; use a file input and Apex upload (`rlmRtkPhotoCapture`)
+- Use relative `/sfc/` file URLs or `filePreview` navigation; use absolute `VersionDataUrl`
+  and Apex-served page images (`rlmFileViewer`)
+- Use the browser Speech Recognition API; it doesn't work in the app
+- Load data only in `connectedCallback`; quick actions can set `recordId` later
+- Add the action only to a flexipage; the app reads the page layout's action list
+
+## Remember
+
+- `lightning__RecordAction` + `ScreenAction`, close with `CloseActionScreenEvent`
+- The user needs `RLM_FSL_Mobile_Extensions` (assigned directly, not via a group)
+- Custom actions need a connection; log out and back in to the app after deploying

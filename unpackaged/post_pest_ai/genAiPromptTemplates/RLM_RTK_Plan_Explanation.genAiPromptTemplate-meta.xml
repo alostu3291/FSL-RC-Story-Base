@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Plain-language "why this plan" for the customer, written from the recommendation rules and findings. Shown on the device and in the proposal. Called from RLM_RTK_AI.explainPlan.</description>
+    <developerName>RLM_RTK_Plan_Explanation</developerName>
+    <masterLabel>RTK Plan Explanation</masterLabel>
+    <templateVersions>
+        <content>Write a short note to a homeowner explaining why Rentokil recommends this plan, based on today's inspection.
+Write exactly two friendly sentences in plain language, starting with what was found. No greeting, no sign-off, and don't use the customer's name. Name the recommended plan and any add-on plans, and tie each one to what was found and where.
+Don't mention prices, discounts or guarantees, and don't add anything that isn't in the facts. Reply with the two sentences only.
+
+{!$Input:Context}</content>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Recommendation and findings</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

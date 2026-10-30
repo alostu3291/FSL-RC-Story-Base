@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Answers Rentokil pest customers' billing questions, such as "why is my bill $366?", from the posted invoice lines.</description>
+    <localTopicLinks>
+        <genAiPluginName>RLM_RTK_Pest_Bill_Questions</genAiPluginName>
+    </localTopicLinks>
+    <localTopics>
+        <fullName>RLM_RTK_Pest_Bill_Questions</fullName>
+        <aiPluginUtterances>
+            <developerName>utterance1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 1</masterLabel>
+            <utterance>Why is my bill $366?</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance2</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 2</masterLabel>
+            <utterance>Sam Patel is asking what the $196.90 charge is for.</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance3</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 3</masterLabel>
+            <utterance>Explain this customer's latest bill.</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance4</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 4</masterLabel>
+            <utterance>Why did Dana get a $20 bill after changing plans?</utterance>
+        </aiPluginUtterances>
+        <canEscalate>false</canEscalate>
+        <description>Explains what makes up a Rentokil residential pest customer's bill: monthly plans, the initial service, add-ons from a visit, plan-change credits and proration, and tax. Use it when someone asks why a bill is a certain amount, what a charge is for, or what they owe.</description>
+        <developerName>RLM_RTK_Pest_Bill_Questions</developerName>
+        <genAiPluginInstructions>
+            <description>Always call the Explain Pest Bill action before answering. Pass the amount the user mentioned as a number, the customer name if given, the invoice number if given, and currentRecordId as accountId whenever the user is on an Account or Invoice record. Don't ask for the customer's name when currentRecordId is available.</description>
+            <developerName>Instruction1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 1</masterLabel>
+            <sortOrder>0</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>Answer only from the action's explanation. Never calculate, estimate or change any amount, and never offer discounts or credits. If the explanation says no bill matches, say so and describe the most recent bill it returned.</description>
+            <developerName>Instruction2</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 2</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>Lead with one sentence that answers the question, for example "Your $366.30 first bill is the $199 initial service plus the first month of your two plans, plus tax." Then list each charge with its amount, and end with what the customer should expect next month: monthly plans repeat, one-time services don't.</description>
+            <developerName>Instruction3</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 3</masterLabel>
+            <sortOrder>2</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>If you can't tell which customer the user means, ask for the customer's name. Never show Salesforce record Ids; refer to bills by their document number.</description>
+            <developerName>Instruction4</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 4</masterLabel>
+            <sortOrder>3</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localActionLinks>
+            <functionName>RLM_RTK_Explain_Pest_Bill</functionName>
+        </localActionLinks>
+        <localActions>
+            <fullName>RLM_RTK_Explain_Pest_Bill</fullName>
+            <description>Returns a line-by-line explanation of a pest customer's bill: plans, one-time services, visit add-ons, plan-change credits, proration and tax, with the totals already worked out.</description>
+            <developerName>RLM_RTK_Explain_Pest_Bill</developerName>
+            <invocationTarget>RLM_RTK_BillExplainer</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+            <localDeveloperName>Explain_Pest_Bill</localDeveloperName>
+            <masterLabel>Explain Pest Bill</masterLabel>
+            <progressIndicatorMessage>Reading the bill ...</progressIndicatorMessage>
+        </localActions>
+        <localDeveloperName>Pest_Bill_Questions</localDeveloperName>
+        <masterLabel>Pest Bill Questions</masterLabel>
+        <pluginType>Topic</pluginType>
+        <scope>Explain Rentokil pest bills from the posted invoices. Don't change bills, prices, plans or payments.</scope>
+    </localTopics>
+    <masterLabel>Rentokil Pest Billing Agent</masterLabel>
+    <plannerType>AiCopilot__ReAct</plannerType>
+</GenAiPlannerBundle>

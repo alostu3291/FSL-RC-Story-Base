@@ -1,0 +1,24 @@
+<template>
+    <div class="backdrop" role="dialog" aria-modal="true" aria-label={title}>
+        <header class="bar">
+            <strong class="title">{title}</strong>
+            <button type="button" class="close" onclick={close}>Close</button>
+        </header>
+        <div class="body">
+            <template lwc:if={failed}>
+                <p class="empty">This file can't be shown yet. Try again in a minute.</p>
+            </template>
+            <template lwc:elseif={isPdf}>
+                <template for:each={pages} for:item="p">
+                    <img key={p.key} class="page" src={p.src} alt={p.label} />
+                </template>
+                <template lwc:if={loadingMore}>
+                    <p class="empty">Loading…</p>
+                </template>
+            </template>
+            <template lwc:else>
+                <img class="photo" src={url} alt={title} onerror={imageMissing} />
+            </template>
+        </div>
+    </div>
+</template>

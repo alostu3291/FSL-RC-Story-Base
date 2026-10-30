@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntitlementProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <SObjectType>WorkOrder</SObjectType>
+    <active>true</active>
+    <businessHours>Rentokil Service Days</businessHours>
+    <description>Guaranteed re-service response for Rentokil plan guarantees: a technician arrives within 48 hours of the request, Sundays excluded. RLM_RTK_Coverage completes the milestone when the visit's appointment starts.</description>
+    <entryStartDateField>WorkOrder.CreatedDate</entryStartDateField>
+    <exitCriteriaFilterItems>
+        <field>WorkOrder.IsClosed</field>
+        <operation>equals</operation>
+        <value>true</value>
+    </exitCriteriaFilterItems>
+    <milestones>
+        <businessHours>Rentokil Service Days</businessHours>
+        <isDisplayedOnLinkedEntity>false</isDisplayedOnLinkedEntity>
+        <milestoneName>Re-service Response</milestoneName>
+        <minutesToComplete>2880</minutesToComplete>
+        <useCriteriaStartTime>false</useCriteriaStartTime>
+    </milestones>
+</EntitlementProcess>

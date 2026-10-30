@@ -1,0 +1,22 @@
+<template>
+    <section class="summary">
+        <div class="title">
+            <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+            <h2>Visit summary for the customer</h2>
+            <template lwc:if={summary}>
+                <span class={badgeClass}>{sourceLabel}</span>
+            </template>
+        </div>
+        <template lwc:if={loading}>
+            <p class="muted">Writing the summary…</p>
+        </template>
+        <template lwc:elseif={error}>
+            <p class="muted">{error}</p>
+            <button type="button" class="link" onclick={load}>Try again</button>
+        </template>
+        <template lwc:elseif={summary}>
+            <p class="body">{summary.text}</p>
+            <p class="sent">{sentLabel}</p>
+        </template>
+    </section>
+</template>

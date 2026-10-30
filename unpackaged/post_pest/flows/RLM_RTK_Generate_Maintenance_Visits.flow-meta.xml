@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Generate_Work_Orders</name>
+        <label>Generate Work Orders</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <actionName>generateWorkOrders</actionName>
+        <actionType>generateWorkOrders</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </inputParameters>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <description>Generates the recurring visit Work Orders for a Rentokil maintenance plan. Called by RLM_RTK_Coverage, because Apex can't invoke the standard Generate Work Orders action directly.</description>
+    <environments>Default</environments>
+    <interviewLabel>RLM RTK Generate Maintenance Visits {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>RLM RTK Generate Maintenance Visits</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Generate_Work_Orders</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

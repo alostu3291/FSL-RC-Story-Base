@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Home_Size__c</fullName>
+    <description>Home size bucket the plan was priced at (Under2000, 2000to3500 or Over3500).</description>
+    <label>Home Size</label>
+    <length>20</length>
+    <type>Text</type>
+</CustomField>

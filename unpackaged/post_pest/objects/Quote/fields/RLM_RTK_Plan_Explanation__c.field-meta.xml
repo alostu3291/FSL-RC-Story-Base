@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_RTK_Plan_Explanation__c</fullName>
+    <description>Plain-language explanation of the recommended plan, copied from the inspection for the proposal.</description>
+    <label>RTK Plan Explanation</label>
+    <length>8000</length>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

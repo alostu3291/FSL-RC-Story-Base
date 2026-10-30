@@ -1,0 +1,114 @@
+<template>
+    <section class="find">
+        <div class="head">
+            <div>
+                <h2>Found something new?</h2>
+                <p class="muted">{summary}</p>
+            </div>
+            <button type="button" class="secondary" onclick={toggle}>{toggleLabel}</button>
+        </div>
+
+        <template lwc:if={open}>
+            <template lwc:if={error}>
+                <p class="error">{error}</p>
+            </template>
+
+            <template lwc:if={hasLines}>
+                <ul class="lines">
+                    <template for:each={linesView} for:item="l">
+                        <li key={l.id}>
+                            <div>
+                                <p class="line-name">{l.name}</p>
+                                <p class="muted">{l.reason}</p>
+                                <p class="muted">{l.meta}</p>
+                            </div>
+                            <div class="line-side">
+                                <span class="price">{l.priceLabel}</span>
+                                <template lwc:if={l.removable}>
+                                    <button type="button" class="link" data-id={l.id} disabled={busy} onclick={remove}>Remove</button>
+                                </template>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <template lwc:if={isCompleted}>
+                <p class="muted notice">This visit is complete, so add-ons can't be added. Log new findings on the next visit.</p>
+            </template>
+            <template lwc:if={isLoading}>
+                <p class="muted notice">Loading…</p>
+            </template>
+
+            <template lwc:if={canEdit}>
+                <template lwc:if={logging}>
+                    <div class="log">
+                        <h3>Log a finding</h3>
+                        <p class="label">Where</p>
+                        <div class="chips">
+                            <template for:each={zoneChips} for:item="c">
+                                <button key={c.key} type="button" class={c.cls} data-field={c.field} data-value={c.value} onclick={pick}>{c.value}</button>
+                            </template>
+                        </div>
+                        <p class="label">Pest</p>
+                        <div class="chips">
+                            <template for:each={pestChips} for:item="c">
+                                <button key={c.key} type="button" class={c.cls} data-field={c.field} data-value={c.value} onclick={pick}>{c.value}</button>
+                            </template>
+                        </div>
+                        <p class="label">What you see</p>
+                        <div class="chips">
+                            <template for:each={evidenceChips} for:item="c">
+                                <button key={c.key} type="button" class={c.cls} data-field={c.field} data-value={c.value} onclick={pick}>{c.value}</button>
+                            </template>
+                        </div>
+                        <lightning-textarea label="Note for the customer" value={draft.note} onchange={handleNote}></lightning-textarea>
+                        <div class="bar">
+                            <button type="button" class="secondary" onclick={cancelLog}>Cancel</button>
+                            <button type="button" class="primary" disabled={cannotSaveFinding} onclick={saveLog}>Save finding</button>
+                        </div>
+                    </div>
+                </template>
+                <template lwc:elseif={canLog}>
+                    <button type="button" class="secondary wide" onclick={startLog}>+ Log a finding</button>
+                </template>
+
+                <div class="services-head">
+                    <h3>One-time services</h3>
+                    <button type="button" class="ai-button" disabled={aiBusy} onclick={askEinstein}>
+                        <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                        {aiLabel}
+                    </button>
+                </div>
+                <template lwc:if={aiMessage}>
+                    <p class="muted ai-message">{aiMessage}</p>
+                </template>
+                <div class="addons">
+                    <template for:each={addOnsView} for:item="a">
+                        <button key={a.sku} type="button" class={a.cls} data-sku={a.sku} disabled={a.disabled} onclick={toggleAddOn}>
+                            <span class="addon-top">
+                                <span class="addon-name">{a.name}</span>
+                                <span class="price">{a.priceLabel}</span>
+                            </span>
+                            <template lwc:if={a.badge}>
+                                <span class={a.badgeCls}>{a.badge}</span>
+                            </template>
+                            <span class="muted">{a.description}</span>
+                            <template lwc:if={a.reason}>
+                                <span class="reason">Because: {a.reason}</span>
+                            </template>
+                        </button>
+                    </template>
+                </div>
+
+                <template lwc:if={hasSelection}>
+                    <div class="approve">
+                        <p class="muted">Hand the device to the customer to approve. Added to today's visit and billed when it's completed.</p>
+                        <lightning-input label="Customer name" value={approver} onchange={handleApprover}></lightning-input>
+                        <button type="button" class="primary wide" disabled={cannotApprove} onclick={approve}>{approveLabel}</button>
+                    </div>
+                </template>
+            </template>
+        </template>
+    </section>
+</template>

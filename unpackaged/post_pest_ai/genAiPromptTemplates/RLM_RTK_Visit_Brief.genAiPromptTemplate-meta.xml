@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Pre-visit brief for the Rentokil technician: why the visit, plan and history, what to look for. Called from RLM_RTK_AI.getBrief.</description>
+    <developerName>RLM_RTK_Visit_Brief</developerName>
+    <masterLabel>RTK Visit Brief</masterLabel>
+    <templateVersions>
+        <content>You are writing a pre-visit brief for a Rentokil pest control technician who is about to arrive at a customer's home.
+Use only the facts below. Don't invent history, prices or dates, and skip anything marked none.
+
+Reply with only a JSON object, no other text:
+{"headline": "one sentence, under 18 words, on what this visit is about",
+ "points": ["3 to 5 short bullets, under 20 words each: why the customer called, their plan, what was found and done before, and any open invoice or scheduled plan change worth mentioning at the door"],
+ "lookFor": ["2 to 4 short bullets naming a specific area and the sign to check on this visit"]}
+
+Facts:
+{!$Input:Context}</content>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Visit facts</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

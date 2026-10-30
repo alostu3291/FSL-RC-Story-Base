@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Turns a technician's dictated notes into a draft inspection finding. Called from RLM_RTK_AI.parseNotes.</description>
+    <developerName>RLM_RTK_Notes_Finding</developerName>
+    <masterLabel>RTK Notes Finding</masterLabel>
+    <templateVersions>
+        <content>A Rentokil pest control technician dictated these notes during a home inspection:
+"{!$Input:Notes}"
+
+{!$Input:Context}
+
+Turn the notes into one inspection finding. Use only values from the allowed lists, exactly as written, or null when the notes don't say. Keep the area the technician is in unless the notes name a different one.
+
+Reply with only a JSON object, no other text:
+{"zone": "...", "pest": "...", "evidence": "...", "severity": "...", "customerNote": "one or two plain sentences for the homeowner", "internalNote": "technical details for the next technician (access, products, follow-ups) or null"}</content>
+        <inputs>
+            <apiName>Notes</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Dictated notes</masterLabel>
+            <referenceName>Input:Notes</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Finding context</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

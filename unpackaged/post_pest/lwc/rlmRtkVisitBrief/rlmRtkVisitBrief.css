@@ -1,0 +1,109 @@
+:host {
+    --rtk-ink: #14241a;
+    --rtk-muted: #5b6b62;
+    --rtk-line: #d7e2db;
+    --rtk-soft: #eef5f0;
+    --rtk-accent: #1f7a4d;
+    --rtk-accent-deep: #145c38;
+    --rtk-ai: #5a2ea6;
+    --rtk-ai-soft: #f3eefc;
+    display: block;
+    color: var(--rtk-ink);
+}
+
+.brief {
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid #ddd2f3;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, var(--rtk-ai-soft), #fff 70%);
+}
+
+.head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    --slds-c-icon-color-foreground-default: var(--rtk-ai);
+}
+
+h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+p {
+    margin: 0;
+}
+
+.headline {
+    margin-top: 0.5rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+ul {
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+li + li {
+    margin-top: 0.2rem;
+}
+
+.look li::marker {
+    color: var(--rtk-accent);
+}
+
+.label {
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--rtk-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.muted {
+    margin-top: 0.5rem;
+    color: var(--rtk-muted);
+    font-size: 0.82rem;
+}
+
+.badge {
+    padding: 0.05rem 0.5rem;
+    border-radius: 1rem;
+    background: var(--rtk-soft);
+    color: var(--rtk-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.badge.ai {
+    background: var(--rtk-ai);
+    color: #fff;
+}
+
+.link {
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--rtk-accent-deep);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.refresh {
+    margin-top: 0.6rem;
+}

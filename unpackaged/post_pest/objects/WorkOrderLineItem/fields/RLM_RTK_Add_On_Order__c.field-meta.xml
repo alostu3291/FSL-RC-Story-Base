@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_RTK_Add_On_Order__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Order that billed this field add-on; set when the work order is completed.</description>
+    <label>RTK Add-on Order</label>
+    <referenceTo>Order</referenceTo>
+    <relationshipLabel>Field Add-ons</relationshipLabel>
+    <relationshipName>RTK_Field_Add_Ons</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>
