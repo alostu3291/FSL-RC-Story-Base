@@ -39,3 +39,25 @@ Database.rollback(sp);
 
 Place Sales Transaction runs inside the savepoint and rolls back cleanly. Confirm afterwards
 that no Quote or Opportunity was left for the test account.
+
+## Demo-template (SDO) orgs
+
+SDO / Trailhead signup orgs (for example `user@fieldrev.demo`) already have Revenue Cloud
+and Field Service under `RC_*` names and Cirrus policies. They have never run
+`prepare_rlm_org`. Overlay pest with single CCI tasks; do not run the full base build.
+
+| Gap | Cause | Fix |
+|-----|-------|-----|
+| No `RLM_SalesTransactionContext` | Org uses `RC_SalesTransactionContext` | `apply_context_pest_location -o developer_name RC_SalesTransactionContext`. Extended contexts require attribute/tag names with `__c` (e.g. `ServicePostalCode__c`). Mapping `ShippingPostalCode` may already exist; Apex zone pricing does not need the tag |
+| RTK products have no Billing/Tax policy | `setupRtkRevenue` looked up QuantumBit SKUs only | Script falls back to the first active `BillingPolicy` / `TaxPolicy` (Cirrus). Keep `RTK-INITIAL` on its milestone policy |
+| Pest actions missing in the FS app | Admin profile uses SDO layouts, not repo `Work Order Layout` / `RLM Quote Layout` | Retrieve the assigned layouts, add pest `platformActionList` entries (and WO fields), redeploy. Do not run `assemble_and_deploy_ux` (it would overwrite template layout assignments) |
+| `post_pest` dry-run fails on `RLM_Demo_*`, `RLM_SignAndPay`, `RLM_Charge_Type__c`, `RLM_Order__c` | Those live in `post_docgen`, `post_billing_ui`, and `post_fsl` | Deploy `post_fsl` first; deploy a Sign & Pay subset from `post_docgen` (Apex, LWCs, `Quote.RLM_Demo_*`, trimmed `RLM_DocGen`) and `InvoiceLine.RLM_Charge_Type__c` from `post_billing_ui` |
+| Apex tests fail creating Work Orders | Org flow **SDO SFS Attach Forms On Create** errors with `Select a valid Action Definition` | Org automation, not pest code. Live quote / order / visits still work. Deactivate or fix that flow if you need green tests |
+| Invoice Status = Error after initial treatment; Revenue Transaction Error Log says "no active or effective sequence policy" | The template has no `SequencePolicy` for Invoice / CreditMemo, so posting can't number the invoice | `cci task run create_sequence_policies -o plan_dir <dir>` with a copy of `qb-billing/SequencePolicies.json` trimmed to the org's legal entities. Then recover one schedule per errored invoice (`POST commerce/invoicing/billing-schedules/collection/actions/recover`, one id per call — it cancels the invoice and frees all its schedules) and run `RLM_FSL_InvoiceOrder.enqueue` once per account |
+| `OrderToAsset` / `AssetizationFailed` "couldn't find order products eligible to be converted to assets" after the initial treatment | `RC_Assetize_Order` already assetized the order at activation; DRO tries again when the plan completes | Harmless — check the plan asset exists |
+| CCI `BaseTask` rejects `--org` | Some custom tasks declare `access_token` or malformed option defaults | `cci org default <alias>` then run the task without `--org` |
+
+Deploy order that worked on fieldrev: `deploy_pre_fsl` → `deploy_post_fsl` + FSL PSG/PS
+→ Sign & Pay subset + charge-type field → `deploy_post_pest_sla` → `deploy_post_pest` →
+pest AI → context / catalog / pricing / FSL / DRO / `setup_rtk_*` → pest docgen → pest agent →
+patch SDO layouts → seed visits.
