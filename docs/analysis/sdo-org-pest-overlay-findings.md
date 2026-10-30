@@ -17,9 +17,10 @@ This page is the overall picture.
 ## Bottom line
 
 The pest story works end to end on an SDO org, but not out of the box. Three
-things the repo assumes are missing or named differently, and two template
-setups break billing and tests. Most of the hand work is in layouts and
-billing.
+things the repo assumes are missing or named differently, two template setups
+break billing and tests, and the managed Field Service package is stricter in
+Apex tests than in the live org. All of it is now handled by repo tasks and
+code; see [Deploy order that worked](#deploy-order-that-worked).
 
 | Area | Result |
 |------|--------|
@@ -27,8 +28,8 @@ billing.
 | Order, DRO initial treatment, guarantees, maintenance plan | Works |
 | Covered re-service with Rentokil SLA milestone | Works |
 | Invoicing | Works after adding sequence policies and recovering the failed invoices |
-| FS mobile actions | Work after patching the template's layouts |
-| Apex tests | 37 pass, 47 fail because of a template flow, not pest code |
+| FS mobile actions | Work after `patch_sdo_org_for_pest` patches the template's layouts |
+| Apex tests | All 79 pest tests pass. Before the fixes most Work Order tests failed (Gaps 6 and 7) |
 
 ## What the template org already has
 
@@ -79,10 +80,10 @@ Layouts the admin profile uses, and what was added to each:
 
 | Object | Assigned layout | Added |
 |--------|-----------------|-------|
-| Work Order | `SDO SFS Work Order Layout` | Inspect & Quote and Treatment actions, plus a "Rentokil Pest" section (`RLM_RTK_Inspection__c`, `RLM_RTK_Reported_Pest__c`, `RLM_Service_Coverage__c`, `RLM_Order__c`) |
+| Work Order | `SDO SFS Work Order Layout` | Inspect & Quote and Treatment actions, plus a "Rentokil Pest" section (`RLM_RTK_Inspection__c`, `RLM_RTK_Reported_Pest__c`, `RLM_Service_Coverage__c`, `RLM_Order__c`, `RLM_Billable_Order__c`) |
 | Service Appointment | `SDO - SFS Service Appointment Feed Based` | Inspect & Quote |
 | Quote | `RC Quote Layout` | Sign & Pay |
-| Account | `Account Layout`, `SDO - Account` | Inspect & Quote |
+| Account | `Account Layout`, `SDO - Account`, `SDO - Partner Account`, `SDO - Account Community` (one per record type) | Inspect & Quote |
 
 Lightning pages the **Revenue Cloud** app (`RC_Revenue_Cloud`) uses, and the
 related lists added to their **Related** tab:
@@ -92,19 +93,39 @@ related lists added to their **Related** tab:
 | `RC_Account_Record_Page` | Work Orders, Service Appointments |
 | `RC_Asset_Record_Page` | Maintenance Plans, Entitlements (guarantees) |
 
-How to do it, and what not to do:
+**Fix: `cci task run patch_sdo_org_for_pest`** (`tasks/rlm_sdo_overlay.py`).
+It patches whatever the org actually uses, in place:
 
-- Retrieve the assigned layout or page, patch it, and deploy it back. Don't run
-  `assemble_and_deploy_ux`; it overwrites the template's profile layout
-  assignments and record pages.
+- **Layouts.** It reads the layouts assigned to the given profiles (default
+  System Administrator; add technician profiles with `-o profiles "System
+  Administrator,Field Technician"`). Into each one it copies the `*.RLM_RTK_*`
+  actions from the matching `templates/layouts/pest` layout, plus any pest
+  `RLM_*` fields the layout lacks, in a "Rentokil Pest" section.
+- **Record pages.** It reads the Account and Asset record pages the app assigns
+  (default `RC_Revenue_Cloud`, `-o app` to change) and adds the related lists
+  to their Related tab.
+- **Flows.** See Gap 6.
+- **Dry run.** `-o deploy false -o work_dir /tmp/sdo` retrieves and patches
+  without deploying, so you can diff the files.
+
+Each step skips when the org lacks its target, and reruns report "already
+patched". The first run on fieldrev found three things the manual pass had
+missed: the Partner and Community account layouts, and
+`RLM_Billable_Order__c`.
+
+What not to do, and why the task works the way it does:
+
+- Don't run `assemble_and_deploy_ux`; it overwrites the template's profile
+  layout assignments and record pages.
 - LWC actions go in `platformActionList`; the Metadata API rejects them in
   `quickActionList`.
-- A new layout section goes before `<miniLayout>`. Putting it after gives
-  "Element layoutSections is duplicated".
+- Layout sections must be contiguous. A section inserted after `<miniLayout>`
+  gives "Element layoutSections is duplicated", so the task inserts after the
+  last `</layoutSections>`.
 - Related list names and columns on `lst:dynamicRelatedList` are covered in
   [Related list details](#related-list-details).
-- These patches are org-only and not in the repo. Other apps (Field Service
-  console, Service console) have their own pages and weren't changed.
+- Other apps (Field Service console, Service console) have their own record
+  pages. Run the task again with `-o app <name> -o steps pages` to patch them.
 
 ### 4. Pest depends on parts of other bundles
 
@@ -126,9 +147,11 @@ no active or effective sequence policy for the target object."
 
 The fix, in order:
 
-1. Run `cci task run create_sequence_policies -o plan_dir <dir>` with a copy of
-   `datasets/sfdmu/qb/en-US/qb-billing/SequencePolicies.json`, trimmed to the
-   org's legal entities (here US and Canada, for both Invoice and Credit Memo).
+1. Run `cci task run create_sequence_policies`. It creates the Invoice and
+   Credit Memo policies from `datasets/sfdmu/qb/en-US/qb-billing/SequencePolicies.json`,
+   one per legal entity. Policies whose legal entity the org doesn't have (EU
+   and UK here) are skipped with a warning. Before this fix they failed the
+   task, so you had to trim the JSON by hand.
 2. Recover the errored invoices. For each one, call `POST
    commerce/invoicing/billing-schedules/collection/actions/recover` with one
    of its billing schedule ids. This cancels the invoice and sets all of its
@@ -137,12 +160,60 @@ The fix, in order:
 
 Afterwards Michael's invoice posted at $370.70 and Priya's at $502.70.
 
-### 6. Template flow breaks Apex tests
+### 6. Template flow breaks Work Order inserts in Apex tests
 
-The org flow **SDO SFS Attach Forms On Create** fails with "Select a valid
-Action Definition" whenever a test inserts a Work Order. That causes all 47
-test failures. Live use is unaffected. Deactivate the flow if you need green
-tests.
+The org flow **SDO SFS Attach Forms On Create** attaches six Data Capture forms
+(`DynamicDataCapture`) to every new Work Order. In an Apex test it fails with
+"Select a valid Action Definition", so every test that inserts a Work Order
+fails. That was the cause of all but four failures.
+
+**Cause.** Form validation reads org data that test isolation hides. This was
+proven with two throwaway tests that insert the same Work Order: the one with
+`SeeAllData=true` passes and the isolated one fails. All six form flows are
+active, and live Work Orders get their forms.
+
+**Fix.** `patch_sdo_org_for_pest` (the `flows` step) gives each of the flow's
+Create Records elements a fault path to the next element. The last element
+gets a fault path to a no-op assignment. A form that can't be attached is
+skipped instead of failing the Work Order insert, and live Work Orders still
+get all six forms.
+
+- Fault paths that rejoin the main path use `isGoTo`, so the auto-layout canvas
+  still opens.
+- The task activates the new flow version if the deploy didn't.
+- `SeeAllData=true` on the pest tests was rejected, because it would couple
+  them to org data and unique-SKU collisions.
+
+On an org that runs tests on deploy, run `patch_sdo_org_for_pest -o steps
+flows` before `deploy_post_pest`, which runs the pest tests. fieldrev skips
+tests on deploy, so a validate-only deploy runs 0 tests there.
+
+### 7. Managed Field Service package is stricter in Apex tests
+
+With the flow fixed, 75 of the 79 pest tests passed. Four failed with "Cannot
+change status from None to Dispatched / In Progress / Completed". Once that
+was fixed, the booking test failed with "there's no service territory member
+defined".
+
+**Cause.** The FSL managed package enforces its default appointment lifecycle,
+None → Scheduled → Dispatched → In Progress → Completed, unless it can see the
+org's own status transitions. Tests can't see them, and an org that never
+configured transitions gets the defaults live too. The pest code jumped
+straight from None to the target status. The package also only assigns a
+resource that is a member of a service territory.
+
+**Fix (repo code).**
+
+- `RLM_RTK_FieldVisit.stepToward` moves appointments through the lifecycle
+  steps before the target, in bulk, one update per step, before the start,
+  book and complete paths set their status. Statuses outside that list (custom
+  SDO statuses) are left alone.
+- `RLM_RTK_FieldVisitTest` steps through the lifecycle too, and gives the
+  booking test's technician a territory and membership.
+- Checked live inside a rolled-back transaction: fieldrev's own transitions
+  accept every intermediate step.
+
+Result: all 79 pest tests pass on fieldrev.
 
 ## Template behaviour that looks like an error but isn't
 
@@ -204,20 +275,23 @@ and the names differ between lists:
    `RLM_Field_Service_PSG` and the mobile permission sets.
 3. The Sign & Pay subset from `post_docgen` and
    `InvoiceLine.RLM_Charge_Type__c`.
-4. `deploy_post_pest_sla` (only once; it can't be redeployed while active),
+4. `patch_sdo_org_for_pest -o steps flows`, so `deploy_post_pest`'s tests
+   can insert Work Orders (see Gap 6).
+5. `deploy_post_pest_sla` (only once; it can't be redeployed while active),
    `deploy_post_pest` and `RLM_Rentokil_Pest`.
-5. `deploy_post_pest_ai` and `activate_pest_prompt_templates`.
-6. `apply_context_pest_location -o developer_name RC_SalesTransactionContext`,
+6. `deploy_post_pest_ai` and `activate_pest_prompt_templates`.
+7. `apply_context_pest_location -o developer_name RC_SalesTransactionContext`,
    then the pest catalog, pricing, FSL and DRO data, the `setup_rtk_*`
    scripts, and `refresh_dt_default_pricing`.
-7. `create_sequence_policies` with a trimmed JSON (see Gap 5).
-8. Pest docgen (`deploy_post_pest_docgen`, `activate_docgen_templates`,
+8. `create_sequence_policies` (see Gap 5).
+9. Pest docgen (`deploy_post_pest_docgen`, `activate_docgen_templates`,
    `fix_pest_document_template_binaries`), then the pest billing agent.
-9. Patch the template's layouts and Revenue Cloud record pages (see Gap 3).
-10. Set the user's time zone to America/Chicago and seed visits (see
+10. `patch_sdo_org_for_pest` for the layouts and record pages (see Gap 3).
+11. Set the user's time zone to America/Chicago and seed visits (see
     [pest-demo-seed-visits](../../.cursor/skills/pest-demo-seed-visits/SKILL.md)).
-11. Run `python scripts/ai/pest_org_inventory.py --target-org <user>`. It
-    should report "Nothing missing".
+12. Run `python scripts/ai/pest_org_inventory.py --target-org <user>`. It
+    should report "Nothing missing". Then run the pest Apex tests; all 79
+    should pass.
 
 ## Not changed on the template org
 
@@ -225,14 +299,17 @@ and the names differ between lists:
   changes, so the Cirrus demo keeps working.
 - No feature flags committed in `cumulusci.yml`.
 - The template's default invoice document template was left in place.
+- Template automation was changed in one place only: fault paths on SDO SFS
+  Attach Forms On Create. Its behaviour for successful form attachment is
+  unchanged.
 
-## Open items
+## Resolved open items
 
-- **Template layout and page patches are org-only.** A fresh template org needs
-  them redone by hand. A task that patches whatever layouts are assigned
-  would remove this step.
-- **`create_sequence_policies` assumes QuantumBit legal entities.** On orgs
-  without EU or UK entities it needs a trimmed JSON. It could skip policies
-  whose legal entity doesn't exist.
-- **Apex tests and the SDO Work Order flow.** Tests stay red on template orgs
-  until that flow is deactivated or the tests bypass it.
+| Item | Resolution |
+|------|------------|
+| Layout and page patches were org-only and manual | `patch_sdo_org_for_pest` does them on any template org |
+| `create_sequence_policies` needed a trimmed JSON | It skips policies whose legal entity the org doesn't have |
+| Apex tests red on template orgs | Fault paths on the template flow (Gap 6) and a lifecycle-aware `RLM_RTK_FieldVisit` (Gap 7); all 79 pest tests pass |
+
+Still manual: recovering invoices that already failed before the sequence
+policies existed (Gap 5, steps 2 and 3).

@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**230 tasks** across **9 groups**.
+**231 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*149 task(s)*
+*150 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -2239,6 +2239,14 @@
 **Description:** Patch Payments_Webhook.site-meta.xml with the org's actual admin username before deploy. Required because siteAdmin and siteGuestRecordDefaultOwner are immutable after site creation and the committed XML contains a placeholder username.
 
 **Class:** `tasks.rlm_community.PatchPaymentsSiteForDeploy`
+
+---
+
+### `patch_sdo_org_for_pest`
+
+**Description:** For orgs built from the Salesforce demo template (SDO), not prepare_rlm_org. Adds the pest quick actions (and any missing pest fields, in a Rentokil Pest section) to the Work Order, Service Appointment, Quote and Account layouts assigned to the given profiles; adds Work Order and Service Appointment related lists to the app's Account record page and Maintenance Plan and Entitlement lists to its Asset record page; and gives each Create Records element in the given flows (default SDO_SFS_Attach_Forms_On_Create) a fault path so Work Order inserts in Apex tests don't fail. Each step skips when the org lacks its target; idempotent. deploy false patches into work_dir without deploying.
+
+**Class:** `tasks.rlm_sdo_overlay.PatchSdoOrgForPest`
 
 ---
 

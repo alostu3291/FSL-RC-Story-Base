@@ -49,7 +49,9 @@ class CreateSequencePolicies(BaseSalesforceApiTask):
     Selection conditions are included inline in each policy's POST body.
     Data is sourced from SequencePolicies.json in the plan directory.
 
-    Idempotent: existing policies (matched by Name) are skipped.
+    Idempotent: existing policies (matched by Name) are skipped. Policies whose selection
+    condition references a record the org doesn't have (e.g. no EU legal entity) are
+    skipped with a warning.
     """
 
     task_options: Dict[str, Dict[str, Any]] = {
@@ -105,6 +107,14 @@ class CreateSequencePolicies(BaseSalesforceApiTask):
                 skipped += 1
                 continue
 
+            unresolved = self._unresolved_refs(policy, ref_id_cache)
+            if unresolved:
+                self.logger.warning(
+                    f"  Skipping policy '{name}': no {', '.join(unresolved)} in this org"
+                )
+                skipped += 1
+                continue
+
             body = self._build_body(policy, ref_id_cache)
             self.logger.info(f"  Creating policy: {name}")
 
@@ -152,6 +162,19 @@ class CreateSequencePolicies(BaseSalesforceApiTask):
                 self.logger.error(f"  Failed to resolve {object_type} IDs: {e}")
 
         return cache
+
+    @staticmethod
+    def _unresolved_refs(policy: dict, ref_id_cache: dict) -> list:
+        """Reference conditions whose record (e.g. a legal entity) the org doesn't have."""
+        missing = []
+        for c in policy.get("selectionConditions", []):
+            if c.get("filterFieldType") != "Reference":
+                continue
+            field = c["filterField"]
+            object_type = field[:-2] if field.endswith("Id") else field
+            if (object_type, c["filterValue"]) not in ref_id_cache:
+                missing.append(f"{object_type} '{c['filterValue']}'")
+        return missing
 
     def _build_body(self, policy: dict, ref_id_cache: dict) -> dict:
         """Build the Connect API request body for one SequencePolicy."""

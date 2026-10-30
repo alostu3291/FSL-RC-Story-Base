@@ -101,6 +101,17 @@ namespace, AppExchange) adds the Dispatcher Console, automatic booking and sched
 route optimization, appointment booking windows and Appointment Assistant arrival texts. The
 mobile app doesn't need the package. The demo deck marks the scenes that change with it.
 
+With the package installed, two of its rules apply to the pest code:
+
+- **Status lifecycle.** Unless the org configured its own status transitions,
+  the package enforces None → Scheduled → Dispatched → In Progress → Completed
+  and rejects skipped steps. Apex tests always get these defaults.
+  `RLM_RTK_FieldVisit` steps through them.
+- **Territory membership.** A resource can be assigned only if it's a member of
+  a service territory.
+
+See [sdo-org-pest-overlay-findings.md](../analysis/sdo-org-pest-overlay-findings.md#7-managed-field-service-package-is-stricter-in-apex-tests).
+
 ## Offline
 
 Custom LWC actions and their Apex calls need a connection. Screen flows can run offline only

@@ -135,11 +135,21 @@ private class RLM_RTK_FieldVisitTest {
 
     @IsTest
     static void firstTreatmentIsBookedAtAPickedSlot() {
-        insert new ServiceResource(Name = 'Field Visit Tech', RelatedRecordId = UserInfo.getUserId(),
+        ServiceResource tech = new ServiceResource(Name = 'Field Visit Tech', RelatedRecordId = UserInfo.getUserId(),
             ResourceType = 'T', IsActive = true);
+        insert tech;
+        // The managed Field Service package only assigns resources who are members of a territory.
+        OperatingHours hours = new OperatingHours(Name = 'Field Visit Test Hours');
+        insert hours;
+        ServiceTerritory territory = new ServiceTerritory(Name = 'Field Visit Test Territory',
+            OperatingHoursId = hours.Id, IsActive = true);
+        insert territory;
+        insert new ServiceTerritoryMember(ServiceResourceId = tech.Id, ServiceTerritoryId = territory.Id,
+            EffectiveStartDate = Datetime.now().addDays(-1), TerritoryType = 'P');
         WorkOrder wo = inspectionVisit();
         ServiceAppointment sa = new ServiceAppointment(ParentRecordId = wo.Id, EarliestStartTime = Datetime.now(),
-            DueDate = Datetime.now().addDays(7), Duration = 1, DurationType = 'Hours');
+            DueDate = Datetime.now().addDays(7), Duration = 1, DurationType = 'Hours',
+            ServiceTerritoryId = territory.Id);
         insert sa;
         Quote q = quoteFor(wo.AccountId);
 
@@ -196,6 +206,7 @@ private class RLM_RTK_FieldVisitTest {
     static void startingTreatmentKeepsTheFirstStartAndCompletionRecordsTheEnd() {
         WorkOrder wo = inspectionVisit();
         ServiceAppointment sa = appointmentFor(wo.Id);
+        RLM_RTK_FieldVisit.stepToward(new List<ServiceAppointment>{ sa }, 'In Progress');
         update new ServiceAppointment(Id = sa.Id, Status = 'In Progress', ActualStartTime = Datetime.now().addMinutes(-30));
         Datetime arrived = [SELECT ActualStartTime FROM ServiceAppointment WHERE Id = :sa.Id].ActualStartTime;
 

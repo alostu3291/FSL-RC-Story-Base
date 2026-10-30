@@ -103,7 +103,10 @@ save, reload from Apex rather than trusting cached wire data.
 - **Speech to text:** use the keyboard's mic and a "Fill from notes" button.
 - **Edit pencil and status picker:** off unless the org's Field Service Mobile Settings record
   turns them on (`IsShowEditFullRecord`, `QuickStatusChangeFlowName`). The pest actions have
-  their own Start and Complete buttons instead (`RLM_RTK_FieldVisit.startVisit`).
+  their own Start and Complete buttons instead (`RLM_RTK_FieldVisit.startVisit`). When
+  Apex sets an appointment status, go through `RLM_RTK_FieldVisit.stepToward` first. The
+  managed FSL package rejects skipped lifecycle steps when the org has no transitions
+  configured, and always in tests.
 - **Long waits:** document generation never reported back on mobile. `rlmDocStatusMonitor`
   checks `FORM_FACTOR` and returns to the record after 2.5 seconds on phones and tablets.
 - **Signatures:** a drawn canvas signature is not saved anywhere unless you save it. The

@@ -142,6 +142,8 @@ inventory and confirm the gaps are gone.
 - Org built from the Salesforce demo template (SDO / `RC_*` names, no `prepare_rlm_org`)?
   Read `docs/analysis/sdo-org-pest-overlay-findings.md` first: the context, billing
   policy, sequence policy and layout gaps all need handling before the story works.
+  `cci task run patch_sdo_org_for_pest` adds the pest actions to the template's own
+  layouts and record pages and makes its Work Order forms flow test-safe.
 - A clean deploy doesn't mean the phone works. For mobile app login, the edit and status
   settings, and licensing, see `docs/guides/fsl-mobile-setup.md`; for actions that work on
   desktop but not in the app, see `.cursor/skills/fsl-mobile-lwc/SKILL.md`.

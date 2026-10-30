@@ -150,6 +150,7 @@ public with sharing class RLM_RTK_FieldVisit {
         if (sa != null && !FINISHED.contains(sa.StatusCategory)) {
             Boolean changed = false;
             if (sa.StatusCategory != 'InProgress') {
+                stepToward(new List<ServiceAppointment>{ sa }, 'In Progress');
                 sa.Status = 'In Progress';
                 changed = true;
             }
@@ -176,6 +177,36 @@ public with sharing class RLM_RTK_FieldVisit {
     }
 
     private static final Set<String> FINISHED = new Set<String>{ 'Completed', 'Canceled', 'CannotComplete' };
+
+    /**
+     * The managed Field Service package's default appointment lifecycle. Without the org's own
+     * status transitions (an org that never set them, and every Apex test) it rejects skipping a step.
+     */
+    private static final List<String> LIFECYCLE = new List<String>{ 'None', 'Scheduled', 'Dispatched', 'In Progress', 'Completed' };
+
+    /** Moves appointments through the lifecycle steps before target; the caller's update then sets target. */
+    @TestVisible
+    private static void stepToward(List<ServiceAppointment> appointments, String target) {
+        Integer targetStep = LIFECYCLE.indexOf(target);
+        Map<Id, Integer> stepOf = new Map<Id, Integer>();
+        for (ServiceAppointment sa : appointments) {
+            Integer current = LIFECYCLE.indexOf(sa.Status == null ? 'None' : sa.Status);
+            if (current >= 0 && current < targetStep - 1) {
+                stepOf.put(sa.Id, current);
+            }
+        }
+        for (Integer step = 1; step < targetStep && !stepOf.isEmpty(); step++) {
+            List<ServiceAppointment> moves = new List<ServiceAppointment>();
+            for (Id saId : stepOf.keySet()) {
+                if (stepOf.get(saId) < step) {
+                    moves.add(new ServiceAppointment(Id = saId, Status = LIFECYCLE[step]));
+                }
+            }
+            if (!moves.isEmpty()) {
+                update moves;
+            }
+        }
+    }
 
     /** The appointment the action was opened from, else the user's open one on the work order, else its first open one. */
     private static ServiceAppointment appointmentFor(Id recordId, Id workOrderId) {
@@ -541,6 +572,7 @@ public with sharing class RLM_RTK_FieldVisit {
             sa.SchedEndTime = endTime;
             sa.ArrivalWindowStartTime = startTime;
             sa.ArrivalWindowEndTime = startTime.addHours(1);
+            stepToward(new List<ServiceAppointment>{ sa }, 'Dispatched');
             sa.Status = 'Dispatched';
             update sa;
             if ([SELECT COUNT() FROM AssignedResource WHERE ServiceAppointmentId = :sa.Id] == 0) {
@@ -562,9 +594,10 @@ public with sharing class RLM_RTK_FieldVisit {
         try {
             WorkOrder wo = workOrderFor(recordId);
             List<ServiceAppointment> open = [
-                SELECT Id, ActualStartTime FROM ServiceAppointment
+                SELECT Id, Status, ActualStartTime FROM ServiceAppointment
                 WHERE ParentRecordId = :wo.Id AND Status NOT IN ('Completed', 'Canceled', 'Cannot Complete')
             ];
+            stepToward(open, 'Completed');
             Datetime now = Datetime.now();
             Datetime startedAt = wo.StartDate;
             for (ServiceAppointment sa : open) {
