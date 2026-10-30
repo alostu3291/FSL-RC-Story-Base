@@ -1714,7 +1714,7 @@ tasks:
 
   patch_sdo_org_for_pest:
     group: Revenue Lifecycle Management
-    description: For orgs built from the Salesforce demo template (SDO), not prepare_rlm_org. Adds the pest quick actions (and any missing pest fields, in a Rentokil Pest section) to the Work Order, Service Appointment, Quote and Account layouts assigned to the given profiles; adds Work Order and Service Appointment related lists to the app's Account record page and Maintenance Plan and Entitlement lists to its Asset record page; and gives each Create Records element in the given flows (default SDO_SFS_Attach_Forms_On_Create) a fault path so Work Order inserts in Apex tests don't fail. Each step skips when the org lacks its target; idempotent. deploy false patches into work_dir without deploying.
+    description: For orgs built from the Salesforce demo template (SDO), not prepare_rlm_org. Adds the pest quick actions (and any missing pest fields, in a Rentokil Pest section) to the Work Order, Service Appointment, Quote and Account layouts assigned to the given profiles, plus Work Order and Service Appointment related lists on those Account layouts and Maintenance Plan and Entitlement lists on the assigned Asset layouts; adds Work Order and Service Appointment related lists to the app's Account record page and Maintenance Plan and Entitlement lists to its Asset record page; and gives each Create Records element in the given flows (default SDO_SFS_Attach_Forms_On_Create) a fault path so Work Order inserts in Apex tests don't fail. Each step skips when the org lacks its target; idempotent. deploy false patches into work_dir without deploying.
     class_path: tasks.rlm_sdo_overlay.PatchSdoOrgForPest
 
   insert_pest_pcm_data:

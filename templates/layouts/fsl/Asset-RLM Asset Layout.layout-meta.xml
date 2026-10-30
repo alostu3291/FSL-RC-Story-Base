@@ -167,10 +167,21 @@
         <relatedList>WorkOrders</relatedList>
     </relatedLists>
     <relatedLists>
+        <fields>MaintenancePlan</fields>
+        <fields>WorkType</fields>
+        <fields>ContractLineItem</fields>
+        <fields>CreatedDate</fields>
         <relatedList>MaintenanceAssets</relatedList>
     </relatedLists>
     <relatedLists>
+        <fields>ENTITLEMENT.NAME</fields>
+        <fields>ENTITLEMENT.TYPE</fields>
+        <fields>ENTITLEMENT.STARTDATE</fields>
+        <fields>ENTITLEMENT.ENDDATE</fields>
+        <fields>ENTITLEMENT.STATUS</fields>
         <relatedList>RelatedEntitlementList</relatedList>
+        <sortField>ENTITLEMENT.STATUS</sortField>
+        <sortOrder>Asc</sortOrder>
     </relatedLists>
     <relatedLists>
         <fields>Name</fields>

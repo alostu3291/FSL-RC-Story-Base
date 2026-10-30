@@ -42,11 +42,25 @@ except ImportError:
 
 
 PEST_LAYOUT_TEMPLATES = {
-    "WorkOrder": "WorkOrder-Work Order Layout.layout-meta.xml",
-    "ServiceAppointment": "ServiceAppointment-Service Appointment Layout.layout-meta.xml",
-    "Quote": "Quote-RLM Quote Layout.layout-meta.xml",
-    "Account": "Account-Account Layout.layout-meta.xml",
+    "WorkOrder": "pest/WorkOrder-Work Order Layout.layout-meta.xml",
+    "ServiceAppointment": "pest/ServiceAppointment-Service Appointment Layout.layout-meta.xml",
+    "Quote": "pest/Quote-RLM Quote Layout.layout-meta.xml",
+    "Account": "pest/Account-Account Layout.layout-meta.xml",
 }
+
+# Related lists copied (with their columns) from a repo layout template into the org's layouts.
+LAYOUT_RELATED_LISTS = {
+    "Account": ("pest/Account-Account Layout.layout-meta.xml", ["WorkOrders", "ServiceAppointmentAccount"]),
+    "Asset": ("fsl/Asset-RLM Asset Layout.layout-meta.xml", ["MaintenanceAssets", "RelatedEntitlementList"]),
+}
+LAYOUT_OBJECTS = list(dict.fromkeys([*PEST_LAYOUT_TEMPLATES, *LAYOUT_RELATED_LISTS]))
+
+# Layout elements that follow relatedLists, in Metadata API order.
+LAYOUT_AFTER_RELATED_LISTS = [
+    "relatedObjects", "runAssignmentRulesDefault", "showEmailCheckbox", "showHighlightsPanel",
+    "showInteractionLogPanel", "showKnowledgeComponent", "showRunAssignmentRulesCheckbox",
+    "showSolutionSection", "showSubmitAndAttachButton", "summaryLayout",
+]
 PEST_ACTION_MARKER = ".RLM_RTK_"
 PEST_SECTION_LABEL = "Rentokil Pest"
 
@@ -159,7 +173,7 @@ class PatchSdoOrgForPest(BaseSalesforceApiTask):
 
     def _run_task(self):
         repo_root = Path(self.project_config.repo_root)
-        self.templates_dir = repo_root / "templates" / "layouts" / "pest"
+        self.templates_dir = repo_root / "templates" / "layouts"
         self._field_cache: Dict[str, set] = {}
         self._patched_flows: List[str] = []
         keep = bool(self.options.get("work_dir"))
@@ -200,23 +214,29 @@ class PatchSdoOrgForPest(BaseSalesforceApiTask):
             if not path.exists():
                 self.logger.warning(f"  {full_name}: not retrieved; skipping")
                 continue
-            template = (self.templates_dir / PEST_LAYOUT_TEMPLATES[sobject]).read_text(encoding="utf-8")
             text = path.read_text(encoding="utf-8")
-            actions = [a for a in _layout_actions(template) if PEST_ACTION_MARKER in a[0]]
-            text, added_actions = _add_layout_actions(text, actions)
-            fields = [f for f in _layout_fields(template) if f.startswith("RLM_")]
-            fields = [f for f in fields if f in self._object_fields(sobject)]
-            text, added_fields = _add_layout_section(text, fields, PEST_SECTION_LABEL)
-            if added_actions is None:
-                self.logger.warning(
-                    f"  {full_name}: no Record platformActionList; add the pest actions in the layout editor"
-                )
-                added_actions = []
-            if added_actions or added_fields:
+            added_actions, added_fields, added_lists = [], [], []
+            if sobject in PEST_LAYOUT_TEMPLATES:
+                template = self._template(PEST_LAYOUT_TEMPLATES[sobject])
+                actions = [a for a in _layout_actions(template) if PEST_ACTION_MARKER in a[0]]
+                text, added_actions = _add_layout_actions(text, actions)
+                fields = [f for f in _layout_fields(template) if f.startswith("RLM_")]
+                fields = [f for f in fields if f in self._object_fields(sobject)]
+                text, added_fields = _add_layout_section(text, fields, PEST_SECTION_LABEL)
+                if added_actions is None:
+                    self.logger.warning(
+                        f"  {full_name}: no Record platformActionList; add the pest actions in the layout editor"
+                    )
+                    added_actions = []
+            if sobject in LAYOUT_RELATED_LISTS:
+                source, names = LAYOUT_RELATED_LISTS[sobject]
+                text, added_lists = _add_layout_related_lists(text, self._template(source), names)
+            if added_actions or added_fields or added_lists:
                 path.write_text(text, encoding="utf-8")
                 changed.append(path)
                 self.logger.info(
-                    f"  {full_name}: +actions {added_actions or '-'}, +fields {added_fields or '-'}"
+                    f"  {full_name}: +actions {added_actions or '-'}, +fields {added_fields or '-'}, "
+                    f"+related lists {added_lists or '-'}"
                 )
             else:
                 self.logger.info(f"  {full_name}: already patched")
@@ -225,7 +245,7 @@ class PatchSdoOrgForPest(BaseSalesforceApiTask):
     def _assigned_layouts(self) -> Dict[str, str]:
         """Full layout name → object, for the pest objects and the configured profiles."""
         profiles = ", ".join(_soql_quote(p) for p in self.profiles)
-        objects = ", ".join(_soql_quote(o) for o in PEST_LAYOUT_TEMPLATES)
+        objects = ", ".join(_soql_quote(o) for o in LAYOUT_OBJECTS)
         soql = (
             "SELECT Layout.Name, Layout.NamespacePrefix, TableEnumOrId FROM ProfileLayout "
             f"WHERE Profile.Name IN ({profiles}) AND TableEnumOrId IN ({objects})"
@@ -240,6 +260,9 @@ class PatchSdoOrgForPest(BaseSalesforceApiTask):
             full = f"{r['TableEnumOrId']}-{ns + '__' if ns else ''}{name}"
             assigned[full] = r["TableEnumOrId"]
         return assigned
+
+    def _template(self, relative: str) -> str:
+        return (self.templates_dir / relative).read_text(encoding="utf-8")
 
     def _object_fields(self, sobject: str) -> set:
         if sobject not in self._field_cache:
@@ -458,6 +481,28 @@ def _add_layout_section(text: str, fields: List[str], label: str):
         return text, []
     end += len("</layoutSections>")
     return text[:end] + section + text[end:], missing
+
+
+def _add_layout_related_lists(text: str, template: str, names: List[str]):
+    """Copy the named related lists, with their columns, from the template layout."""
+    present = set(re.findall(r"<relatedList>([^<]+)</relatedList>", text))
+    blocks = {}
+    for m in re.finditer(r"<relatedLists>.*?</relatedLists>", template, re.S):
+        name = re.search(r"<relatedList>([^<]+)</relatedList>", m.group(0))
+        if name:
+            blocks[name.group(1)] = m.group(0)
+    new = [n for n in names if n not in present and n in blocks]
+    if not new:
+        return text, []
+    insert = "".join("\n    " + blocks[n] for n in new)
+    # relatedLists must stay contiguous: after the last one, else before the elements that follow.
+    end = text.rfind("</relatedLists>")
+    if end != -1:
+        at = end + len("</relatedLists>")
+    else:
+        later = [m.start() for t in LAYOUT_AFTER_RELATED_LISTS for m in [re.search(rf"\n    <{t}>", text)] if m]
+        at = min(later) if later else text.rfind("\n</Layout>")
+    return text[:at] + insert + text[at:], new
 
 
 def _app_record_pages(app_xml: str, sobjects: List[str]) -> Dict[str, str]:
