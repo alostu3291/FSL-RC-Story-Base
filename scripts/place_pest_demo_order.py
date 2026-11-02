@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rentokil residential pest demo driver (Michael Reyes / Bloomingdale).
+"""Verdant residential pest demo driver (Michael Reyes / Bloomingdale).
 
 Places a field Quote (Home Protection + Initial Service + optional Mosquito) via
 Place Sales Transaction with location zone pricing, converts to Order, activates,

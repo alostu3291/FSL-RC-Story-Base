@@ -4,7 +4,7 @@
     <developerName>RLM_RTK_Plan_Explanation</developerName>
     <masterLabel>RTK Plan Explanation</masterLabel>
     <templateVersions>
-        <content>Write a short note to a homeowner explaining why Rentokil recommends this plan, based on today's inspection.
+        <content>Write a short note to a homeowner explaining why Verdant recommends this plan, based on today's inspection.
 Write exactly two friendly sentences in plain language, starting with what was found. No greeting, no sign-off, and don't use the customer's name. Name the recommended plan and any add-on plans, and tie each one to what was found and where.
 Don't mention prices, discounts or guarantees, and don't add anything that isn't in the facts. Reply with the two sentences only.
 

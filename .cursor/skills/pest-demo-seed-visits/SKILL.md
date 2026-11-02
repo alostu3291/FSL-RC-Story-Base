@@ -1,6 +1,6 @@
 ---
 name: pest-demo-seed-visits
-description: Seeds fresh Rentokil pest demo data for the two field flows - a new prospect's inspection (Inspect & Quote, Sign & Pay, treatment) and a Covered re-service for an existing customer (response guarantee countdown, Treatment, Change the plan) - and verifies each seed. Use when asked to seed, reset or prepare demo data, customers or visits for the pest or Field Service demo.
+description: Seeds fresh Verdant pest demo data for the two field flows - a new prospect's inspection (Inspect & Quote, Sign & Pay, treatment) and a Covered re-service for an existing customer (response guarantee countdown, Treatment, Change the plan) - and verifies each seed. Use when asked to seed, reset or prepare demo data, customers or visits for the pest or Field Service demo.
 ---
 
 # Pest Demo Seed Visits

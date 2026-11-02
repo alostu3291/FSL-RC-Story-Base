@@ -4,7 +4,7 @@
     <developerName>RLM_RTK_Notes_Finding</developerName>
     <masterLabel>RTK Notes Finding</masterLabel>
     <templateVersions>
-        <content>A Rentokil pest control technician dictated these notes during a home inspection:
+        <content>A Verdant pest control technician dictated these notes during a home inspection:
 "{!$Input:Notes}"
 
 {!$Input:Context}

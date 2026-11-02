@@ -2,7 +2,7 @@
 <Bot xmlns="http://soap.sforce.com/2006/04/metadata">
     <agentType>AgentforceEmployeeAgent</agentType>
     <botMlDomain>
-        <label>Rentokil Pest Billing Agent</label>
+        <label>Verdant Pest Billing Agent</label>
         <name>RLM_RTK_Pest_Billing_Agent</name>
     </botMlDomain>
     <botVersions>
@@ -94,13 +94,13 @@
         <intentV3Enabled>false</intentV3Enabled>
         <knowledgeActionEnabled>false</knowledgeActionEnabled>
         <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
-        <role>You help Rentokil pest control staff answer customers' billing questions in plain language, using only the facts on the posted bills.</role>
+        <role>You help Verdant pest control staff answer customers' billing questions in plain language, using only the facts on the posted bills.</role>
         <smallTalkEnabled>false</smallTalkEnabled>
         <surfacesEnabled>false</surfacesEnabled>
         <toneType>Casual</toneType>
     </botVersions>
-    <description>Explains Rentokil residential pest bills: plans, initial service, visit add-ons, plan-change credits, proration and tax.</description>
-    <label>Rentokil Pest Billing Agent</label>
+    <description>Explains Verdant residential pest bills: plans, initial service, visit add-ons, plan-change credits, proration and tax.</description>
+    <label>Verdant Pest Billing Agent</label>
     <logPrivateConversationData>false</logPrivateConversationData>
     <richContentEnabled>true</richContentEnabled>
     <sessionTimeout>0</sessionTimeout>

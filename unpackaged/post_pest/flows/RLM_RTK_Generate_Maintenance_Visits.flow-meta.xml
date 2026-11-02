@@ -17,7 +17,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>66.0</apiVersion>
-    <description>Generates the recurring visit Work Orders for a Rentokil maintenance plan. Called by RLM_RTK_Coverage, because Apex can't invoke the standard Generate Work Orders action directly.</description>
+    <description>Generates the recurring visit Work Orders for a Verdant maintenance plan. Called by RLM_RTK_Coverage, because Apex can't invoke the standard Generate Work Orders action directly.</description>
     <environments>Default</environments>
     <interviewLabel>RLM RTK Generate Maintenance Visits {!$Flow.CurrentDateTime}</interviewLabel>
     <label>RLM RTK Generate Maintenance Visits</label>

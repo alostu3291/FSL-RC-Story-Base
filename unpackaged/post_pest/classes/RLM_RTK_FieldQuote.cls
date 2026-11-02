@@ -1,5 +1,5 @@
 /**
- * Creates a priced Rentokil residential Quote in the field via Place Sales Transaction.
+ * Creates a priced Verdant residential Quote in the field via Place Sales Transaction.
  * Always includes Initial Service (RTK-INITIAL) with the selected plan. Applies location
  * zone multiplier from RLM_RTK_Service_Zone__c to list prices before pricing.
  */
@@ -29,7 +29,7 @@ public with sharing class RLM_RTK_FieldQuote {
         @InvocableVariable public Boolean success;
     }
 
-    @InvocableMethod(label='Create Rentokil Field Quote' category='Rentokil'
+    @InvocableMethod(label='Create Verdant Field Quote' category='Verdant'
         description='Places a priced residential pest Quote for the account, including Initial Service and location pricing.')
     public static List<Response> createQuotes(List<Request> requests) {
         List<Response> responses = new List<Response>();

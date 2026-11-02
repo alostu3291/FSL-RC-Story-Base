@@ -1,12 +1,12 @@
 :host {
     --rtk-ink: #14241a;
     --rtk-muted: #5b6b62;
-    --rtk-line: #d7e2db;
-    --rtk-soft: #eef5f0;
+    --rtk-line: #D7E2D2;
+    --rtk-soft: #EEF3E8;
     --rtk-panel: #ffffff;
-    --rtk-accent: #1f7a4d;
-    --rtk-accent-deep: #145c38;
-    --rtk-accent-soft: #d8f0e3;
+    --rtk-accent: #2E7340;
+    --rtk-accent-deep: #1F4D3A;
+    --rtk-accent-soft: #E1EDDB;
     --rtk-warn: #c45c16;
     --rtk-warn-soft: #fde8d6;
     --rtk-hot: #b42318;
@@ -19,9 +19,9 @@
 
 .shell {
     background:
-        radial-gradient(120% 80% at 100% -10%, #dff3e8 0%, transparent 55%),
+        radial-gradient(120% 80% at 100% -10%, #E1EDDB 0%, transparent 55%),
         radial-gradient(90% 60% at -10% 110%, #e7f1ff 0%, transparent 50%),
-        linear-gradient(180deg, #f7fbf8 0%, #ffffff 40%);
+        linear-gradient(180deg, #F8F7F0 0%, #ffffff 40%);
     border: 1px solid var(--rtk-line);
     border-radius: calc(var(--rtk-radius) + 0.25rem);
     padding: 1.25rem 1.25rem 1rem;
@@ -135,7 +135,7 @@
 
 .plan-card:hover {
     transform: translateY(-2px);
-    border-color: #a9cbb8;
+    border-color: #A8C69F;
     box-shadow: 0 8px 18px rgba(20, 36, 26, 0.08);
 }
 
@@ -316,7 +316,7 @@
 
 .prop-tile:hover {
     transform: translateY(-1px);
-    border-color: #a9cbb8;
+    border-color: #A8C69F;
 }
 
 .prop-tile.selected {
@@ -398,9 +398,9 @@
 }
 
 .sev-chip.light.selected {
-    border-color: #3d8f5f;
-    background: #e8f7ee;
-    box-shadow: 0 0 0 3px rgba(61, 143, 95, 0.18);
+    border-color: #3FA34D;
+    background: #E9F2E4;
+    box-shadow: 0 0 0 3px rgba(63, 163, 77, 0.18);
 }
 
 .sev-chip.moderate.selected {

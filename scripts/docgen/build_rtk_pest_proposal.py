@@ -1,8 +1,8 @@
-"""Build the Rentokil pest proposal DocGen template (docx).
+"""Build the Verdant pest proposal DocGen template (docx).
 
 Usage:
     python scripts/docgen/build_rtk_pest_proposal.py \
-        scripts/docgen/assets/rentokil_logo_white.png \
+        scripts/docgen/assets/verdant_logo_white.png \
         unpackaged/post_pest_docgen/documentTemplates/RLM_RTK_PestProposal_1.dt
 
 Tokens must match the RLMRTKProposalTransform output and the template's tokenList.
@@ -15,11 +15,12 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Inches, Pt, RGBColor
 
-RED = "EC1D23"
-INK = "071017"
-GREY = "5A6470"
-TINT = "FDECEC"
-RULE = "D9DDE2"
+FOREST = "1F4D3A"
+LEAF = "3FA34D"
+INK = "14241A"
+GREY = "5B6B62"
+TINT = "EEF3E8"
+RULE = "D7E2DB"
 LOGO_WHITE = sys.argv[1]
 OUT = sys.argv[2]
 
@@ -117,20 +118,20 @@ def cell_text(cell, text, size=None, bold=False, color=None, align=None, caps=Fa
 
 def section_title(text, before=14):
     p = para(doc, before=before, after=4)
-    run(p, text, 11, True, RED, caps=True)
+    run(p, text, 11, True, FOREST, caps=True)
     pPr = p._p.get_or_add_pPr()
     bdr = OxmlElement("w:pBdr")
     bottom = OxmlElement("w:bottom")
     bottom.set(qn("w:val"), "single")
     bottom.set(qn("w:sz"), "8")
     bottom.set(qn("w:space"), "2")
-    bottom.set(qn("w:color"), RED)
+    bottom.set(qn("w:color"), LEAF)
     bdr.append(bottom)
     pPr.append(bdr)
     return p
 
 
-# ---------- header: red band with logo + contact ----------
+# ---------- header: Forest band with logo + contact ----------
 header = sec.header
 hp = header.paragraphs[0]
 ht = header.add_table(rows=1, cols=2, width=Inches(CONTENT_W))
@@ -138,7 +139,7 @@ borders(ht)
 cell_margins(ht, 140, 140, 180, 180)
 widths(ht, [3.0, 4.3])
 for c in ht.rows[0].cells:
-    shade(c, RED)
+    shade(c, FOREST)
     c.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 ht.cell(0, 0).paragraphs[0].add_run().add_picture(LOGO_WHITE, width=Inches(1.9))
 rc = ht.cell(0, 1)
@@ -153,7 +154,7 @@ header.add_paragraph()
 footer = sec.footer
 fp = footer.paragraphs[0]
 fp.alignment = WD_ALIGN_PARAGRAPH.CENTER
-run(fp, "Rentokil Pest Control", 8, True, RED)
+run(fp, "Verdant Pest Care", 8, True, FOREST)
 run(fp, "   |   Proposal {{QuoteNumber}}   |   Questions? Contact {{SalesRep}} at {{SalesRepEmail}}", 8, False, GREY)
 
 # ---------- proposal meta ----------
@@ -170,7 +171,7 @@ widths(info, [2.45, 2.45, 2.4])
 for i, label in enumerate(["SERVICE ADDRESS", "BILLING ADDRESS", "YOUR PEST SPECIALIST"]):
     c = info.cell(0, i)
     shade(c, TINT)
-    cell_text(c, label, 7.5, True, RED)
+    cell_text(c, label, 7.5, True, FOREST)
 blocks = [
     ["{{ServiceStreet}}", "{{ServiceCity}}, {{ServiceState}} {{ServicePostalCode}}"],
     ["{{BillingStreet}}", "{{BillingCity}}, {{BillingState}} {{BillingPostalCode}}", "{{CustomerPhone}}"],
@@ -199,7 +200,7 @@ for i, h in enumerate(["AREA", "WHAT WE FOUND", "SEVERITY", "NOTES"]):
     cell_text(c, h, 8, True, "FFFFFF")
 cell_text(found.cell(1, 0), "{{#Finding}}{{Area}}", 9.5, True, INK)
 cell_text(found.cell(1, 1), "{{Observation}}", 9.5, False, INK)
-cell_text(found.cell(1, 2), "{{Severity}}", 9, True, RED)
+cell_text(found.cell(1, 2), "{{Severity}}", 9, True, FOREST)
 cell_text(found.cell(1, 3), "{{Note}}{{/Finding}}", 9, False, GREY)
 
 # ---------- why this plan ----------
@@ -231,7 +232,7 @@ merged = tot[0].merge(tot[1])
 for c in (merged, tot[2]):
     shade(c, TINT)
 cell_text(merged, "Monthly service total", 10, True, INK)
-cell_text(tot[2], "{{MonthlyTotal}}", 11, True, RED, WD_ALIGN_PARAGRAPH.RIGHT)
+cell_text(tot[2], "{{MonthlyTotal}}", 11, True, FOREST, WD_ALIGN_PARAGRAPH.RIGHT)
 
 # ---------- one-time services ----------
 section_title("One-Time Services")
@@ -252,7 +253,7 @@ merged = tot[0].merge(tot[1])
 for c in (merged, tot[2]):
     shade(c, TINT)
 cell_text(merged, "One-time total", 10, True, INK)
-cell_text(tot[2], "{{OneTimeTotal}}", 11, True, RED, WD_ALIGN_PARAGRAPH.RIGHT)
+cell_text(tot[2], "{{OneTimeTotal}}", 11, True, FOREST, WD_ALIGN_PARAGRAPH.RIGHT)
 
 # ---------- summary band ----------
 para(doc, after=8)
@@ -264,7 +265,7 @@ for i, (label, value) in enumerate([("MONTHLY SERVICE", "{{MonthlyTotal}} / mo")
                                     ("DUE AFTER FIRST VISIT", "{{OneTimeTotal}}"),
                                     ("FIRST MONTH TOTAL", "{{GrandTotal}}")]):
     c = band.cell(0, i)
-    shade(c, RED)
+    shade(c, FOREST)
     cell_text(c, label, 7.5, True, "FFFFFF", WD_ALIGN_PARAGRAPH.CENTER)
     p = c.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -290,7 +291,7 @@ cell_margins(st, 60, 60, 100, 100)
 widths(st, [0.45, 6.85])
 for r, (num, title, body) in enumerate(steps):
     n = st.cell(r, 0)
-    shade(n, RED)
+    shade(n, FOREST)
     n.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
     cell_text(n, num, 13, True, "FFFFFF", WD_ALIGN_PARAGRAPH.CENTER)
     c = st.cell(r, 1)
@@ -303,10 +304,11 @@ section_title("Our Promise to You", before=16)
 for line in [
     "Licensed, trained technicians who arrive in a marked vehicle and uniform.",
     "Treatments applied to label directions, with guidance on keeping children and pets safe.",
+    "Lower-impact methods first: exclusion, monitoring and targeted treatments before broad applications.",
     "If you are not satisfied with a visit, tell us and we will make it right.",
 ]:
     p = para(doc, after=2)
-    run(p, "■  ", 8, True, RED)
+    run(p, "■  ", 8, True, LEAF)
     run(p, line, 9, False, INK)
 
 # ---------- terms ----------
@@ -325,13 +327,13 @@ for t in terms:
 
 # ---------- signatures ----------
 section_title("Acceptance", before=16)
-para(doc, "By signing below, you accept this proposal and authorize Rentokil to begin service at the address above.",
+para(doc, "By signing below, you accept this proposal and authorize Verdant Pest Care to begin service at the address above.",
      8.5, color=GREY, after=10)
 sig = doc.add_table(rows=2, cols=2)
 borders(sig)
 cell_margins(sig, 40, 40, 0, 200)
 widths(sig, [3.65, 3.65])
-for i, who in enumerate(["Customer signature", "Rentokil representative"]):
+for i, who in enumerate(["Customer signature", "Verdant representative"]):
     c = sig.cell(0, i)
     cell_text(c, " ", 18)
     p = c.paragraphs[0]

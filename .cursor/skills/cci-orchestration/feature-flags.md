@@ -36,7 +36,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `guidedselling` | `False` | 2 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
-| `pest` | `False` | 24 flow step(s) |
+| `pest` | `False` | 25 flow step(s) |
 | `prm` | `True` | 9 flow step(s) |
 | `prm_exp_bundle` | `True` | 4 flow step(s) |
 | `procedure_plan_definition_version_active` | `False` | — |
@@ -275,6 +275,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 16 → `deploy_post_pest_agent`
 - `prepare_pest` step 17 → `assign_permission_sets`
 - `prepare_pest` step 18 → `activate_pest_billing_agent`
+- `prepare_pest` step 19 → `deploy_post_pest_brand`
 
 ### `prm` (default: `True`)
 

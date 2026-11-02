@@ -2,7 +2,7 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>DRO AutoTask: create the Initial Pest Treatment Work Order; the Initial Pest Treatment Work Type auto-creates the Service Appointment for Rentokil Initial Service fulfillment. DRO passes the FulfillmentOrderLineItem Id as recordId; the step is resolved through FulfillmentStepSource and the Asset through FulfillmentLineSourceRel and AssetActionSource. Links the Work Order to the inspection behind the quote so the technician sees the findings.</description>
+    <description>DRO AutoTask: create the Initial Pest Treatment Work Order; the Initial Pest Treatment Work Type auto-creates the Service Appointment for Verdant Initial Service fulfillment. DRO passes the FulfillmentOrderLineItem Id as recordId; the step is resolved through FulfillmentStepSource and the Asset through FulfillmentLineSourceRel and AssetActionSource. Links the Work Order to the inspection behind the quote so the technician sees the findings.</description>
     <environments>Default</environments>
     <interviewLabel>Create Initial Pest WO {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Create Initial Pest Treatment Work Order</label>

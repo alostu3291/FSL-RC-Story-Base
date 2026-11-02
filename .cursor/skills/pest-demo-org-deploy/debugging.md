@@ -6,7 +6,7 @@ Find the error text, apply the fix, redeploy only what failed.
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `Must have at least one default business hours` | `BusinessHours.settings-meta.xml` lists only Rentokil Service Days | Keep the Default (24/7) entry in the settings file; it is in the repo version |
+| `Must have at least one default business hours` | `BusinessHours.settings-meta.xml` lists only Verdant Service Days | Keep the Default (24/7) entry in the settings file; it is in the repo version |
 | Entitlement process can't be updated / is in use | Active processes with entitlements can't be redeployed | Use `deploy_post_pest_sla` (skips when present). To change it, create a new version in Setup |
 | `IsVersionDefault` invalid on `SlaProcess` | Versioning is off in these orgs | Don't query or set it |
 | Layout related list not found | Milestones related list name | Use `RelatedEntityMilestoneList` |

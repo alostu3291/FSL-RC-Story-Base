@@ -320,7 +320,7 @@ public with sharing class RLM_RTK_FieldVisit {
                 ORDER BY VersionNumber DESC LIMIT 1
             ];
             if (templates.isEmpty()) {
-                throw new VisitException('The Rentokil proposal template is not active in this org.');
+                throw new VisitException('The Verdant proposal template is not active in this org.');
             }
             DocumentGenerationProcess process = new DocumentGenerationProcess(
                 Type = 'GenerateAndConvert',
@@ -703,7 +703,7 @@ public with sharing class RLM_RTK_FieldVisit {
     }
 
     private static String proposalTitle(Id quoteId) {
-        return 'Rentokil Proposal ' + [SELECT QuoteNumber FROM Quote WHERE Id = :quoteId].QuoteNumber;
+        return 'Verdant Proposal ' + [SELECT QuoteNumber FROM Quote WHERE Id = :quoteId].QuoteNumber;
     }
 
     private static String joinAddress(String street, String city, String state, String postalCode) {

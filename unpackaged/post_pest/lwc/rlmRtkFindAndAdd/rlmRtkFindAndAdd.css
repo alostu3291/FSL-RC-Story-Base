@@ -1,10 +1,10 @@
 :host {
     --rtk-ink: #14241a;
     --rtk-muted: #5b6b62;
-    --rtk-line: #d7e2db;
-    --rtk-soft: #eef5f0;
-    --rtk-accent: #1f7a4d;
-    --rtk-accent-deep: #145c38;
+    --rtk-line: #D7E2D2;
+    --rtk-soft: #EEF3E8;
+    --rtk-accent: #2E7340;
+    --rtk-accent-deep: #1F4D3A;
     --rtk-hot: #b42318;
     display: block;
     color: var(--rtk-ink);

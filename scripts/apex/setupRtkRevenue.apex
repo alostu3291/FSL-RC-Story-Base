@@ -1,4 +1,4 @@
-// Idempotent Rentokil revenue setup:
+// Idempotent Verdant revenue setup:
 //  1. Service zones (ZIP / prefix → multiplier) for location pricing
 //  2. Price book entries for RTK-* products
 //  3. Required Initial Service ProductRelatedComponent on each plan

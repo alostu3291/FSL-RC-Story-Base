@@ -116,7 +116,7 @@ Reverse dependency order (children before parents):
 | 10 | prepare_docgen | DocGen |
 | 11 | prepare_dro | DRO + fulfillment scope |
 | 11.5 | prepare_fsl | Field Service Core + DRO Field Installation (when `fsl`) |
-| 13.6 | prepare_pest | Rentokil residential pest catalog, field quote, Bloomingdale FSL (when `pest`) |
+| 13.6 | prepare_pest | Verdant residential pest catalog, field quote, Bloomingdale FSL (when `pest`) |
 | 12 | prepare_tax | Tax |
 | 13 | prepare_billing | Billing |
 | 13.5 | setup_fsl_revenue | FSL install/repair prices + Installation Milestone billing policy (when `fsl` + `billing` + `qb`; must follow qb-billing, which resets Product2 billing policies) |

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 120">
+<g transform="translate(6 10)"><path d="M50 5 L88 18 V47 C88 71 71 88 50 96 C29 88 12 71 12 47 V18 Z" fill="#1F4D3A"/>
+<path d="M50 24 C70 32 74 56 50 79 C30 62 30 38 50 24 Z" fill="#3FA34D"/>
+<path d="M50 30 C47 46 47 62 50 76" stroke="#F6F4EC" stroke-width="3" fill="none" stroke-linecap="round"/>
+<path d="M49 48 L60 40 M49 60 L61 53 M49 54 L39 46" stroke="#F6F4EC" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<circle cx="73" cy="27" r="6" fill="#F2B33D"/></g>
+<text x="122" y="70" font-family="'Avenir Next', 'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="54" letter-spacing="0.5" fill="#1F4D3A">Verdant</text>
+<text x="125" y="100" font-family="'Avenir Next', 'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="15" letter-spacing="4.2" fill="#3FA34D">PEST CARE</text>
+</svg>

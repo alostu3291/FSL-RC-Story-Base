@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Rentokil residential pest demo: service zones, property inspections, findings and treatment checklist, field quote Apex, and Line of Business on Quote.</description>
+    <description>Verdant residential pest demo: service zones, property inspections, findings and treatment checklist, field quote Apex, and Line of Business on Quote.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>RLM Rentokil Pest</label>
+    <label>RLM Verdant Pest</label>
     <classAccesses>
         <apexClass>RLM_RTK_AI</apexClass>
         <enabled>true</enabled>

@@ -1,5 +1,5 @@
 /**
- * Generative AI for the Rentokil pest field app. Each feature fills one Prompt Builder template
+ * Generative AI for the Verdant pest field app. Each feature fills one Prompt Builder template
  * (RLM_RTK_* in unpackaged/post_pest_ai) and falls back to the rules when Einstein isn't set up,
  * the call fails, or the reply can't be used. AI only drafts, suggests and explains: technicians
  * confirm findings, customers approve anything they pay for, and prices stay rule and zone based.
@@ -452,7 +452,7 @@ public with sharing class RLM_RTK_AI {
                 try {
                     Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                     email.setTargetObjectId(contact.Id);
-                    email.setSubject('Your Rentokil visit summary · ' + wo.WorkOrderNumber);
+                    email.setSubject('Your Verdant visit summary · ' + wo.WorkOrderNumber);
                     email.setPlainTextBody(summary.text);
                     email.setSaveAsActivity(true);
                     Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ email });
@@ -508,7 +508,7 @@ public with sharing class RLM_RTK_AI {
         }
         lines.add('');
         lines.add('Questions? Just reply to this email.');
-        lines.add('Rentokil');
+        lines.add('Verdant Pest Care');
         return String.join(lines, '\n');
     }
 

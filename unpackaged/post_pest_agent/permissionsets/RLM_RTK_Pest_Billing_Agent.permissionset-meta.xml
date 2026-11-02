@@ -8,7 +8,7 @@
         <apexClass>RLM_RTK_BillExplainer</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <description>Access to the Rentokil Pest Billing Agent and its bill explanation action.</description>
+    <description>Access to the Verdant Pest Billing Agent and its bill explanation action.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>RLM Rentokil Pest Billing Agent</label>
+    <label>RLM Verdant Pest Billing Agent</label>
 </PermissionSet>

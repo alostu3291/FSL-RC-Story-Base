@@ -4,9 +4,9 @@
     <developerName>RLM_RTK_Visit_Summary</developerName>
     <masterLabel>RTK Visit Summary</masterLabel>
     <templateVersions>
-        <content>Write the visit summary email Rentokil sends a homeowner after today's visit. Use only the facts below.
+        <content>Write the visit summary email Verdant sends a homeowner after today's visit. Use only the facts below.
 Start with "Hi" and the customer's first name. In 80 to 140 words of plain language, cover what we checked and treated, what we found, anything they approved today (extra services or plan changes, by name), anything to keep an eye on or do (such as clearing standing water), and the next visit date if there is one.
-No prices, no internal notes, no promises. End with a new line that says "Rentokil". Reply with the email body only.
+No prices, no internal notes, no promises. End with a new line that says "Verdant Pest Care". Reply with the email body only.
 
 {!$Input:Context}</content>
         <inputs>

@@ -171,7 +171,7 @@ and ServiceTerritoryMember have no direct-field key; they are created idempotent
 
 ## pest-pcm / pest-pricing (`pest: true`)
 
-Rentokil residential catalog (`RTK-*`). Products Upsert on `StockKeepingUnit`.
+Verdant residential catalog (`RTK-*`). Products Upsert on `StockKeepingUnit`.
 PricebookEntry and ProductRelatedComponent (required Initial Service) are created
 idempotently by `scripts/apex/setupRtkRevenue.apex` (SFDMU Bug 3 on traversal keys).
 

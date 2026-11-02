@@ -1,7 +1,7 @@
-// Delete Rentokil pest demo configuration data (not transactional quotes/orders).
+// Delete Verdant pest demo configuration data (not transactional quotes/orders).
 // Dependency order: coverage → junctions → work types/territory → related components → price book → products → zones.
 
-List<MaintenancePlan> plans = [SELECT Id FROM MaintenancePlan WHERE MaintenancePlanTitle = 'Rentokil recurring service'];
+List<MaintenancePlan> plans = [SELECT Id FROM MaintenancePlan WHERE MaintenancePlanTitle = 'Verdant recurring service'];
 delete [SELECT Id FROM WorkOrder WHERE MaintenancePlanId IN :plans AND Status = 'New'];
 delete plans;
 delete [SELECT Id FROM Entitlement WHERE RLM_RTK_Covered_Pests__c != null];

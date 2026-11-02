@@ -1,6 +1,6 @@
 feature: pest
 feature_flag: pest
-# Adds Sign & Pay next to Create Proposal for the Rentokil doorstep close.
+# Adds Sign & Pay next to Create Proposal for the Verdant doorstep close.
 patches:
   - type: insert_action
     after: "Quote.RLM_Create_Proposal"

@@ -1,4 +1,4 @@
-// Idempotent Rentokil Field Service junctions for Bloomingdale territory.
+// Idempotent Verdant Field Service junctions for Bloomingdale territory.
 
 OperatingHours hours = [
     SELECT Id FROM OperatingHours WHERE Name = 'Bloomingdale Pest Hours' LIMIT 1

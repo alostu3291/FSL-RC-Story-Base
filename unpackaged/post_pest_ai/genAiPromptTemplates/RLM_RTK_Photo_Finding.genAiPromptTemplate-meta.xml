@@ -4,7 +4,7 @@
     <developerName>RLM_RTK_Photo_Finding</developerName>
     <masterLabel>RTK Photo Finding</masterLabel>
     <templateVersions>
-        <content>You help a Rentokil pest control technician log an inspection finding from a photo taken at a customer's home.
+        <content>You help a Verdant pest control technician log an inspection finding from a photo taken at a customer's home.
 
 Photo: {!$Input:Photo}
 

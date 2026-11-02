@@ -22,8 +22,8 @@ public with sharing class RLM_RTK_BillExplainer {
         public String invoiceNumbers;
     }
 
-    @InvocableMethod(label='Explain Pest Bill' category='Rentokil'
-        description='Explains what makes up a Rentokil pest customer\'s bill: plans, one-time services, visit add-ons, plan-change credits, proration and tax.')
+    @InvocableMethod(label='Explain Pest Bill' category='Verdant'
+        description='Explains what makes up a Verdant pest customer\'s bill: plans, one-time services, visit add-ons, plan-change credits, proration and tax.')
     public static List<Response> explain(List<Request> requests) {
         List<Response> responses = new List<Response>();
         for (Request request : requests) {

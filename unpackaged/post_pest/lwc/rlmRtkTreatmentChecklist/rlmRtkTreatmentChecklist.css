@@ -1,11 +1,11 @@
 :host {
     --rtk-ink: #14241a;
     --rtk-muted: #5b6b62;
-    --rtk-line: #d7e2db;
-    --rtk-soft: #eef5f0;
-    --rtk-accent: #1f7a4d;
-    --rtk-accent-deep: #145c38;
-    --rtk-accent-soft: #d8f0e3;
+    --rtk-line: #D7E2D2;
+    --rtk-soft: #EEF3E8;
+    --rtk-accent: #2E7340;
+    --rtk-accent-deep: #1F4D3A;
+    --rtk-accent-soft: #E1EDDB;
     --rtk-warn: #c45c16;
     --rtk-warn-soft: #fde8d6;
     --rtk-hot: #b42318;
@@ -93,8 +93,8 @@
 }
 
 .finding.done {
-    border-color: #a9cbb8;
-    background: #f5fbf7;
+    border-color: #A8C69F;
+    background: #F6F4EC;
 }
 
 .finding.follow {

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Report what a Salesforce org has of the Rentokil pest / Field Service demo, and what it is missing.
+Report what a Salesforce org has of the Verdant pest / Field Service demo, and what it is missing.
 
 For each metadata bundle it runs a check-only deploy (nothing is saved) and lists components the
 org doesn't have yet (Created), components that differ (Changed) and failures. Then it runs SOQL
@@ -58,10 +58,10 @@ CHECKS = [
      "SELECT COUNT() FROM PermissionSetAssignment WHERE PermissionSet.Name = 'RLM_Rentokil_Pest' AND Assignee.Username = '{user}'", 1,
      "cci task run assign_permission_sets -o api_names RLM_Rentokil_Pest"),
     ("Re-service entitlement process active",
-     "SELECT COUNT() FROM SlaProcess WHERE Name = 'Rentokil Re-service Guarantee' AND IsActive = true", 1,
+     "SELECT COUNT() FROM SlaProcess WHERE Name = 'Verdant Re-service Guarantee' AND IsActive = true", 1,
      "cci task run deploy_post_pest_sla"),
-    ("Rentokil Service Days business hours",
-     "SELECT COUNT() FROM BusinessHours WHERE Name = 'Rentokil Service Days' AND IsActive = true", 1,
+    ("Verdant Service Days business hours",
+     "SELECT COUNT() FROM BusinessHours WHERE Name = 'Verdant Service Days' AND IsActive = true", 1,
      "cci task run deploy_post_pest_sla"),
     ("Active RTK document templates",
      "SELECT COUNT() FROM DocumentTemplate WHERE Name LIKE 'RLM_RTK%' AND IsActive = true", 2,

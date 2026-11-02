@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Rentokil Treatment Checklist</masterLabel>
+    <masterLabel>Verdant Treatment Checklist</masterLabel>
     <description>Technician checklist of inspection findings on a Work Order, with before photos, treatment status, notes and after photos</description>
     <targets>
         <target>lightning__FlowScreen</target>

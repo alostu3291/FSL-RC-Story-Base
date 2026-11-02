@@ -2,7 +2,7 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>true</isExposed>
-    <masterLabel>Rentokil Inspect &amp; Quote</masterLabel>
+    <masterLabel>Verdant Inspect &amp; Quote</masterLabel>
     <description>Visual field tablet Inspect &amp; Quote for residential pest plans</description>
     <targets>
         <target>lightning__FlowScreen</target>

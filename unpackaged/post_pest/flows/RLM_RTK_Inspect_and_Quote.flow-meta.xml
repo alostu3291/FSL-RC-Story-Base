@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
-    <description>Inspection-led field quote for Rentokil residential pest. The technician walks the property zone by zone, logging findings with notes and photos; rules turn findings into a recommended plan, add-ons and severity. The quote screen is pre-filled with the recommendation and its reasons, requires a reason for any override, and Apex creates a priced Quote linked to the inspection.</description>
+    <description>Inspection-led field quote for Verdant residential pest. The technician walks the property zone by zone, logging findings with notes and photos; rules turn findings into a recommended plan, add-ons and severity. The quote screen is pre-filled with the recommendation and its reasons, requires a reason for any override, and Apex creates a priced Quote linked to the inspection.</description>
     <environments>Default</environments>
     <interviewLabel>Inspect &amp; Quote {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Inspect &amp; Quote</label>
