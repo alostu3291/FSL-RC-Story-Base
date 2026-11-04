@@ -461,6 +461,18 @@ coverage was built before the entitlement process was deployed.
 Milestones count on business hours and are met by the appointment trigger when
 the visit starts.
 
+### Flow error email: `type mapping "SuccessMessage" is not a supported type`
+
+**Cause:** A flow calls the standard Generate Work Orders action with
+`storeOutputAutomatically` on. When the maintenance plan has nothing new to
+generate, the action returns a reply the flow can't store and the interview
+faults. Plans with visits due still generate. `RLM_RTK_Coverage.generate()`
+catches the fault per plan, so the only symptom is a nightly email per plan
+that's already up to date.
+
+**Fix:** Set `storeOutputAutomatically` to `false` on the action (the outputs
+aren't used), as in `RLM_RTK_Generate_Maintenance_Visits`.
+
 ### Field Service mobile app: `oauth_approval_error_generic` on sign-in
 
 **Cause:** The org (created Winter '27 or later) has Allow OAuth User-Agent
