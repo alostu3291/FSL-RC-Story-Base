@@ -68,8 +68,8 @@ cci task run seed_hvac_prospect_check --org <cci_alias> \
   -o description "Furnace is from 2008 and the AC barely keeps up; homeowner smelled something odd at startup."
 ```
 
-For the replacement, in Check & Quote enter an install year 15+ years back and a Safety
-finding (for example a cracked heat exchanger); Replacement Options then suggests a system.
+For the replacement, in Check & Quote enter an install year 12 or more years back (or a Safety
+finding such as a cracked heat exchanger); Replacement Options then suggests a system.
 The systems are Good / Better / Best Heat Pump System ($8,900 / $11,500 / $14,800 before zone).
 
 Existing customer with a covered call:
