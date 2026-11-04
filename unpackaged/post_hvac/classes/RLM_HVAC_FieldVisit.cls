@@ -342,6 +342,10 @@ public with sharing class RLM_HVAC_FieldVisit {
     public static final String REPLACEMENT_BETTER = 'HVAC-REPL-BETTER';
     public static final String REPLACEMENT_BEST = 'HVAC-REPL-BEST';
 
+    /** Product SKUs are unique org-wide, so tests use suffixed SKUs that can't collide with the catalog. */
+    @TestVisible
+    private static String skuSuffix = '';
+
     /** Tier, headline and features for each replacement SKU, in the order they are shown. */
     private static final List<List<String>> REPLACEMENTS = new List<List<String>>{
         new List<String>{ REPLACEMENT_GOOD, 'Good', 'Dependable single-stage heat pump',
@@ -447,13 +451,18 @@ public with sharing class RLM_HVAC_FieldVisit {
     }
 
     private static Map<String, PricebookEntry> replacementEntries() {
+        Set<String> skus = new Set<String>{
+            REPLACEMENT_GOOD + skuSuffix, REPLACEMENT_BETTER + skuSuffix, REPLACEMENT_BEST + skuSuffix
+        };
+        Id standardPricebookId = Test.isRunningTest() ? Test.getStandardPricebookId()
+            : [SELECT Id FROM Pricebook2 WHERE IsStandard = true LIMIT 1].Id;
         Map<String, PricebookEntry> entries = new Map<String, PricebookEntry>();
         for (PricebookEntry entry : [
             SELECT UnitPrice, Product2.Name, Product2.StockKeepingUnit FROM PricebookEntry
-            WHERE Product2.StockKeepingUnit IN (:REPLACEMENT_GOOD, :REPLACEMENT_BETTER, :REPLACEMENT_BEST)
-                AND Pricebook2.IsStandard = true AND CurrencyIsoCode = 'USD' AND IsActive = true
+            WHERE Product2.StockKeepingUnit IN :skus AND Pricebook2Id = :standardPricebookId
+                AND CurrencyIsoCode = 'USD' AND IsActive = true
         ]) {
-            entries.put(entry.Product2.StockKeepingUnit, entry);
+            entries.put(entry.Product2.StockKeepingUnit.removeEnd(skuSuffix), entry);
         }
         return entries;
     }

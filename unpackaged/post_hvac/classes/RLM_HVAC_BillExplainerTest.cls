@@ -114,7 +114,7 @@ private class RLM_HVAC_BillExplainerTest {
         RLM_HVAC_BillExplainer.Request onMissingInvoice = new RLM_HVAC_BillExplainer.Request();
         onMissingInvoice.accountId = Invoice.SObjectType.getDescribe().getKeyPrefix() + '000000000000';
         Assert.isTrue(RLM_HVAC_BillExplainer.explainOne(onMissingInvoice).explanation.startsWith('I couldn\'t find'));
-        Assert.isTrue(RLM_HVAC_BillExplainer.zoneLine(account).contains('ZIP 60108'));
+        Assert.isTrue(RLM_HVAC_BillExplainer.zoneLine(account).contains('ZIP 60540'));
         Assert.isNull(RLM_HVAC_BillExplainer.zoneLine(new Account(Name = 'No ZIP')));
         Assert.isTrue(RLM_HVAC_BillExplainer.visitsFor(account.Id).isEmpty());
         Invoice inv = invoice('DOC-000000099', 10, 1, 11);

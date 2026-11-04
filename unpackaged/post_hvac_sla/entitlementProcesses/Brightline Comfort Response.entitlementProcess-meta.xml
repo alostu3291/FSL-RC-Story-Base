@@ -3,7 +3,7 @@
     <SObjectType>WorkOrder</SObjectType>
     <active>true</active>
     <businessHours>Brightline Service Hours</businessHours>
-    <description>Priority response for Brightline comfort agreements: a technician arrives within 4 service hours on Comfort Premier (Critical), 8 on Comfort Plus (High) and 24 on Comfort Basic and add-ons (Medium), counting 7 AM to 9 PM every day. RLM_HVAC_Coverage sets the work order Priority from the agreement and completes the milestone when the visit's appointment starts.</description>
+    <description>Brightline priority response: a technician arrives within 4 service hours on Comfort Premier (Critical), 8 on Comfort Plus (High) and 24 on Comfort Basic (Medium), counting 7 AM to 9 PM daily.</description>
     <entryStartDateField>WorkOrder.CreatedDate</entryStartDateField>
     <exitCriteriaFilterItems>
         <field>WorkOrder.IsClosed</field>

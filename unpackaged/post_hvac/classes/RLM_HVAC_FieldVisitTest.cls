@@ -97,18 +97,19 @@ private class RLM_HVAC_FieldVisitTest {
     }
 
     private static void replacementProducts() {
+        RLM_HVAC_FieldVisit.skuSuffix = '-FVTEST';
         Map<String, Decimal> prices = new Map<String, Decimal>{
             'HVAC-REPL-GOOD' => 8900, 'HVAC-REPL-BETTER' => 11500, 'HVAC-REPL-BEST' => 14800
         };
         List<Product2> products = new List<Product2>();
         for (String sku : prices.keySet()) {
-            products.add(new Product2(Name = sku, StockKeepingUnit = sku, IsActive = true));
+            products.add(new Product2(Name = sku, StockKeepingUnit = sku + RLM_HVAC_FieldVisit.skuSuffix, IsActive = true));
         }
         insert products;
         List<PricebookEntry> entries = new List<PricebookEntry>();
         for (Product2 p : products) {
             entries.add(new PricebookEntry(Pricebook2Id = Test.getStandardPricebookId(), Product2Id = p.Id,
-                UnitPrice = prices.get(p.StockKeepingUnit), IsActive = true));
+                UnitPrice = prices.get(p.Name), IsActive = true));
         }
         insert entries;
     }
