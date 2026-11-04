@@ -1971,6 +1971,11 @@ tasks:
       path: scripts/apex/seedHvacNoCoolCall.apex
       hour: 8
 
+  seed_hvac_agreement_customer:
+    group: Revenue Lifecycle Management
+    description: Seed an existing Brightline customer by running the real sale end to end (account_name, street, plan Basic/Plus/Premier, system_type, systems, install_year, iaq, water_heater, repair) - system check with findings, quote, proposal PDF, Sign & Pay, activated order, Initial Tune-up booked and completed with its checklist and approved repairs - then waits for the agreement entitlements, maintenance plan and tune-up invoice and reports them. Resumes where a previous run stopped; a customer who already has an agreement is only reported. Use before seed_hvac_service_call in an org with no agreement customers.
+    class_path: tasks.rlm_hvac_seed_agreement.SeedHvacAgreementCustomer
+
   apply_context_hvac_location:
     group: Revenue Lifecycle Management
     description: Add ServicePostalCode tag to RLM_SalesTransactionContext for location-aware HVAC pricing (same plan as the pest demo)

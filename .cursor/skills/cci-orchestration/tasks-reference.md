@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**253 tasks** across **9 groups**.
+**254 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*169 task(s)*
+*170 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -2605,6 +2605,14 @@
 **Description:** Restore the placeholder siteAdmin and siteGuestRecordDefaultOwner in Payments_Webhook.site-meta.xml after deploy_post_payments_site so the repo never stores the target org's real username. Run AFTER deploy_post_payments_site.
 
 **Class:** `tasks.rlm_community.RevertPaymentsSiteAfterDeploy`
+
+---
+
+### `seed_hvac_agreement_customer`
+
+**Description:** Seed an existing Brightline customer by running the real sale end to end (account_name, street, plan Basic/Plus/Premier, system_type, systems, install_year, iaq, water_heater, repair) - system check with findings, quote, proposal PDF, Sign & Pay, activated order, Initial Tune-up booked and completed with its checklist and approved repairs - then waits for the agreement entitlements, maintenance plan and tune-up invoice and reports them. Resumes where a previous run stopped; a customer who already has an agreement is only reported. Use before seed_hvac_service_call in an org with no agreement customers.
+
+**Class:** `tasks.rlm_hvac_seed_agreement.SeedHvacAgreementCustomer`
 
 ---
 
