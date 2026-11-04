@@ -118,7 +118,7 @@ REPLACEMENT_SAMPLE = {
                    "and an AC low on R-22 refrigerant, which is no longer made.",
     "Plan": [],
     "OneTime": [
-        {"Name": "Comfort Plus System", "Description": "Better: 16 SEER2 two-stage heat pump with 96% furnace backup, installed.",
+        {"Name": "Better Heat Pump System", "Description": "Better: 16 SEER2 two-stage heat pump with 96% furnace backup, installed.",
          "Quantity": 1, "Price": "$11,500.00"},
     ],
     "Finding": [
