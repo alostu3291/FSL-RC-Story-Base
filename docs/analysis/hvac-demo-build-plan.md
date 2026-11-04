@@ -4,7 +4,7 @@ A Revenue Cloud + Field Service story for heating and cooling companies, built o
 control demo's framework (`prepare_pest`, Verdant Pest Care). Residential first; commercial
 second, as an extension of the residential build.
 
-Branch: `hvac`. Status: plan only, nothing built yet.
+Branch: `hvac`. Status: residential build in progress.
 
 ## Decisions
 
@@ -12,8 +12,11 @@ Branch: `hvac`. Status: plan only, nothing built yet.
 |----------|------|-----|
 | Replace pest or run alongside | Alongside: new `RLM_HVAC_*` metadata, `hvac` feature flag, `prepare_hvac` flow | The pest demo is working and recorded; both can live in one org |
 | Clone or generalize the pest code | Clone for residential; extract a shared field-services layer when commercial starts | Cloning is fastest; a third vertical (commercial) is when shared code pays for itself |
-| Brand | New fictional brand, built with the Verdant script pattern | Proposals: *Brightline Home Comfort*, *Keystone Climate*, *Northwind Heating & Cooling* |
-| Territory | New territory (Naperville IL) next to Bloomingdale | Separate schedule, so the pest and HVAC demos don't collide |
+| Brand | **Brightline Home Comfort** (chosen Nov 4); commercial is Brightline Commercial | |
+| Residential scope | **Includes the good / better / best replacement quote** (chosen Nov 4) | The strongest HVAC moment |
+| Commercial scope | **All nine commercial scenes** (chosen Nov 4) | |
+| Org | **A fresh QuantumBit base org** dedicated to HVAC (chosen Nov 4) | Clean start; no pest data to work around |
+| Territory | Naperville IL | Separate schedule from the pest demo's Bloomingdale territory |
 
 Naming: metadata `RLM_HVAC_*`, LWCs `rlmHvac*`, SKUs `HVAC-*`, bundles `unpackaged/post_hvac*`,
 data plans `datasets/sfdmu/hvac/en-US/hvac-{pcm,pricing,fsl,dro-fsl}`, flags `hvac` and
@@ -116,7 +119,7 @@ Agreement benefits drive the coverage rules:
 | — | Customer equipment as `Asset` records | Make, model, serial, install year, tonnage, refrigerant type. The furnace and condenser become real Field Service assets |
 | `Entitlement.RLM_RTK_Covered_Pests__c` | `Entitlement.RLM_HVAC_Covered_Systems__c` | Cooling, Heating, IAQ, Water Heater |
 | `WorkOrder.RLM_RTK_Reported_Pest__c` | `WorkOrder.RLM_HVAC_Reported_Issue__c` | No cool, no heat, noise, leak, thermostat |
-| `RLM_RTK_Service_Zone__c` | Reused as is | Same ZIP-prefix pricing |
+| `RLM_RTK_Service_Zone__c` | `RLM_HVAC_Service_Zone__c` | Same ZIP-prefix pricing; its own object so the HVAC org needs no pest metadata |
 
 ### Rules to rewrite (Apex)
 
