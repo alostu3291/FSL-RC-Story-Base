@@ -47,6 +47,15 @@ private class RLM_HVAC_FieldQuoteTest {
     }
 
     @IsTest
+    static void repairsQuotedWithAnAgreementGetTheMemberDiscount() {
+        Assert.areEqual(0.10, RLM_HVAC_FieldQuote.signupRepairDiscount('HVAC-BASIC'));
+        Assert.areEqual(0.15, RLM_HVAC_FieldQuote.signupRepairDiscount('HVAC-PLUS'));
+        Assert.areEqual(0.15, RLM_HVAC_FieldQuote.signupRepairDiscount('HVAC-PREMIER'),
+            'Premier covers repairs only once the agreement starts');
+        Assert.areEqual(0, RLM_HVAC_FieldQuote.signupRepairDiscount(null));
+    }
+
+    @IsTest
     static void ageBandsFollowTheOldestSystem() {
         Assert.areEqual('0to5', RLM_HVAC_FieldQuote.ageBand(null));
         Assert.areEqual('0to5', RLM_HVAC_FieldQuote.ageBand(4));

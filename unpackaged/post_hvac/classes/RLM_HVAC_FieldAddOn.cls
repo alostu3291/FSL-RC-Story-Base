@@ -18,6 +18,8 @@ public with sharing class RLM_HVAC_FieldAddOn {
         @AuraEnabled public String name;
         @AuraEnabled public String description;
         @AuraEnabled public Decimal price;
+        /** Why the price differs from the zone price, such as the customer's agreement discount. */
+        @AuraEnabled public String priceNote;
         @AuraEnabled public Boolean recommended = false;
         @AuraEnabled public String reason;
         @AuraEnabled public Id findingId;
@@ -124,7 +126,8 @@ public with sharing class RLM_HVAC_FieldAddOn {
                     Quantity = 1,
                     UnitPrice = a.price,
                     Subject = a.name,
-                    Description = a.reason == null ? a.description : a.reason,
+                    Description = String.join(new List<String>{ a.reason == null ? a.description : a.reason,
+                        a.priceNote == null ? '' : '(' + a.priceNote + ')' }, ' ').trim().abbreviate(255),
                     Status = 'New',
                     RLM_HVAC_Finding__c = a.findingId,
                     RLM_HVAC_Approved_By__c = approvedBy.trim(),
@@ -309,12 +312,20 @@ public with sharing class RLM_HVAC_FieldAddOn {
         }
 
         Map<String, Suggestion> suggestions = suggest(wo.RLM_HVAC_Assessment__c);
+        String agreement = RLM_HVAC_Coverage.agreementFor(wo.AccountId);
+        Decimal discount = RLM_HVAC_Coverage.repairDiscountFor(agreement);
         for (PricebookEntry entry : entriesBySku().values()) {
             AddOn a = new AddOn();
             a.sku = entry.Product2.StockKeepingUnit.removeEnd(skuSuffix);
             a.name = entry.Product2.Name;
             a.description = entry.Product2.Description;
             a.price = RLM_HVAC_ZonePricing.apply(entry.UnitPrice, multiplier);
+            if (discount > 0 && RLM_HVAC_Assessment.isRepair(a.sku)) {
+                a.price = (a.price * (1 - discount)).setScale(2);
+                a.priceNote = discount == 1
+                    ? 'Covered by ' + agreementName(agreement.removeEnd(skuSuffix))
+                    : (discount * 100).intValue() + '% ' + agreementName(agreement.removeEnd(skuSuffix)) + ' member price';
+            }
             a.added = addedSkus.contains(a.sku);
             Suggestion s = suggestions.get(a.sku);
             if (s != null) {
@@ -326,6 +337,10 @@ public with sharing class RLM_HVAC_FieldAddOn {
         }
         state.addOns.sort(new RecommendedFirst());
         return state;
+    }
+
+    private static String agreementName(String sku) {
+        return sku == null ? null : 'Comfort ' + sku.removeStart('HVAC-').toLowerCase().capitalize();
     }
 
     private class Suggestion {

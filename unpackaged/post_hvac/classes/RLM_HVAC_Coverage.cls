@@ -586,7 +586,7 @@ public with sharing class RLM_HVAC_Coverage {
         }
         insert rules;
 
-        syncUpcomingVisits(planIds, byAssetId, emptied);
+        syncUpcomingVisits(planIds, emptied);
 
         // The plan leads with the plan of its own that still has visits, and points at its next visit.
         List<MaintenancePlan> planUpdates = new List<MaintenancePlan>();
@@ -603,7 +603,10 @@ public with sharing class RLM_HVAC_Coverage {
         return changedPlans;
     }
 
-    /** Runs the standard Generate Work Orders action through a flow, which Apex can't call directly. */
+    /**
+     * Runs the standard Generate Work Orders action through a flow, which Apex can't call directly.
+     * A generated visit gets its lines after insert, so its work type is set from them afterwards.
+     */
     public static void generate(Set<Id> planIds) {
         for (Id planId : planIds) {
             try {
@@ -611,6 +614,9 @@ public with sharing class RLM_HVAC_Coverage {
             } catch (Exception e) {
                 System.debug(LoggingLevel.ERROR, 'Visit generation failed for ' + planId + ': ' + e.getMessage());
             }
+        }
+        if (!planIds.isEmpty()) {
+            syncUpcomingVisits(planIds, new Set<Id>());
         }
     }
 
@@ -638,12 +644,12 @@ public with sharing class RLM_HVAC_Coverage {
     }
 
     /** Visits that lost all their lines are removed with their appointment; the rest take their leading plan's work type. */
-    private static void syncUpcomingVisits(Set<Id> planIds, Map<Id, PlanAsset> byAssetId, Set<Id> emptied) {
+    private static void syncUpcomingVisits(Set<Id> planIds, Set<Id> emptied) {
         Map<String, Id> workTypes = workTypeIds();
         List<WorkOrder> empty = new List<WorkOrder>();
         List<WorkOrder> retyped = new List<WorkOrder>();
         for (WorkOrder wo : [
-            SELECT Id, WorkTypeId, SuggestedMaintenanceDate, (SELECT AssetId FROM WorkOrderLineItems)
+            SELECT Id, WorkTypeId, SuggestedMaintenanceDate, (SELECT Asset.Product2.StockKeepingUnit FROM WorkOrderLineItems)
             FROM WorkOrder
             WHERE MaintenancePlanId IN :planIds AND Status = 'New' AND SuggestedMaintenanceDate >= :Date.today()
         ]) {
@@ -655,9 +661,9 @@ public with sharing class RLM_HVAC_Coverage {
             }
             Cadence lead;
             for (WorkOrderLineItem line : wo.WorkOrderLineItems) {
-                PlanAsset pa = byAssetId.get(line.AssetId);
-                if (pa != null && (lead == null || leads(pa.cadence, lead))) {
-                    lead = pa.cadence;
+                Cadence c = CADENCES.get(line.Asset?.Product2?.StockKeepingUnit);
+                if (c != null && (lead == null || leads(c, lead))) {
+                    lead = c;
                 }
             }
             Id workTypeId = lead == null ? null : workTypes.get(lead.workTypeOn(wo.SuggestedMaintenanceDate));
@@ -852,7 +858,37 @@ public with sharing class RLM_HVAC_Coverage {
         return best;
     }
 
-    /** Response hours for a covered call under the agreement, for the response countdown. */
+    /** Share of a repair's price each agreement takes off; Premier covers parts and labor. */
+    @TestVisible
+    private static final Map<String, Decimal> REPAIR_DISCOUNTS = new Map<String, Decimal>{
+        'HVAC-PREMIER' => 1, 'HVAC-PLUS' => 0.15, 'HVAC-BASIC' => 0.10
+    };
+
+    /** The SKU of the customer's active agreement with the largest repair discount, or null without one. */
+    public static String agreementFor(Id accountId) {
+        if (accountId == null) {
+            return null;
+        }
+        Date today = Date.today();
+        String best;
+        for (Entitlement e : [
+            SELECT Asset.Product2.StockKeepingUnit FROM Entitlement
+            WHERE AccountId = :accountId AND StartDate <= :today AND (EndDate = null OR EndDate >= :today)
+                AND Asset.Product2.StockKeepingUnit IN :REPAIR_DISCOUNTS.keySet()
+        ]) {
+            String sku = e.Asset.Product2.StockKeepingUnit;
+            if (best == null || REPAIR_DISCOUNTS.get(sku) > REPAIR_DISCOUNTS.get(best)) {
+                best = sku;
+            }
+        }
+        return best;
+    }
+
+    /** Repair discount for an agreement SKU, from 0 (none) to 1 (covered). */
+    public static Decimal repairDiscountFor(String agreementSku) {
+        return agreementSku == null || !REPAIR_DISCOUNTS.containsKey(agreementSku) ? 0 : REPAIR_DISCOUNTS.get(agreementSku);
+    }
+
     /** Covered systems that can handle a reported issue, such as Cooling for No Cool; empty for an unknown issue. */
     public static Set<String> systemsForIssue(String issue) {
         Set<String> systems = SYSTEMS_FOR_ISSUE.get(issue);

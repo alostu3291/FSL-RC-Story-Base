@@ -156,6 +156,12 @@ p {
     font-weight: 600;
 }
 
+.price-note {
+    font-size: 0.8rem;
+    color: var(--hvac-accent);
+    font-weight: 700;
+}
+
 .chips {
     display: flex;
     flex-wrap: wrap;

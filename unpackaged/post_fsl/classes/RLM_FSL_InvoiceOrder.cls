@@ -39,7 +39,7 @@ public with sharing class RLM_FSL_InvoiceOrder {
         }
 
         public void execute(QueueableContext context) {
-            List<String> scheduleIds = readyScheduleIds(orderIds);
+            List<String> scheduleIds = readyScheduleIds(orderIds, targetDate);
             if (scheduleIds.isEmpty()) {
                 if (attempt < MAX_ATTEMPTS && !Test.isRunningTest()) {
                     System.enqueueJob(new InvoiceJob(orderIds, attempt + 1, targetDate), RETRY_DELAY_MINUTES);
@@ -56,13 +56,19 @@ public with sharing class RLM_FSL_InvoiceOrder {
     @TestVisible
     private static List<String> readyScheduleIdsOverride;
 
-    private static List<String> readyScheduleIds(Set<Id> orderIds) {
+    /**
+     * Ready schedules with something due by the target date. A recurring schedule already billed
+     * ahead stays ReadyForInvoicing, and one such schedule makes generateInvoices reject the whole request.
+     */
+    private static List<String> readyScheduleIds(Set<Id> orderIds, Date targetDate) {
         if (readyScheduleIdsOverride != null) {
             return readyScheduleIdsOverride;
         }
+        Date dueBy = targetDate == null || targetDate < Date.today() ? Date.today() : targetDate;
         List<String> scheduleIds = new List<String>();
         for (BillingSchedule schedule : [SELECT Id FROM BillingSchedule
-                WHERE ReferenceEntityId IN :orderIds AND Status = 'ReadyForInvoicing' LIMIT 200]) {
+                WHERE ReferenceEntityId IN :orderIds AND Status = 'ReadyForInvoicing'
+                    AND (NextBillingDate = null OR NextBillingDate <= :dueBy) LIMIT 200]) {
             scheduleIds.add(schedule.Id);
         }
         return scheduleIds;

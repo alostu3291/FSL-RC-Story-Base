@@ -220,7 +220,7 @@ para(doc, "A maintenance agreement for every system in your home, priced per sys
 plans = doc.add_table(rows=3, cols=4)
 borders(plans, RULE, inside_h=True)
 cell_margins(plans, 70, 70, 120, 120)
-widths(plans, [2.0, 3.5, 0.7, 1.1])
+widths(plans, [2.0, 3.3, 0.9, 1.1])
 for i, h in enumerate(["AGREEMENT", "WHAT'S INCLUDED", "SYSTEMS", "PER MONTH"]):
     c = plans.cell(0, i)
     shade(c, INK)

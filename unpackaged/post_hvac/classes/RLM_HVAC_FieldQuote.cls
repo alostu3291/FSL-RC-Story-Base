@@ -141,6 +141,7 @@ public with sharing class RLM_HVAC_FieldQuote {
                     new RevSalesTrxn.RecordWithReferenceRequest('refQuote', quoteRecord)
                 };
             Decimal adjustment = adjustmentFor(request.equipmentAge);
+            Decimal repairDiscount = hasPlan ? signupRepairDiscount(request.planSku) : 0;
             Integer i = 1;
             for (String sku : skus) {
                 PricebookEntry entry = entries.get(sku);
@@ -159,6 +160,10 @@ public with sharing class RLM_HVAC_FieldQuote {
                     }
                 } else if (sku == INITIAL_SKU) {
                     quantity = systems;
+                } else if (repairDiscount > 0 && RLM_HVAC_Assessment.isRepair(sku)) {
+                    unitPrice = (unitPrice * (1 - repairDiscount)).setScale(2);
+                    description = (description + ' ' + PLAN_NAMES.get(request.planSku) + ' member price: '
+                        + (repairDiscount * 100).intValue() + '% off.').trim();
                 }
                 RevSalesTrxn.RecordResource line = new RevSalesTrxn.RecordResource(QuoteLineItem.SObjectType, 'POST');
                 Map<String, Object> fields = new Map<String, Object>{
@@ -225,6 +230,20 @@ public with sharing class RLM_HVAC_FieldQuote {
             }
         }
         return out;
+    }
+
+    // ---------- repair discount ----------
+
+    private static final Map<String, String> PLAN_NAMES = new Map<String, String>{
+        'HVAC-BASIC' => 'Comfort Basic', 'HVAC-PLUS' => 'Comfort Plus', 'HVAC-PREMIER' => 'Comfort Premier'
+    };
+    /** Premier covers repairs once the agreement starts; repairs found before signing get the Plus discount. */
+    private static final Decimal MAX_SIGNUP_REPAIR_DISCOUNT = 0.15;
+
+    /** Discount on repairs quoted with a new agreement. */
+    @TestVisible
+    private static Decimal signupRepairDiscount(String planSku) {
+        return Math.min(RLM_HVAC_Coverage.repairDiscountFor(planSku), MAX_SIGNUP_REPAIR_DISCOUNT);
     }
 
     // ---------- equipment age adjustment ----------

@@ -41,6 +41,10 @@ public with sharing class RLM_HVAC_Assessment {
         'Outdoor Unit', 'Furnace', 'Air Handler', 'Heat Pump', 'Boiler'
     };
 
+    public static Boolean isRepair(String sku) {
+        return REPAIR_SKUS.contains(sku);
+    }
+
     public class PhotoView {
         @AuraEnabled public Id versionId;
         @AuraEnabled public Id documentId;
@@ -701,7 +705,12 @@ public with sharing class RLM_HVAC_Assessment {
         }
         Reason plan = bySku.get(rec.planSku);
         if (rec.oldestAge != null) {
-            plan.because.add(0, 'Oldest system is ' + rec.oldestAge + ' years old');
+            String age = 'Oldest system is ' + rec.oldestAge + ' years old';
+            if (plan.because.isEmpty()) {
+                plan.because.add(age);
+            } else {
+                plan.because.add(0, age);
+            }
         }
         if (rec.systemCount > 1) {
             plan.because.add(rec.systemCount + ' systems in the home');

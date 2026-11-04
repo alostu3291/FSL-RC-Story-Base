@@ -171,7 +171,7 @@
                         <div class="one-time"><dt>Initial Tune-up, {breakdown.systemsLabel}, one time</dt><dd>{breakdown.tuneUp}</dd></div>
                     </template>
                     <template for:each={breakdown.repairs} for:item="r">
-                        <div key={r.key} class="one-time"><dt>{r.label}, one time</dt><dd>{r.amount}</dd></div>
+                        <div key={r.key} class="one-time"><dt>{r.label}, one time <span class="sub">{breakdown.repairDiscountLabel}</span></dt><dd>{r.amount}</dd></div>
                     </template>
                     <template lwc:if={breakdown.hasRepairs}>
                         <div class="total"><dt>Due today</dt><dd>{breakdown.oneTime}</dd></div>

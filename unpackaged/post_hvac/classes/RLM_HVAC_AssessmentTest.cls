@@ -54,6 +54,16 @@ private class RLM_HVAC_AssessmentTest {
     }
 
     @IsTest
+    static void aRepairOnDatedEquipmentLeadsThePlanWithTheAge() {
+        RLM_HVAC_Finding__c cap = finding('Outdoor Unit', 'Capacitor', 'Worn', 'Repair Soon');
+        cap.Install_Year__c = Date.today().year() - 11;
+        RLM_HVAC_Assessment.Recommendation rec = recommend(new List<RLM_HVAC_Finding__c>{ cap });
+        Assert.areEqual(RLM_HVAC_Assessment.PLUS, rec.planSku);
+        Assert.areEqual(11, rec.oldestAge);
+        Assert.isTrue(rec.summary.contains('Oldest system is 11 years old'), rec.summary);
+    }
+
+    @IsTest
     static void monitoredFindingsAreNotedNotRepaired() {
         RLM_HVAC_Assessment.Recommendation rec = recommend(
             new List<RLM_HVAC_Finding__c>{ finding('Outdoor Unit', 'Coil', 'Dirty', 'Monitor') }

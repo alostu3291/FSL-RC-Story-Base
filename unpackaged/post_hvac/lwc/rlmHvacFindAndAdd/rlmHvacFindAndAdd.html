@@ -101,6 +101,9 @@
                                 <span class={a.badgeCls}>{a.badge}</span>
                             </template>
                             <span class="muted">{a.description}</span>
+                            <template lwc:if={a.priceNote}>
+                                <span class="price-note">{a.priceNote}</span>
+                            </template>
                             <template lwc:if={a.reason}>
                                 <span class="reason">Because: {a.reason}</span>
                             </template>

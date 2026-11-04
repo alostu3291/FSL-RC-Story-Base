@@ -66,6 +66,40 @@ private class RLM_HVAC_FieldAddOnTest {
         Assert.isNotNull(state.assessmentId);
     }
 
+    private static void agreement(String sku, Decimal discount) {
+        Product2 plan = new Product2(Name = sku, StockKeepingUnit = sku + SUFFIX, IsActive = true);
+        insert plan;
+        RLM_HVAC_Coverage.REPAIR_DISCOUNTS.put(plan.StockKeepingUnit, discount);
+        Id accountId = workOrder().AccountId;
+        Asset asset = new Asset(Name = sku, AccountId = accountId, Product2Id = plan.Id);
+        insert asset;
+        insert new Entitlement(Name = sku, AccountId = accountId, AssetId = asset.Id, StartDate = Date.today().addDays(-1));
+    }
+
+    private static RLM_HVAC_FieldAddOn.AddOn capacitor(RLM_HVAC_FieldAddOn.State state) {
+        for (RLM_HVAC_FieldAddOn.AddOn a : state.addOns) {
+            if (a.sku == RLM_HVAC_Assessment.CAPACITOR) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    @IsTest
+    static void agreementCustomersGetTheirRepairDiscount() {
+        Assert.isNull(capacitor(RLM_HVAC_FieldAddOn.getState(workOrder().Id)).priceNote, 'No agreement, no discount');
+
+        agreement('HVAC-PLUS', 0.15);
+        RLM_HVAC_FieldAddOn.AddOn plus = capacitor(RLM_HVAC_FieldAddOn.getState(workOrder().Id));
+        Assert.areEqual(157.25, plus.price);
+        Assert.areEqual('15% Comfort Plus member price', plus.priceNote);
+
+        agreement('HVAC-PREMIER', 1);
+        RLM_HVAC_FieldAddOn.AddOn premier = capacitor(RLM_HVAC_FieldAddOn.getState(workOrder().Id));
+        Assert.areEqual(0, premier.price, 'The best agreement wins');
+        Assert.areEqual('Covered by Comfort Premier', premier.priceNote);
+    }
+
     @IsTest
     static void approvedAddOnsBecomeWorkOrderLinesOnce() {
         Id woId = workOrder().Id;

@@ -99,6 +99,24 @@ private class RLM_HVAC_CoverageTest {
     }
 
     @IsTest
+    static void aGeneratedAddOnVisitTakesItsOwnWorkType() {
+        Map<String, Id> types = workTypes();
+        Account account = new Account(Name = 'Air Quality Home');
+        insert account;
+        addPlan(account.Id, 'Comfort Plus', 'HVAC-PLUS');
+        Asset iaq = addPlan(account.Id, 'Indoor Air Quality', 'HVAC-IAQ');
+        RLM_HVAC_Coverage.activate(new Set<Id>{ account.Id });
+        Id planId = [SELECT Id FROM MaintenancePlan WHERE AccountId = :account.Id].Id;
+        WorkOrderLineItem line = visit(account.Id, planId, iaq.Id, Date.newInstance(Date.today().year() + 1, 2, 4));
+        Assert.areEqual(types.get('Fall Furnace Tune-up'), [SELECT WorkTypeId FROM WorkOrder WHERE Id = :line.WorkOrderId].WorkTypeId,
+            'At insert the visit has no lines yet, so it takes the plan\'s tune-up type');
+
+        RLM_HVAC_Coverage.generate(new Set<Id>{ planId });
+
+        Assert.areEqual(types.get('Indoor Air Quality Visit'), [SELECT WorkTypeId FROM WorkOrder WHERE Id = :line.WorkOrderId].WorkTypeId);
+    }
+
+    @IsTest
     static void aServiceCallIsCoveredOnlyForCoveredSystems() {
         Map<String, Id> types = workTypes();
         Account account = customerWithPlans();

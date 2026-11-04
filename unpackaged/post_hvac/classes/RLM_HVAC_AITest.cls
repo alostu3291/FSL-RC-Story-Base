@@ -273,6 +273,37 @@ private class RLM_HVAC_AITest {
     }
 
     @IsTest
+    static void summaryFactsSeparateFixedFindingsAndPointAtTheNextVisit() {
+        StubGenerator generator = stub();
+        generator.replies.put(RLM_HVAC_AI.SUMMARY_TEMPLATE, 'Hi Dana,\n\nAll done.\n\nBrightline Home Comfort');
+        Account account = customer();
+        Id assessmentId = assessmentFor(account.Id);
+        RLM_HVAC_Finding__c capacitor = finding(assessmentId, 'Outdoor Unit', 'Capacitor', 'Worn', null);
+        finding(assessmentId, 'Furnace', 'Filter', 'Clogged', null);
+        update new RLM_HVAC_Finding__c(Id = capacitor.Id, Work_Status__c = 'Done');
+        WorkOrder wo = new WorkOrder(AccountId = account.Id, Subject = 'Initial Tune-up', RLM_HVAC_Assessment__c = assessmentId,
+            Status = 'Completed');
+        Date upcoming = Date.today().addMonths(3);
+        MaintenancePlan plan = new MaintenancePlan(AccountId = account.Id, MaintenancePlanTitle = 'AI Test Plan',
+            StartDate = Date.today(), NextSuggestedMaintenanceDate = upcoming, GenerationTimeframe = 4,
+            GenerationTimeframeType = 'Months', DoesAutoGenerateWorkOrders = false);
+        insert plan;
+        WorkOrder next = new WorkOrder(AccountId = account.Id, Subject = 'Indoor Air Quality Visit', MaintenancePlanId = plan.Id,
+            SuggestedMaintenanceDate = upcoming);
+        insert new List<WorkOrder>{ wo, next };
+        insert new ServiceAppointment(ParentRecordId = wo.Id, EarliestStartTime = Datetime.now(), DueDate = Datetime.now().addDays(3),
+            SchedStartTime = Datetime.now().addDays(1), SchedEndTime = Datetime.now().addDays(1).addHours(2));
+
+        RLM_HVAC_AI.summarizeVisit(wo.Id);
+
+        String context = (String) generator.lastInputs.get('Context');
+        Assert.isTrue(context.contains('Found and fixed on this visit:\n- Outdoor Unit: capacitor worn'), context);
+        Assert.isTrue(context.contains('Still open, to keep an eye on:\n- Furnace: filter clogged'), context);
+        Assert.isTrue(context.contains('Next visit: '
+            + Datetime.newInstance(upcoming, Time.newInstance(12, 0, 0, 0)).format('EEEE, MMMM d')), context);
+    }
+
+    @IsTest
     static void summaryWaitsForTheVisitToBeComplete() {
         stub();
         WorkOrder wo = new WorkOrder(AccountId = customer().Id, Subject = 'Spring AC Tune-up');

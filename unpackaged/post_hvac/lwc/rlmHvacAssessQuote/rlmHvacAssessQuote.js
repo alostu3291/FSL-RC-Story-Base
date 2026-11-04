@@ -32,6 +32,9 @@ const REPAIRS = {
     'HVAC-BLOWER-MOTOR': 'Blower motor replacement'
 };
 
+// Matches RLM_HVAC_FieldQuote: repairs quoted with a new agreement get its member discount, up to 15%.
+const SIGNUP_REPAIR_DISCOUNTS = { 'HVAC-BASIC': 0.1, 'HVAC-PLUS': 0.15, 'HVAC-PREMIER': 0.15 };
+
 const money = (n) => {
     const v = Math.round(Number(n) * 100) / 100;
     return Number.isInteger(v) ? `$${v.toLocaleString()}` : `$${v.toFixed(2)}`;
@@ -83,6 +86,15 @@ export default class RlmHvacAssessQuote extends LightningElement {
         return map ? Number(map[this._equipmentAge] || 0) : 0;
     }
 
+    get repairDiscount() {
+        return SIGNUP_REPAIR_DISCOUNTS[this._planSku] || 0;
+    }
+
+    repairPrice(sku) {
+        const price = this.zonePrice(sku);
+        return price === null ? null : Math.round(price * (1 - this.repairDiscount) * 100) / 100;
+    }
+
     get hasPricing() {
         return this.zonePrice(this._planSku) !== null;
     }
@@ -106,7 +118,7 @@ export default class RlmHvacAssessQuote extends LightningElement {
         const tuneUp = this.zonePrice('HVAC-TUNEUP');
         const repairs = this._repairSkus
             .filter((r) => this.zonePrice(r) !== null)
-            .map((r) => ({ key: r, label: REPAIRS[r] || r, amount: this.zonePrice(r) }));
+            .map((r) => ({ key: r, label: REPAIRS[r] || r, amount: this.repairPrice(r) }));
         const oneTime = repairs.reduce((sum, r) => sum + r.amount, tuneUp === null ? 0 : tuneUp * this._systemCount);
         const multiplier = Number(this.pricing.zoneMultiplier || 1);
         return {
@@ -127,6 +139,7 @@ export default class RlmHvacAssessQuote extends LightningElement {
             tuneUp: tuneUp === null ? null : money(tuneUp * this._systemCount),
             repairs: repairs.map((r) => ({ ...r, amount: money(r.amount) })),
             hasRepairs: repairs.length > 0,
+            repairDiscountLabel: this.repairDiscount > 0 ? `${Math.round(this.repairDiscount * 100)}% member price` : '',
             oneTime: money(oneTime)
         };
     }
@@ -359,7 +372,7 @@ export default class RlmHvacAssessQuote extends LightningElement {
         const skus = [...new Set([...this.recommendedRepairs, ...this._repairSkus])];
         return skus.map((sku) => {
             const on = this._repairSkus.includes(sku);
-            const price = this.zonePrice(sku);
+            const price = this.repairPrice(sku);
             return {
                 sku,
                 label: REPAIRS[sku] || sku,

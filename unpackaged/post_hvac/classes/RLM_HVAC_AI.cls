@@ -558,7 +558,7 @@ public with sharing class RLM_HVAC_AI {
         }
         if (facts.nextVisit != null) {
             lines.add('');
-            lines.add('Your next visit is ' + facts.nextVisit.format('EEEE, MMMM d') + '.');
+            lines.add('Your next visit is ' + facts.nextVisitText() + '.');
         }
         lines.add('');
         lines.add('Questions? Just reply to this email.');
@@ -587,6 +587,7 @@ public with sharing class RLM_HVAC_AI {
         List<String> visitPlanChanges = new List<String>();
         List<String> stepsDone = new List<String>();
         Datetime nextVisit;
+        String nextVisitType;
 
         Facts(WorkOrder wo) {
             this.wo = wo;
@@ -652,13 +653,31 @@ public with sharing class RLM_HVAC_AI {
             findings = findingsFor(wo.RLM_HVAC_Assessment__c != null
                 ? new Set<Id>{ wo.RLM_HVAC_Assessment__c } : assessmentsFor(wo.AccountId));
             for (ServiceAppointment sa : [
-                SELECT SchedStartTime FROM ServiceAppointment
-                WHERE AccountId = :wo.AccountId AND SchedStartTime > :Datetime.now()
+                SELECT SchedStartTime, WorkType.Name FROM ServiceAppointment
+                WHERE AccountId = :wo.AccountId AND ParentRecordId != :wo.Id AND SchedStartTime > :Datetime.now()
                     AND Status NOT IN ('Completed', 'Canceled', 'Cannot Complete')
                 ORDER BY SchedStartTime ASC LIMIT 1
             ]) {
                 nextVisit = sa.SchedStartTime;
+                nextVisitType = sa.WorkType?.Name;
             }
+            if (nextVisit == null) {
+                // Visits generated from the agreement aren't booked yet; they have a suggested day.
+                for (WorkOrder upcoming : [
+                    SELECT SuggestedMaintenanceDate, WorkType.Name FROM WorkOrder
+                    WHERE AccountId = :wo.AccountId AND Id != :wo.Id AND Status = 'New'
+                        AND SuggestedMaintenanceDate >= :Date.today()
+                    ORDER BY SuggestedMaintenanceDate ASC LIMIT 1
+                ]) {
+                    nextVisit = Datetime.newInstance(upcoming.SuggestedMaintenanceDate, Time.newInstance(12, 0, 0, 0));
+                    nextVisitType = upcoming.WorkType?.Name;
+                }
+            }
+        }
+
+        String nextVisitText() {
+            return nextVisit == null ? null
+                : nextVisit.format('EEEE, MMMM d') + (String.isBlank(nextVisitType) ? '' : ' (' + nextVisitType + ')');
         }
 
         void loadPlans() {
@@ -715,12 +734,23 @@ public with sharing class RLM_HVAC_AI {
                 'Agreement now: ' + (plans.isEmpty() ? 'none' : String.join(plans, ', ')),
                 'Repairs approved today: ' + (visitAddOns.isEmpty() ? 'none' : String.join(visitAddOns, ', ')),
                 'Agreement changes approved today: ' + (visitPlanChanges.isEmpty() ? 'none' : String.join(visitPlanChanges, '; ')),
-                'Next visit: ' + (nextVisit == null ? 'not scheduled yet' : nextVisit.format('EEEE, MMMM d')),
+                'Next visit: ' + blankAs(nextVisitText(), 'not scheduled yet'),
                 'Tune-up steps done:'
             };
             lines.addAll(stepsDone.isEmpty() ? new List<String>{ '- none' } : bullets(stepsDone));
-            lines.add('Findings and what was done:');
-            lines.addAll(findingLines(findings, false));
+            List<RLM_HVAC_Finding__c> fixed = new List<RLM_HVAC_Finding__c>();
+            List<RLM_HVAC_Finding__c> open = new List<RLM_HVAC_Finding__c>();
+            for (RLM_HVAC_Finding__c f : findings) {
+                if (f.Work_Status__c == 'Done') {
+                    fixed.add(f);
+                } else {
+                    open.add(f);
+                }
+            }
+            lines.add('Found and fixed on this visit:');
+            lines.addAll(fixed.isEmpty() ? new List<String>{ '- none' } : findingLines(fixed, false));
+            lines.add('Still open, to keep an eye on:');
+            lines.addAll(open.isEmpty() ? new List<String>{ '- none' } : findingLines(open, false));
             return String.join(lines, '\n');
         }
     }
