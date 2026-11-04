@@ -1,0 +1,7 @@
+CustomDecompositionScope,DecompositionScope,FulfillmentQtyCalcMethod,IsActive,IsAssetizable,Name,ProductCode,StockKeepingUnit
+,OrderLineItem,,true,false,Initial Tune-up Fulfillment,HVAC-DRO-FSL,HVAC-DRO-FSL
+,OrderLineItem,,true,false,Replacement Install Fulfillment,HVAC-DRO-INSTALL,HVAC-DRO-INSTALL
+,OrderLineItem,,true,false,Initial Tune-up,HVAC-TUNEUP,HVAC-TUNEUP
+,OrderLineItem,,true,false,Comfort Standard System,HVAC-REPL-GOOD,HVAC-REPL-GOOD
+,OrderLineItem,,true,false,Comfort Plus System,HVAC-REPL-BETTER,HVAC-REPL-BETTER
+,OrderLineItem,,true,false,Comfort Premier System,HVAC-REPL-BEST,HVAC-REPL-BEST

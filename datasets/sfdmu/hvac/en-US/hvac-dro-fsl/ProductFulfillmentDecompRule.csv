@@ -1,0 +1,5 @@
+DestinationProduct.StockKeepingUnit,Name,Priority,SourceProduct.StockKeepingUnit,SourceProductClassification.Name
+HVAC-DRO-INSTALL,Better System to Install,,HVAC-REPL-BETTER,
+HVAC-DRO-INSTALL,Best System to Install,,HVAC-REPL-BEST,
+HVAC-DRO-INSTALL,Good System to Install,,HVAC-REPL-GOOD,
+HVAC-DRO-FSL,Initial Tune-up to Field Tune-up,,HVAC-TUNEUP,

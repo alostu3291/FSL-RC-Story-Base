@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Plain-language "why this agreement" for the homeowner, written from the recommendation rules and system check findings. Shown on the device and in the proposal. Called from RLM_HVAC_AI.explainPlan.</description>
+    <developerName>RLM_HVAC_Plan_Explanation</developerName>
+    <masterLabel>HVAC Plan Explanation</masterLabel>
+    <templateVersions>
+        <content>Write a short note to a homeowner explaining why Brightline recommends this comfort agreement, based on today's system check.
+Write exactly two friendly sentences in plain language, starting with what was found on the equipment. No greeting, no sign-off, and don't use the customer's name. Name the recommended agreement and any add-ons, and tie each one to what was found (for example, the age of the furnace or a worn capacitor on the outdoor unit). If replacement is recommended, say the equipment is near the end of its life.
+Don't mention prices, discounts or response times, and don't add anything that isn't in the facts. Reply with the two sentences only.
+
+{!$Input:Context}</content>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Recommendation and findings</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

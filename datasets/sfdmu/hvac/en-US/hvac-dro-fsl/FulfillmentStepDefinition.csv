@@ -1,0 +1,6 @@
+AssignedTo.Name,CustomBaseExecutionDate,CustomFulfillmentScope,DelayOf,DelayUnit,ExecuteOn,FlowDefinitionName,ForcePlanFreezeDuringExecution,IsSkipBranch,Name,OmniscriptName,PointOfNoReturn,Scope,StepDefinitionGroup.Name,StepType,TaskAllocationType,UsageType
+__DRO_ASSIGNED_TO_USER__,,,,,,RLM_HVAC_Create_Initial_Work_Order,Never,false,Create Initial Tune-up Work Order,,,Plan,Initial Tune-up,AutoTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,,Never,false,Initial Tune-up Complete,,,Plan,Initial Tune-up,ManualTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,,Never,false,Start Agreement Billing,,,Plan,HVAC Finance,Milestone,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,RLM_HVAC_Create_Install_Work_Order,Never,false,Create Replacement Install Work Order,,,Plan,Replacement Install,AutoTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,,Never,false,Replacement Install Complete,,,Plan,Replacement Install,ManualTask,,Fulfillment

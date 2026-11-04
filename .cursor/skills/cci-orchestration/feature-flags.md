@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**41 feature flags**, **84 configuration values**, **33 YAML anchors** under `project.custom`.
+**42 feature flags**, **87 configuration values**, **33 YAML anchors** under `project.custom`.
 
 ---
 
@@ -13,10 +13,10 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 | Flag | Default | Used in `when:` clauses |
 |------|---------|------------------------|
-| `agents` | `False` | 8 flow step(s) |
+| `agents` | `False` | 12 flow step(s) |
 | `analytics` | `True` | 2 flow step(s) |
 | `approvals` | `True` | 4 flow step(s) |
-| `billing` | `True` | 21 flow step(s) |
+| `billing` | `True` | 22 flow step(s) |
 | `billing_portal` | `False` | 3 flow step(s) |
 | `billing_portal_deploy` | `True` | 1 flow step(s) |
 | `billing_ui` | `True` | 4 flow step(s) |
@@ -28,12 +28,13 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `constraints` | `True` | 9 flow step(s) |
 | `constraints_data` | `True` | 5 flow step(s) |
 | `dev_ed` | `False` | 1 flow step(s) |
-| `docgen` | `True` | 13 flow step(s) |
-| `dro` | `True` | 12 flow step(s) |
-| `einstein` | `True` | 5 flow step(s) |
-| `fsl` | `False` | 17 flow step(s) |
+| `docgen` | `True` | 16 flow step(s) |
+| `dro` | `True` | 15 flow step(s) |
+| `einstein` | `True` | 7 flow step(s) |
+| `fsl` | `False` | 22 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
+| `hvac` | `False` | 24 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -65,6 +66,10 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 16 → `deploy_post_pest_agent`
 - `prepare_pest` step 17 → `assign_permission_sets`
 - `prepare_pest` step 18 → `activate_pest_billing_agent`
+- `prepare_hvac` step 15 → `deploy_agents_settings`
+- `prepare_hvac` step 16 → `deploy_post_hvac_agent`
+- `prepare_hvac` step 17 → `assign_permission_sets`
+- `prepare_hvac` step 18 → `activate_hvac_billing_agent`
 - `prepare_agents` step 1 → `assign_permission_set_groups`
 - `prepare_agents` step 2 → `deploy_agents_settings`
 - `prepare_agents` step 3 → `deploy_agents`
@@ -89,6 +94,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `extend_context_definitions` step 4 → `extend_context_billing`
 - `extend_context_definitions` step 5 → `extend_context_collection_plan_segment`
 - `prepare_pest` step 5 → `setup_rtk_revenue`
+- `prepare_hvac` step 5 → `setup_hvac_revenue`
 - `prepare_billing` step 1 → `deploy_post_billing`
 - `prepare_billing` step 2 → `insert_billing_data`
 - `prepare_billing` step 3 → `insert_q3_billing_data`
@@ -177,6 +183,9 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 12 → `deploy_post_pest_docgen`
 - `prepare_pest` step 13 → `activate_docgen_templates`
 - `prepare_pest` step 14 → `fix_pest_document_template_binaries`
+- `prepare_hvac` step 12 → `deploy_post_hvac_docgen`
+- `prepare_hvac` step 13 → `activate_docgen_templates`
+- `prepare_hvac` step 14 → `fix_hvac_document_template_binaries`
 - `prepare_docgen` step 1 → `create_docgen_library`
 - `prepare_docgen` step 2 → `enable_document_builder_toggle`
 - `prepare_docgen` step 3 → `deploy_docgen_seller_fields`
@@ -202,6 +211,9 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 8 → `insert_pest_dro_fsl_data`
 - `prepare_pest` step 8.5 → `setup_rtk_dro_steps`
 - `prepare_pest` step 9 → `update_product_fulfillment_decomp_rules`
+- `prepare_hvac` step 8 → `insert_hvac_dro_fsl_data`
+- `prepare_hvac` step 8.5 → `setup_hvac_dro_steps`
+- `prepare_hvac` step 9 → `update_product_fulfillment_decomp_rules`
 
 ### `einstein` (default: `True`)
 
@@ -210,6 +222,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `assign_feature_permission_sets` step 3 → `assign_permission_sets`
 - `prepare_pest` step 1.6 → `deploy_post_pest_ai`
 - `prepare_pest` step 1.7 → `activate_pest_prompt_templates`
+- `prepare_hvac` step 1.6 → `deploy_post_hvac_ai`
+- `prepare_hvac` step 1.7 → `activate_hvac_prompt_templates`
 
 ### `fsl` (default: `False`)
 
@@ -230,6 +244,11 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 8 → `insert_pest_dro_fsl_data`
 - `prepare_pest` step 11 → `setup_rtk_grow`
 - `prepare_pest` step 11.5 → `setup_rtk_inspection_visit`
+- `prepare_hvac` step 6 → `insert_hvac_fsl_data`
+- `prepare_hvac` step 7 → `setup_hvac_foundation`
+- `prepare_hvac` step 8 → `insert_hvac_dro_fsl_data`
+- `prepare_hvac` step 11 → `setup_hvac_grow`
+- `prepare_hvac` step 11.5 → `seed_hvac_prospect_check`
 
 ### `fsl_managed_package` (default: `False`)
 
@@ -239,6 +258,33 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 - `prepare_guidedselling` step 1 → `insert_qb_guidedselling_data`
 - `prepare_guidedselling` step 2 → `deploy_post_guidedselling`
+
+### `hvac` (default: `False`)
+
+- `prepare_hvac` step 0.5 → `deploy_post_hvac_sla`
+- `prepare_hvac` step 1 → `deploy_post_hvac`
+- `prepare_hvac` step 1.5 → `assign_permission_sets`
+- `prepare_hvac` step 1.6 → `deploy_post_hvac_ai`
+- `prepare_hvac` step 1.7 → `activate_hvac_prompt_templates`
+- `prepare_hvac` step 2 → `apply_context_hvac_location`
+- `prepare_hvac` step 3 → `insert_hvac_pcm_data`
+- `prepare_hvac` step 5 → `setup_hvac_revenue`
+- `prepare_hvac` step 6 → `insert_hvac_fsl_data`
+- `prepare_hvac` step 7 → `setup_hvac_foundation`
+- `prepare_hvac` step 8 → `insert_hvac_dro_fsl_data`
+- `prepare_hvac` step 8.5 → `setup_hvac_dro_steps`
+- `prepare_hvac` step 9 → `update_product_fulfillment_decomp_rules`
+- `prepare_hvac` step 10 → `refresh_dt_default_pricing`
+- `prepare_hvac` step 11 → `setup_hvac_grow`
+- `prepare_hvac` step 11.5 → `seed_hvac_prospect_check`
+- `prepare_hvac` step 12 → `deploy_post_hvac_docgen`
+- `prepare_hvac` step 13 → `activate_docgen_templates`
+- `prepare_hvac` step 14 → `fix_hvac_document_template_binaries`
+- `prepare_hvac` step 15 → `deploy_agents_settings`
+- `prepare_hvac` step 16 → `deploy_post_hvac_agent`
+- `prepare_hvac` step 17 → `assign_permission_sets`
+- `prepare_hvac` step 18 → `activate_hvac_billing_agent`
+- `prepare_hvac` step 19 → `deploy_post_hvac_brand`
 
 ### `payments` (default: `True`)
 
@@ -474,6 +520,9 @@ Non-boolean scalar values under `project.custom` used as YAML anchors for contex
 | `fulfillment_asset_context_base_reference` | `FulfillmentAssetContext__stdctx` |
 | `fulfillment_asset_context_default_mapping` | `FulfillAssetEntitiesMapping` |
 | `fulfillment_asset_context_name` | `RLM_FulfillmentAssetContext` |
+| `hvac_dro_fsl_dataset` | `datasets/sfdmu/hvac/en-US/hvac-dro-fsl` |
+| `hvac_fsl_dataset` | `datasets/sfdmu/hvac/en-US/hvac-fsl` |
+| `hvac_pcm_dataset` | `datasets/sfdmu/hvac/en-US/hvac-pcm` |
 | `locale` | `en_US` |
 | `pest_dro_fsl_dataset` | `datasets/sfdmu/pest/en-US/pest-dro-fsl` |
 | `pest_fsl_dataset` | `datasets/sfdmu/pest/en-US/pest-fsl` |

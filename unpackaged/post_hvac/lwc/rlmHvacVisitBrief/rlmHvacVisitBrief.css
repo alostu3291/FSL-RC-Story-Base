@@ -1,0 +1,109 @@
+:host {
+    --hvac-ink: #1E2A35;
+    --hvac-muted: #5A6773;
+    --hvac-line: #D5DFE8;
+    --hvac-soft: #EEF3F7;
+    --hvac-accent: #1F6E99;
+    --hvac-accent-deep: #1B3A5C;
+    --hvac-ai: #5a2ea6;
+    --hvac-ai-soft: #f3eefc;
+    display: block;
+    color: var(--hvac-ink);
+}
+
+.brief {
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid #ddd2f3;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, var(--hvac-ai-soft), #fff 70%);
+}
+
+.head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    --slds-c-icon-color-foreground-default: var(--hvac-ai);
+}
+
+h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+p {
+    margin: 0;
+}
+
+.headline {
+    margin-top: 0.5rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+ul {
+    margin: 0.4rem 0 0;
+    padding-left: 1.1rem;
+    list-style: disc;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+li + li {
+    margin-top: 0.2rem;
+}
+
+.look li::marker {
+    color: var(--hvac-accent);
+}
+
+.label {
+    margin-top: 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--hvac-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.muted {
+    margin-top: 0.5rem;
+    color: var(--hvac-muted);
+    font-size: 0.82rem;
+}
+
+.badge {
+    padding: 0.05rem 0.5rem;
+    border-radius: 1rem;
+    background: var(--hvac-soft);
+    color: var(--hvac-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.badge.ai {
+    background: var(--hvac-ai);
+    color: #fff;
+}
+
+.link {
+    border: none;
+    background: none;
+    padding: 0;
+    color: var(--hvac-accent-deep);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.refresh {
+    margin-top: 0.6rem;
+}

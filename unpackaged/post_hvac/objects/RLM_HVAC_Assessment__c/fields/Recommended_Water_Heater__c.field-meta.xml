@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Recommended_Water_Heater__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Findings recommend Water Heater Care.</description>
+    <label>Water Heater Care Recommended</label>
+    <type>Checkbox</type>
+</CustomField>

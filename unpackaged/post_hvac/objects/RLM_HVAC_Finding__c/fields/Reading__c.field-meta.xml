@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reading__c</fullName>
+    <description>A measurement taken for this finding, e.g. "Temperature split 12°F" or "Capacitor 31 µF (rated 45)".</description>
+    <label>Reading</label>
+    <length>120</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

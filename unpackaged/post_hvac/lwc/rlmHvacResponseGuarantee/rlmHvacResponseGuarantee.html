@@ -1,0 +1,15 @@
+<template>
+    <section class={cardClass}>
+        <div class="top">
+            <div>
+                <p class="title">{title}</p>
+                <p class="subtitle">{subtitle}</p>
+            </div>
+            <p class="headline">{headline}</p>
+        </div>
+        <template lwc:if={showBar}>
+            <div class="track"><div class="bar" style={barStyle}></div></div>
+        </template>
+        <p class="detail">{detail}</p>
+    </section>
+</template>

@@ -3,13 +3,13 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**231 tasks** across **9 groups**.
+**253 tasks** across **9 groups**.
 
 ---
 
 ## Data Maintenance
 
-*6 task(s)*
+*7 task(s)*
 
 ### `delete_draft_billing_records`
 
@@ -20,6 +20,18 @@
 **Options:**
 
 - `path`: `scripts/apex/deleteDraftBillingRecords.apex`
+
+---
+
+### `delete_hvac_data`
+
+**Description:** Delete Brightline HVAC demo data in dependency order
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/deleteHvacData.apex`
 
 ---
 
@@ -105,7 +117,7 @@
 
 ## Data Management - Extract
 
-*17 task(s)*
+*18 task(s)*
 
 ### `export_bre_rule_library`
 
@@ -116,6 +128,18 @@
 **Options:**
 
 - `output_dir`: `datasets/bre/exports`
+
+---
+
+### `extract_hvac_pcm_data`
+
+**Description:** Extract hvac-pcm from org to CSV. Output in datasets/sfdmu/extractions/hvac-pcm/<timestamp>.
+
+**Class:** `tasks.rlm_sfdmu.ExtractSFDMUData`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-pcm`
 
 ---
 
@@ -314,7 +338,20 @@
 
 ## Data Management - Idempotency
 
-*15 task(s)*
+*16 task(s)*
+
+### `test_hvac_pcm_idempotency`
+
+**Description:** Idempotency test for hvac-pcm.
+
+**Class:** `tasks.rlm_sfdmu.TestSFDMUIdempotency`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-pcm`
+- `use_extraction_roundtrip`: `False`
+
+---
 
 ### `test_pest_pcm_idempotency`
 
@@ -620,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*150 task(s)*
+*169 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -694,6 +731,30 @@
 
 - `operation`: `activate_versions`
 - `metadata_path`: `force-app/main/default/expressionSetDefinition`
+
+---
+
+### `activate_hvac_billing_agent`
+
+**Description:** Activate the Brightline Billing Agent after deploy_post_hvac_agent.
+
+**Class:** `tasks.rlm_prompt_templates.ActivateAgents`
+
+**Options:**
+
+- `api_names`: `RLM_HVAC_Billing_Agent`
+
+---
+
+### `activate_hvac_prompt_templates`
+
+**Description:** Activate the latest version of the RLM_HVAC_* prompt templates after deploy_post_hvac_ai (a metadata deploy leaves new versions inactive).
+
+**Class:** `tasks.rlm_prompt_templates.ActivatePromptTemplates`
+
+**Options:**
+
+- `templates_dir`: `unpackaged/post_hvac_ai/genAiPromptTemplates`
 
 ---
 
@@ -840,6 +901,21 @@
 - `deactivate_before`: `False`
 - `activate`: `True`
 - `verify`: `True`
+
+---
+
+### `apply_context_hvac_location`
+
+**Description:** Add ServicePostalCode tag to RLM_SalesTransactionContext for location-aware HVAC pricing (same plan as the pest demo)
+
+**Class:** `tasks.rlm_context_service.ManageContextDefinition`
+
+**Options:**
+
+- `developer_name`: `RLM_SalesTransactionContext`
+- `plan_file`: `datasets/context_plans/PestLocation/manifest.json`
+- `translate_plan`: `True`
+- `activate`: `True`
 
 ---
 
@@ -1304,6 +1380,83 @@
 
 ---
 
+### `deploy_post_hvac`
+
+**Description:** Deploy Brightline HVAC metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, system check assessment and finding objects with equipment data plates, the Check and Quote flow, Field Service mobile Check and Quote, Service Checklist (season-filtered tune-up steps with readings, approved repairs, before/after photos) and Replacement Options (Good / Better / Best system replacement quote with its own Replacement Install work order) quick actions, Find & Add field add-ons and their billing flow, field plan changes, the RLM_HVAC_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, the RLM_HVAC_BillExplainer agent action, and Field Service coverage through RLM_HVAC_Coverage and RLM_HVAC_WorkOrderTrigger, which on Initial Tune-up completion creates a comfort agreement Entitlement per system and one Maintenance Plan with spring and fall tune-ups, and marks No-Cool / No-Heat Calls Covered or Not Covered from their Reported Issue, setting Priority from the agreement tier (Premier 4-hour, Plus 8-hour, Basic 24-hour response) so the entitlement process starts the matching Priority Response milestone, which RLM_HVAC_ServiceAppointmentTrigger completes when the technician arrives; RLM_HVAC_AssetTrigger and the nightly RLM_HVAC_Nightly_Coverage_Sync scheduled flow keep agreements and visits in step with plan changes). Runs RLM_HVAC_FieldQuoteTest, RLM_HVAC_AssessmentTest, RLM_HVAC_FieldVisitTest, RLM_HVAC_FieldAddOnTest, RLM_HVAC_PlanChangeTest, RLM_HVAC_AITest, RLM_HVAC_BillExplainerTest and RLM_HVAC_CoverageTest.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac`
+- `test_level`: `RunSpecifiedTests`
+- `specified_tests`: `RLM_HVAC_FieldQuoteTest,RLM_HVAC_AssessmentTest,RLM_HVAC_FieldVisitTest,RLM_HVAC_FieldAddOnTest,RLM_HVAC_PlanChangeTe...`
+
+---
+
+### `deploy_post_hvac_agent`
+
+**Description:** Deploy the Brightline Billing Agent (Agentforce employee agent with an HVAC Bill Questions topic that calls RLM_HVAC_BillExplainer, for questions like "why is my bill $316?") and its RLM_HVAC_Billing_Agent permission set. Requires deploy_post_hvac and the Agentforce settings from prepare_agents.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_agent`
+
+---
+
+### `deploy_post_hvac_ai`
+
+**Description:** Deploy the Brightline Einstein layer (EinsteinGpt settings, six RLM_HVAC_* prompt templates and the RLM_HVAC_EinsteinGenerator that RLM_HVAC_AI finds at runtime). Without it the HVAC AI features fall back to the rules. Requires deploy_post_hvac and Einstein generative AI (Prompt Builder) licenses. Runs RLM_HVAC_EinsteinGeneratorTest.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_ai`
+- `test_level`: `RunSpecifiedTests`
+- `specified_tests`: `RLM_HVAC_EinsteinGeneratorTest`
+
+---
+
+### `deploy_post_hvac_brand`
+
+**Description:** Deploy the Brightline Home Comfort Lightning theme (RLM_brightline_logo header image, RLM_Brightline branding set with Navy
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_brand`
+
+---
+
+### `deploy_post_hvac_docgen`
+
+**Description:** Deploy Brightline-branded DocGen templates (RLM_HVAC_Proposal for quotes, with system check findings and per-system agreement pricing; RLM_HVAC_Invoice for invoices) and the RLMHVACProposalExtract/Transform data mappings. Requires prepare_docgen plus the Quote total roll-ups and assessment objects from deploy_post_hvac. Rebuild with scripts/docgen/build_hvac_proposal.py, build_hvac_proposal_odts.py and build_hvac_invoice.py.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_docgen`
+
+---
+
+### `deploy_post_hvac_sla`
+
+**Description:** Deploy the Brightline priority response SLA (enables Entitlements, adds "Brightline Service Hours" business hours (7 AM to 9 PM every day, Central) alongside an unchanged 24/7 Default, the Priority Response milestone and the Brightline Comfort Response Work Order entitlement process with 4-, 8- and 24-hour milestones keyed on Work Order Priority). Skipped when the entitlement process already exists, because the platform rejects redeploying a process in use. Must run before deploy_post_hvac, whose RLM_HVAC_CoverageTest expects the process.
+
+**Class:** `tasks.rlm_deploy_unless_present.DeployUnlessPresent`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_sla`
+- `skip_if_soql`: `SELECT Id FROM SlaProcess WHERE Name = 'Brightline Comfort Response'`
+
+---
+
 ### `deploy_post_personas`
 
 **Description:** Deploy persona metadata (profiles, permission set groups, permission sets) from unpackaged/post_personas.
@@ -1727,6 +1880,18 @@
 
 ---
 
+### `fix_hvac_document_template_binaries`
+
+**Description:** Re-upload the Brightline DocumentTemplate binaries after deploy_post_hvac_docgen (works around the batch-deploy binary bug).
+
+**Class:** `tasks.rlm_docgen.FixDocumentTemplateBinaries`
+
+**Options:**
+
+- `templates_dir`: `unpackaged/post_hvac_docgen/documentTemplates`
+
+---
+
 ### `fix_pest_document_template_binaries`
 
 **Description:** Re-upload the Verdant DocumentTemplate binaries after deploy_post_pest_docgen (works around the batch-deploy binary bug).
@@ -1780,6 +1945,43 @@
 **Options:**
 
 - `pathtoexportjson`: `datasets/sfdmu/qb/en-US/qb-clm`
+
+---
+
+### `insert_hvac_dro_fsl_data`
+
+**Description:** Insert Brightline DRO overlay (HVAC-DRO-FSL and HVAC-DRO-INSTALL, the Initial Tune-up and Replacement Install step groups, and decomposition from the tune-up and replacement systems)
+
+**Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-dro-fsl`
+- `dynamic_assigned_to_user`: `True`
+
+---
+
+### `insert_hvac_fsl_data`
+
+**Description:** Insert Brightline Field Service foundation (Naperville OperatingHours, ServiceTerritory, WorkTypes for System Check, Initial Tune-up, Spring and Fall Tune-ups, IAQ Visit, Water Heater Flush, No-Cool / No-Heat Call, Repair and Replacement Install)
+
+**Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-fsl`
+
+---
+
+### `insert_hvac_pcm_data`
+
+**Description:** Insert Brightline residential HVAC product catalog (HVAC- comfort agreements, add-ons, tune-up and diagnostic services, repairs and Good / Better / Best replacement systems, with selling models and categories)
+
+**Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-pcm`
 
 ---
 
@@ -2406,6 +2608,32 @@
 
 ---
 
+### `seed_hvac_prospect_check`
+
+**Description:** Idempotently book a free System Check for a new prospect (account_name, street, optional phone, hour, days_ahead), dispatched to the running user, for the Check and Quote flow. Creates the Naperville account and contact if missing, refuses an account that already has agreements, and reports the work order and appointment it booked.
+
+**Class:** `tasks.rlm_hvac_seed_visit.SeedHvacVisit`
+
+**Options:**
+
+- `path`: `scripts/apex/seedHvacProspectCheck.apex`
+- `hour`: `10`
+
+---
+
+### `seed_hvac_service_call`
+
+**Description:** Idempotently book a No-Cool / No-Heat Call for an existing customer (account_name, issue, hour, days_ahead), dispatched to the running user, for the priority response flow. Fails unless an active comfort agreement covers the issue (require_coverage false allows a Not Covered call), and reports the priority, covering agreement and response milestone.
+
+**Class:** `tasks.rlm_hvac_seed_visit.SeedHvacVisit`
+
+**Options:**
+
+- `path`: `scripts/apex/seedHvacNoCoolCall.apex`
+- `hour`: `8`
+
+---
+
 ### `seed_rtk_prospect_inspection`
 
 **Description:** Idempotently book a free Pest Inspection for a new prospect (account_name, street, optional phone, hour, days_ahead), dispatched to the running user, for the Inspect and Quote flow. Creates the Bloomingdale account and contact if missing, refuses an account that already has plans, and reports the work order and appointment it booked.
@@ -2453,6 +2681,54 @@
 **Options:**
 
 - `path`: `scripts/apex/setupFslRevenue.apex`
+
+---
+
+### `setup_hvac_dro_steps`
+
+**Description:** Idempotently create Brightline Initial Tune-up and Replacement Install DRO step definitions (AutoTask/ManualTask/Milestone) and dependencies. Use when SFDMU StepType values do not match the org picklist.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/setupHvacDroSteps.apex`
+
+---
+
+### `setup_hvac_foundation`
+
+**Description:** Idempotently create Brightline FSL junctions (Naperville service hours time slots, EPA 608 / Gas Furnace / Heat Pump skills, work type skill requirements, service resource for Naperville)
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/setupHvacFoundation.apex`
+
+---
+
+### `setup_hvac_grow`
+
+**Description:** Idempotently start Field Service coverage for every HVAC customer with an active comfort agreement (agreement Entitlements, one Maintenance Plan with spring and fall tune-ups) and generate their visits. New customers get this automatically when their Initial Tune-up is completed.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/setupHvacGrow.apex`
+
+---
+
+### `setup_hvac_revenue`
+
+**Description:** Idempotently seed Brightline service zones, price book entries, Initial Tune-up milestone billing, agreement entitlement template, and Maintenance Plan defaults. Runs after the HVAC catalog load.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/setupHvacRevenue.apex`
 
 ---
 

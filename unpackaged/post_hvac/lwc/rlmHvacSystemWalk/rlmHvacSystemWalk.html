@@ -1,0 +1,320 @@
+<template>
+    <div class="shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Step 1 · Check the system</p>
+                <h1 class="title">{accountName}</h1>
+                <p class="subtitle">{serviceAddress}</p>
+            </div>
+            <div class="stats">
+                <div class="stat"><strong>{findingTotal}</strong><span>findings</span></div>
+                <div class="stat"><strong>{oldestAgeLabel}</strong><span>oldest</span></div>
+                <div class="stat"><span class={overallUrgencyClass}>{overallUrgency}</span><span>urgency</span></div>
+            </div>
+        </header>
+
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>The home's systems</h2>
+                    <p>Main system type and how many systems the home has.</p>
+                </div>
+                <div class="panel-actions">
+                    <lightning-button-icon
+                        icon-name="utility:dash"
+                        alternative-text="One fewer system"
+                        disabled={cannotRemoveSystem}
+                        onclick={removeSystem}
+                    ></lightning-button-icon>
+                    <strong>{systemCountLabel}</strong>
+                    <lightning-button-icon
+                        icon-name="utility:add"
+                        alternative-text="One more system"
+                        disabled={cannotAddSystem}
+                        onclick={addSystem}
+                    ></lightning-button-icon>
+                </div>
+            </div>
+            <div class="chips">
+                <template for:each={systemTypeOptions} for:item="t">
+                    <button
+                        key={t.value}
+                        type="button"
+                        class={t.cls}
+                        data-value={t.value}
+                        aria-pressed={t.ariaPressed}
+                        disabled={saving}
+                        onclick={pickSystemType}
+                    >
+                        {t.label}
+                    </button>
+                </template>
+            </div>
+        </section>
+
+        <div class="progress">
+            <div class="progress-label">
+                <span>Equipment checked</span>
+                <strong>{checkedCount} / {equipmentTotal}</strong>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style={progressStyle}></div></div>
+        </div>
+
+        <template lwc:if={error}>
+            <div class="error" role="alert">{error}</div>
+        </template>
+
+        <div class="zone-grid" role="group" aria-label="Equipment">
+            <template for:each={equipment} for:item="item">
+                <button
+                    key={item.value}
+                    type="button"
+                    class={item.cardClass}
+                    data-equipment={item.value}
+                    aria-pressed={item.ariaPressed}
+                    onclick={selectEquipment}
+                >
+                    <lightning-icon icon-name={item.icon} size="small" alternative-text=""></lightning-icon>
+                    <span class="zone-name">{item.value}</span>
+                    <span class="zone-status">{item.status}</span>
+                </button>
+            </template>
+        </div>
+
+        <template lwc:if={hasActiveEquipment}>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>{activeEquipment}</h2>
+                        <p>{activeEquipmentHint}</p>
+                    </div>
+                    <div class="panel-actions">
+                        <template lwc:if={canMarkClear}>
+                            <button type="button" class="btn ghost" onclick={markClear} disabled={editing}>
+                                Mark good
+                            </button>
+                        </template>
+                        <button type="button" class="btn primary" onclick={startFinding} disabled={editing}>
+                            Add finding
+                        </button>
+                    </div>
+                </div>
+
+                <template for:each={activeFindings} for:item="f">
+                    <article key={f.id} class="finding">
+                        <div class="finding-head">
+                            <div>
+                                <strong>{f.title}</strong>
+                                <span class={f.sevClass}>{f.urgency}</span>
+                            </div>
+                            <div class="finding-actions">
+                                <button type="button" class="link" data-id={f.id} onclick={editFinding}>Edit</button>
+                                <button type="button" class="link danger" data-id={f.id} onclick={removeFinding}>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                        <template lwc:if={f.plate}>
+                            <p class="note internal"><span>Data plate</span>{f.plate}</p>
+                        </template>
+                        <template lwc:if={f.reading}>
+                            <p class="note internal"><span>Reading</span>{f.reading}</p>
+                        </template>
+                        <template lwc:if={f.customerNote}>
+                            <p class="note">{f.customerNote}</p>
+                        </template>
+                        <template lwc:if={f.internalNote}>
+                            <p class="note internal"><span>Internal</span>{f.internalNote}</p>
+                        </template>
+                        <div class="photos">
+                            <template for:each={f.photos} for:item="p">
+                                <button
+                                    key={p.versionId}
+                                    type="button"
+                                    class="thumb"
+                                    data-url={p.url}
+                                    data-title={p.title}
+                                    onclick={previewPhoto}
+                                    title={p.title}
+                                >
+                                    <img src={p.url} alt={p.title} />
+                                </button>
+                            </template>
+                            <c-rlm-hvac-photo-capture
+                                class="uploader"
+                                label="Add photos"
+                                stage="Before"
+                                record-id={f.id}
+                                data-id={f.id}
+                                onuploaded={handleUploadFinished}
+                            ></c-rlm-hvac-photo-capture>
+                        </div>
+                        <template lwc:if={f.suggestion}>
+                            <div class="ai-suggest">
+                                <p class="ai-label">
+                                    <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                                    <template lwc:if={f.suggestion.loading}>Einstein is reading the photo…</template>
+                                    <template lwc:else>Einstein sees</template>
+                                </p>
+                                <template lwc:if={f.suggestion.observation}>
+                                    <p class="ai-what">{f.suggestion.observation}</p>
+                                </template>
+                                <template lwc:if={f.suggestion.ready}>
+                                    <p class="ai-values">{f.suggestion.values}</p>
+                                    <div class="ai-actions">
+                                        <button type="button" class="btn ghost" data-id={f.id} onclick={dismissSuggestion}>Dismiss</button>
+                                        <button type="button" class="btn primary" data-id={f.id} onclick={reviewSuggestion} disabled={editing}>
+                                            Review &amp; apply
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </article>
+                </template>
+
+                <template lwc:if={activeEquipmentClear}>
+                    <p class="clear-note">Marked good: nothing to note.</p>
+                </template>
+
+                <template lwc:if={editing}>
+                    <div class="editor">
+                        <h3>{editorTitle}</h3>
+                        <div class="dictate">
+                            <lightning-textarea
+                                label="Describe what you see"
+                                placeholder="Say it or type it, e.g. condenser coil packed with cottonwood, split 12 degrees, capacitor reading 31 on a 45"
+                                value={dictation}
+                                onchange={handleDictation}
+                            ></lightning-textarea>
+                            <div class="dictate-actions">
+                                <span class="hint">Tap the mic on your keyboard to dictate.</span>
+                                <button type="button" class="btn ai" onclick={fillFromNotes} disabled={fillDisabled}>{fillLabel}</button>
+                            </div>
+                        </div>
+                        <template lwc:if={filledBy}>
+                            <p class="ai-filled">
+                                <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                                {filledBy}
+                            </p>
+                        </template>
+                        <template lwc:if={showPlate}>
+                            <p class="field-label">Data plate</p>
+                            <div class="plate-grid">
+                                <lightning-input label="Make" data-field="make" value={draft.make} onchange={handleNote}></lightning-input>
+                                <lightning-input label="Model" data-field="modelNumber" value={draft.modelNumber} onchange={handleNote}></lightning-input>
+                                <lightning-input label="Serial" data-field="serialNumber" value={draft.serialNumber} onchange={handleNote}></lightning-input>
+                                <lightning-input
+                                    type="number"
+                                    label="Year made"
+                                    min="1950"
+                                    max="2030"
+                                    value={draft.installYear}
+                                    onchange={handleYear}
+                                ></lightning-input>
+                            </div>
+                        </template>
+                        <p class="field-label">Component</p>
+                        <div class="chips">
+                            <template for:each={componentChips} for:item="c">
+                                <button
+                                    key={c.value}
+                                    type="button"
+                                    class={c.cls}
+                                    data-field={c.field}
+                                    data-value={c.value}
+                                    aria-pressed={c.ariaPressed}
+                                    onclick={pickChip}
+                                >
+                                    {c.value}
+                                </button>
+                            </template>
+                        </div>
+                        <p class="field-label">Condition</p>
+                        <div class="chips">
+                            <template for:each={conditionChips} for:item="c">
+                                <button
+                                    key={c.value}
+                                    type="button"
+                                    class={c.cls}
+                                    data-field={c.field}
+                                    data-value={c.value}
+                                    aria-pressed={c.ariaPressed}
+                                    onclick={pickChip}
+                                >
+                                    {c.value}
+                                </button>
+                            </template>
+                        </div>
+                        <p class="field-label">Urgency</p>
+                        <div class="sev-row">
+                            <template for:each={urgencyChips} for:item="s">
+                                <button
+                                    key={s.value}
+                                    type="button"
+                                    class={s.cls}
+                                    data-value={s.value}
+                                    aria-pressed={s.ariaPressed}
+                                    onclick={pickUrgency}
+                                >
+                                    {s.value}
+                                </button>
+                            </template>
+                        </div>
+                        <lightning-input
+                            label="Reading"
+                            placeholder="e.g. Temperature split 12°F, capacitor 31 µF (rated 45)"
+                            data-field="reading"
+                            value={draft.reading}
+                            onchange={handleNote}
+                        ></lightning-input>
+                        <lightning-textarea
+                            label="Note for the customer"
+                            placeholder="What you found, in plain language"
+                            data-field="customerNote"
+                            value={draft.customerNote}
+                            onchange={handleNote}
+                        ></lightning-textarea>
+                        <lightning-textarea
+                            label="Internal note (technician only)"
+                            data-field="internalNote"
+                            value={draft.internalNote}
+                            onchange={handleNote}
+                        ></lightning-textarea>
+                        <p class="hint">Save the finding, then add photos to it. A photo of the data plate fills in make, model and year.</p>
+                        <div class="editor-actions">
+                            <button type="button" class="btn ghost" onclick={cancelFinding}>Cancel</button>
+                            <button type="button" class="btn primary" onclick={submitFinding} disabled={saveDisabled}>
+                                Save finding
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </section>
+        </template>
+
+        <section class="recommend">
+            <p class="eyebrow">Recommended from findings</p>
+            <template lwc:if={loading}>
+                <lightning-spinner size="small" alternative-text="Loading"></lightning-spinner>
+            </template>
+            <template lwc:if={replacementRecommended}>
+                <p class="clear-note">Replacement recommended: the equipment is near the end of its life.</p>
+            </template>
+            <template for:each={reasons} for:item="r">
+                <div key={r.key} class="reason">
+                    <strong>{r.productName}</strong>
+                    <ul>
+                        <template for:each={r.because} for:item="b">
+                            <li key={b.key}>{b.text}</li>
+                        </template>
+                    </ul>
+                </div>
+            </template>
+            <p class="hint">Tap <strong>Next</strong> to review the agreement and price. You can still change it.</p>
+        </section>
+    </div>
+    <template lwc:if={viewing}>
+        <c-rlm-file-viewer url={viewing.url} title={viewing.title} onclose={closePhoto}></c-rlm-file-viewer>
+    </template>
+</template>

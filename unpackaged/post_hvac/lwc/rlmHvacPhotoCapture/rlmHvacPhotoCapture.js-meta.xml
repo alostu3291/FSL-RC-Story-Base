@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Brightline Photo Capture</masterLabel>
+    <description>Camera or library photo upload for a system check finding; mobile-safe replacement for lightning-file-upload</description>
+</LightningComponentBundle>

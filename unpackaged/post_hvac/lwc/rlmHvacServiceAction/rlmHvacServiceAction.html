@@ -1,0 +1,40 @@
+<template>
+    <template lwc:if={recordId}>
+        <c-rlm-hvac-visit-brief record-id={recordId}></c-rlm-hvac-visit-brief>
+        <template lwc:if={response}>
+            <c-rlm-hvac-response-guarantee response={response}></c-rlm-hvac-response-guarantee>
+        </template>
+        <template lwc:if={started}>
+            <p class="started">{startedLabel}</p>
+            <c-rlm-hvac-service-checklist class="checklist" record-id={recordId}></c-rlm-hvac-service-checklist>
+            <c-rlm-hvac-find-and-add record-id={recordId} onfindingadded={handleFindingAdded}></c-rlm-hvac-find-and-add>
+            <c-rlm-hvac-plan-change class="plan-change" record-id={recordId}></c-rlm-hvac-plan-change>
+            <div class="complete">
+                <template lwc:if={completedNumber}>
+                    <p class="done">Work order {completedNumber} and its appointment are complete. Any approved repairs are being billed.</p>
+                    <c-rlm-hvac-visit-summary record-id={recordId}></c-rlm-hvac-visit-summary>
+                    <button type="button" class="primary" onclick={close}>Close</button>
+                </template>
+                <template lwc:else>
+                    <template lwc:if={error}>
+                        <p class="error">{error}</p>
+                    </template>
+                    <button type="button" class="primary" disabled={busy} onclick={complete}>Complete visit</button>
+                    <p class="hint">Completes this appointment and work order.</p>
+                </template>
+            </div>
+        </template>
+        <template lwc:elseif={loaded}>
+            <div class="complete">
+                <template lwc:if={error}>
+                    <p class="error">{error}</p>
+                </template>
+                <button type="button" class="primary" disabled={busy} onclick={start}>Start visit</button>
+                <p class="hint">Records your arrival: the appointment and work order go In Progress with the start time.</p>
+            </div>
+        </template>
+        <template lwc:elseif={error}>
+            <p class="error">{error}</p>
+        </template>
+    </template>
+</template>

@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OmniDataTransform xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>false</active>
+    <assignmentRulesUsed>false</assignmentRulesUsed>
+    <deletedOnSuccess>false</deletedOnSuccess>
+    <errorIgnored>false</errorIgnored>
+    <expectedOutputJson>{
+  "QuoteId": "0Q0Ka000000EXAMPLE",
+  "QuoteNumber": "00000052",
+  "CreatedDate": "11/02/2026",
+  "ExpirationDate": "12/02/2026",
+  "AccountName": "Marcus Bell",
+  "CustomerPhone": "(630) 555-0187",
+  "BillingStreet": "1240 Aurora Ave",
+  "BillingCity": "Naperville",
+  "BillingState": "IL",
+  "BillingPostalCode": "60540",
+  "ServiceStreet": "1240 Aurora Ave",
+  "ServiceCity": "Naperville",
+  "ServiceState": "IL",
+  "ServicePostalCode": "60540",
+  "SalesRep": "Sample Comfort Advisor",
+  "SalesRepEmail": "advisor@example.com",
+  "MonthlyTotal": "$70.00",
+  "OneTimeTotal": "$507.00",
+  "GrandTotal": "$577.00",
+  "WhyThisPlan": "We found a worn run capacitor on the outdoor unit and a furnace that is 11 years old. Comfort Plus covers both systems with two tune-ups a year and 8-hour priority response, and we can replace the capacitor today.",
+  "Plan": [
+    {
+      "Name": "Comfort Plus",
+      "Description": "Basic plus 8-hour priority response, no diagnostic fee and 15% off repairs. Includes a $6.00/mo per system equipment age adjustment (equipment 11\u201315 years old +$6).",
+      "Quantity": 2,
+      "MonthlyPrice": "$70.00"
+    }
+  ],
+  "OneTime": [
+    {
+      "Name": "Initial Tune-up",
+      "Description": "First tune-up for each system at signup.",
+      "Quantity": 2,
+      "Price": "$258.00"
+    },
+    {
+      "Name": "Capacitor Replacement",
+      "Description": "Replace a weak or failed run capacitor on the outdoor unit.",
+      "Quantity": 1,
+      "Price": "$185.00"
+    },
+    {
+      "Name": "Condensate Drain Clear",
+      "Description": "Clear and flush a clogged condensate drain line and treat the pan.",
+      "Quantity": 1,
+      "Price": "$64.00"
+    }
+  ],
+  "Finding": [
+    {
+      "Equipment": "Outdoor Unit",
+      "Observation": "Capacitor \u2013 Worn",
+      "Urgency": "Repair Soon",
+      "Note": "The run capacitor reads 32 \u00b5F against a 45 \u00b5F rating."
+    },
+    {
+      "Equipment": "Furnace",
+      "Observation": "Filter \u2013 Clogged",
+      "Urgency": "Monitor",
+      "Note": "The filter is overdue for a change."
+    }
+  ]
+}</expectedOutputJson>
+    <fieldLevelSecurityEnabled>false</fieldLevelSecurityEnabled>
+    <inputType>JSON</inputType>
+    <isManagedUsingStdDesigner>false</isManagedUsingStdDesigner>
+    <name>RLMHVACProposalTransform</name>
+    <nullInputsIncludedInOutput>false</nullInputsIncludedInOutput>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>52086526-5e8e-5ed9-af4c-0d70332cc8ae</globalKey>
+        <inputFieldName>QuoteId</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>QuoteId</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>62d8cfd6-559b-5e8e-b17c-0a03b988b0e3</globalKey>
+        <inputFieldName>QuoteNumber</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>QuoteNumber</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>80f4f6a3-4117-525f-81e8-2ee23405981c</globalKey>
+        <inputFieldName>CreatedDate</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>CreatedDate</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>c707a558-b722-567b-9012-2e3d941650ee</globalKey>
+        <inputFieldName>ExpirationDate</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>ExpirationDate</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>d733ae5d-8ce8-59f2-a19f-9e78a1769154</globalKey>
+        <inputFieldName>AccountName</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>AccountName</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>12426ce7-c247-5b2c-a342-819db4ef1bd6</globalKey>
+        <inputFieldName>CustomerPhone</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>CustomerPhone</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>fa2735d5-fb5a-5e82-ac8c-e0674f5e2a88</globalKey>
+        <inputFieldName>BillingStreet</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingStreet</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>a79ab62b-5802-5ac0-b47a-243b6389128b</globalKey>
+        <inputFieldName>BillingCity</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingCity</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>606f0ab6-b4c2-5845-9627-7433613c0c82</globalKey>
+        <inputFieldName>BillingState</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingState</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>6e8a826f-82ac-5dcc-897d-802ec9edf0f1</globalKey>
+        <inputFieldName>BillingPostalCode</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingPostalCode</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>8c08a5ff-94c7-552a-8a5f-d211dd71859c</globalKey>
+        <inputFieldName>ServiceStreet</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>ServiceStreet</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>fc00f084-b6c4-505f-a8f7-cde7571f9f64</globalKey>
+        <inputFieldName>ServiceCity</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>ServiceCity</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>320e67b2-8afe-5a17-9304-32c0b6a00942</globalKey>
+        <inputFieldName>ServiceState</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>ServiceState</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>71031599-b47a-576b-a8dd-6bed96e961e9</globalKey>
+        <inputFieldName>ServicePostalCode</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>ServicePostalCode</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>e5d43ecf-7a8e-543e-a0ef-ff740f10bda7</globalKey>
+        <inputFieldName>SalesRep</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>SalesRep</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>ff21eb91-5b67-5449-96f5-e6db3e733fac</globalKey>
+        <inputFieldName>SalesRepEmail</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>SalesRepEmail</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>3251e877-bec2-5ce4-8499-1805fb526f15</globalKey>
+        <inputFieldName>MonthlyTotal</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>MonthlyTotal</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>c86ecc6b-19b0-552b-93aa-d2f904073c37</globalKey>
+        <inputFieldName>OneTimeTotal</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>OneTimeTotal</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>a79d9d04-3cf9-526e-a944-88d6a9435ff0</globalKey>
+        <inputFieldName>GrandTotal</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>GrandTotal</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>b4b7a459-4504-5f82-967f-170069b8baf6</globalKey>
+        <inputFieldName>WhyThisPlan</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>WhyThisPlan</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>8404a09b-1fe7-556b-b342-1d3d3083886d</globalKey>
+        <inputFieldName>Plan:Name</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Plan:Name</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>f6f46c96-5483-57d4-a0ea-6111cbf2e30f</globalKey>
+        <inputFieldName>Plan:Description</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Plan:Description</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>bff77a6c-ae4b-5c06-855b-1ccba3b1c05d</globalKey>
+        <inputFieldName>Plan:Quantity</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Plan:Quantity</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>11fb20b9-f637-54b4-bbe6-a193684c3143</globalKey>
+        <inputFieldName>Plan:MonthlyPrice</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Plan:MonthlyPrice</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>d0d0e943-fad0-5744-b5df-7bfbda6261ad</globalKey>
+        <inputFieldName>OneTime:Name</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>OneTime:Name</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>df0d7b85-eaf8-5deb-9879-07dc1f00fae6</globalKey>
+        <inputFieldName>OneTime:Description</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>OneTime:Description</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>815a44f6-9833-520d-a363-eb782a62fb20</globalKey>
+        <inputFieldName>OneTime:Quantity</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>OneTime:Quantity</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>56af2b98-213d-581f-be24-d0963182e7da</globalKey>
+        <inputFieldName>OneTime:Price</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>OneTime:Price</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>40bb695a-6507-581f-a72e-8a7bc68494b8</globalKey>
+        <inputFieldName>Finding:Equipment</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Finding:Equipment</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>facb6f61-8aa0-5d85-9d86-bfb5045cc597</globalKey>
+        <inputFieldName>Finding:Observation</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Finding:Observation</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>94072c8b-5dcd-5f77-ac3f-f7dbb402ee0e</globalKey>
+        <inputFieldName>Finding:Urgency</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Finding:Urgency</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>9573f08f-5de9-5f19-b1ea-2cb50c2195cc</globalKey>
+        <inputFieldName>Finding:Note</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACProposalTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Finding:Note</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <outputType>JSON</outputType>
+    <previewJsonData>{
+  "QuoteId": "0Q0Ka000000EXAMPLE",
+  "QuoteNumber": "00000052",
+  "CreatedDate": "11/02/2026",
+  "ExpirationDate": "12/02/2026",
+  "AccountName": "Marcus Bell",
+  "CustomerPhone": "(630) 555-0187",
+  "BillingStreet": "1240 Aurora Ave",
+  "BillingCity": "Naperville",
+  "BillingState": "IL",
+  "BillingPostalCode": "60540",
+  "ServiceStreet": "1240 Aurora Ave",
+  "ServiceCity": "Naperville",
+  "ServiceState": "IL",
+  "ServicePostalCode": "60540",
+  "SalesRep": "Sample Comfort Advisor",
+  "SalesRepEmail": "advisor@example.com",
+  "MonthlyTotal": "$70.00",
+  "OneTimeTotal": "$507.00",
+  "GrandTotal": "$577.00",
+  "WhyThisPlan": "We found a worn run capacitor on the outdoor unit and a furnace that is 11 years old. Comfort Plus covers both systems with two tune-ups a year and 8-hour priority response, and we can replace the capacitor today.",
+  "Plan": [
+    {
+      "Name": "Comfort Plus",
+      "Description": "Basic plus 8-hour priority response, no diagnostic fee and 15% off repairs. Includes a $6.00/mo per system equipment age adjustment (equipment 11\u201315 years old +$6).",
+      "Quantity": 2,
+      "MonthlyPrice": "$70.00"
+    }
+  ],
+  "OneTime": [
+    {
+      "Name": "Initial Tune-up",
+      "Description": "First tune-up for each system at signup.",
+      "Quantity": 2,
+      "Price": "$258.00"
+    },
+    {
+      "Name": "Capacitor Replacement",
+      "Description": "Replace a weak or failed run capacitor on the outdoor unit.",
+      "Quantity": 1,
+      "Price": "$185.00"
+    },
+    {
+      "Name": "Condensate Drain Clear",
+      "Description": "Clear and flush a clogged condensate drain line and treat the pan.",
+      "Quantity": 1,
+      "Price": "$64.00"
+    }
+  ],
+  "Finding": [
+    {
+      "Equipment": "Outdoor Unit",
+      "Observation": "Capacitor \u2013 Worn",
+      "Urgency": "Repair Soon",
+      "Note": "The run capacitor reads 32 \u00b5F against a 45 \u00b5F rating."
+    },
+    {
+      "Equipment": "Furnace",
+      "Observation": "Filter \u2013 Clogged",
+      "Urgency": "Monitor",
+      "Note": "The filter is overdue for a change."
+    }
+  ]
+}</previewJsonData>
+    <processSuperBulk>false</processSuperBulk>
+    <responseCacheTtlMinutes>0.0</responseCacheTtlMinutes>
+    <rollbackOnError>false</rollbackOnError>
+    <sourceObjectDefault>false</sourceObjectDefault>
+    <synchronousProcessThreshold>0.0</synchronousProcessThreshold>
+    <targetOutputFileName>Brightline_Proposal(Version 1)</targetOutputFileName>
+    <type>Transform</type>
+    <uniqueName>RLMHVACProposalTransform_1</uniqueName>
+    <versionNumber>1.0</versionNumber>
+    <xmlDeclarationRemoved>false</xmlDeclarationRemoved>
+</OmniDataTransform>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Brightline Check &amp; Quote</masterLabel>
+    <description>Visual field tablet Check &amp; Quote for residential HVAC comfort agreements</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="accountName" type="String" label="Account Name" role="inputOnly"/>
+            <property name="postalCode" type="String" label="Service ZIP" role="inputOnly"/>
+            <property name="recommendationJson" type="String" label="System Check Recommendation JSON" role="inputOnly"/>
+            <property name="planSku" type="String" label="Agreement SKU"/>
+            <property name="systemType" type="String" label="System Type"/>
+            <property name="systemCount" type="Integer" label="Systems"/>
+            <property name="equipmentAge" type="String" label="Equipment Age Band"/>
+            <property name="includeIaq" type="Boolean" label="Include Indoor Air Quality"/>
+            <property name="includeWaterHeater" type="Boolean" label="Include Water Heater Care"/>
+            <property name="repairSkus" type="String" label="Repair SKUs (comma-separated)"/>
+            <property name="overrideReason" type="String" label="Override Reason" role="outputOnly"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

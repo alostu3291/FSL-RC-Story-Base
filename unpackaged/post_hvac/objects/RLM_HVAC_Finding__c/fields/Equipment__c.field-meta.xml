@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Equipment__c</fullName>
+    <description>Which piece of the home's equipment the finding is on.</description>
+    <label>Equipment</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+                <value>
+                    <fullName>Outdoor Unit</fullName>
+                    <default>false</default>
+                    <label>Outdoor Unit</label>
+                </value>
+                <value>
+                    <fullName>Furnace</fullName>
+                    <default>false</default>
+                    <label>Furnace</label>
+                </value>
+                <value>
+                    <fullName>Air Handler</fullName>
+                    <default>false</default>
+                    <label>Air Handler</label>
+                </value>
+                <value>
+                    <fullName>Heat Pump</fullName>
+                    <default>false</default>
+                    <label>Heat Pump</label>
+                </value>
+                <value>
+                    <fullName>Boiler</fullName>
+                    <default>false</default>
+                    <label>Boiler</label>
+                </value>
+                <value>
+                    <fullName>Thermostat</fullName>
+                    <default>false</default>
+                    <label>Thermostat</label>
+                </value>
+                <value>
+                    <fullName>Ductwork</fullName>
+                    <default>false</default>
+                    <label>Ductwork</label>
+                </value>
+                <value>
+                    <fullName>Water Heater</fullName>
+                    <default>false</default>
+                    <label>Water Heater</label>
+                </value>
+                <value>
+                    <fullName>Indoor Air</fullName>
+                    <default>false</default>
+                    <label>Indoor Air</label>
+                </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

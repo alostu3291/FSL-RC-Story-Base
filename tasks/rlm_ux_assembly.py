@@ -727,7 +727,7 @@ class AssembleAndDeployUX(SFDXBaseTask):
             "qb", "billing", "billing_ui", "tax", "rating", "rates", "clm", "dro",
             "guidedselling", "ramps", "tso", "prm", "agents", "docgen",
             "payments", "constraints", "analytics", "procedureplans",
-            "collections", "fsl", "pest",
+            "collections", "fsl", "pest", "hvac",
         ]
         flags = {}
         for flag in known_flags:
@@ -815,6 +815,7 @@ class AssembleAndDeployUX(SFDXBaseTask):
             ("collections", "collections"),
             ("fsl",         "fsl"),
             ("pest",        "pest"),
+            ("hvac",        "hvac"),
         ]
 
         # Flexipage types that cannot be deployed via Metadata API (platform restriction)
@@ -927,6 +928,7 @@ class AssembleAndDeployUX(SFDXBaseTask):
             ("constraints", templates_path / "layouts" / "constraints", features.get("constraints", False)),
             ("fsl", templates_path / "layouts" / "fsl", features.get("fsl", False)),
             ("pest", templates_path / "layouts" / "pest", features.get("pest", False)),
+            ("hvac", templates_path / "layouts" / "hvac", features.get("hvac", False)),
         ]
 
         copied_names: Set[str] = set()

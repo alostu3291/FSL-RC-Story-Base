@@ -64,6 +64,9 @@ private class RLM_FSL_ServiceBillingTest {
         Assert.areEqual(RLM_FSL_BillRepair.PEST_RESERVICE_SKU,
             RLM_FSL_BillRepair.skuFor(new WorkOrder(WorkType = new WorkType(Name = 'Pest Re-service'))),
             'Pest re-service visits bill the re-service product');
+        Assert.areEqual(RLM_FSL_BillRepair.HVAC_DIAGNOSTIC_SKU,
+            RLM_FSL_BillRepair.skuFor(new WorkOrder(WorkType = new WorkType(Name = 'No-Cool / No-Heat Call'))),
+            'Uncovered HVAC service calls bill the diagnostic');
         Assert.areEqual(RLM_FSL_BillRepair.REPAIR_SKU, RLM_FSL_BillRepair.skuFor(new WorkOrder()),
             'Other work orders bill the break/fix repair');
     }

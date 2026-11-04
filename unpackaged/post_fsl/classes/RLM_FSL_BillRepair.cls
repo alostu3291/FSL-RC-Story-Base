@@ -13,6 +13,16 @@
 public with sharing class RLM_FSL_BillRepair {
     public static final String REPAIR_SKU = 'QB-SVC-REPAIR';
     public static final String PEST_RESERVICE_SKU = 'RTK-RESERVICE';
+    public static final String HVAC_DIAGNOSTIC_SKU = 'HVAC-DIAGNOSTIC';
+
+    private static final Map<String, String> SKU_BY_WORK_TYPE = new Map<String, String>{
+        'Pest Re-service' => PEST_RESERVICE_SKU,
+        'No-Cool / No-Heat Call' => HVAC_DIAGNOSTIC_SKU
+    };
+    private static final Map<String, String> ORDER_NAME_BY_SKU = new Map<String, String>{
+        PEST_RESERVICE_SKU => 'Re-service Visit - WO ',
+        HVAC_DIAGNOSTIC_SKU => 'Diagnostic Visit - WO '
+    };
 
     @TestVisible
     private static String repairSku = REPAIR_SKU;
@@ -66,10 +76,8 @@ public with sharing class RLM_FSL_BillRepair {
     @TestVisible
     private static String skuFor(WorkOrder workOrder) {
         String workTypeName = workOrder.WorkType != null ? workOrder.WorkType.Name : null;
-        if (workTypeName == 'Pest Re-service') {
-            return PEST_RESERVICE_SKU;
-        }
-        return repairSku;
+        return workTypeName != null && SKU_BY_WORK_TYPE.containsKey(workTypeName)
+            ? SKU_BY_WORK_TYPE.get(workTypeName) : repairSku;
     }
 
     private static Id bill(WorkOrder workOrder) {
@@ -101,7 +109,8 @@ public with sharing class RLM_FSL_BillRepair {
             orderRecord.fieldValues = new Map<String, Object>{
                 'AccountId' => workOrder.AccountId, 'Pricebook2Id' => entry.Pricebook2Id, 'EffectiveDate' => today,
                 'Status' => 'Draft', 'CurrencyIsoCode' => 'USD',
-                'Name' => (skuFor(workOrder) == PEST_RESERVICE_SKU ? 'Re-service Visit - WO ' : 'Break/Fix Repair - WO ') + workOrder.WorkOrderNumber,
+                'Name' => (ORDER_NAME_BY_SKU.containsKey(skuFor(workOrder))
+                    ? ORDER_NAME_BY_SKU.get(skuFor(workOrder)) : 'Break/Fix Repair - WO ') + workOrder.WorkOrderNumber,
                 'ShippingStreet' => account.ShippingStreet, 'ShippingCity' => account.ShippingCity,
                 'ShippingState' => account.ShippingState, 'ShippingPostalCode' => account.ShippingPostalCode,
                 'ShippingCountry' => account.ShippingCountry, 'BillingStreet' => account.BillingStreet,

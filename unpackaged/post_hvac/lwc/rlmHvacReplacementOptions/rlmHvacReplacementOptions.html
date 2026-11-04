@@ -1,0 +1,59 @@
+<template>
+    <template lwc:if={data}>
+        <section class="card">
+            <header class="head">
+                <p class="eyebrow">System check {data.assessmentName}</p>
+                <h2>Replacement options</h2>
+                <p class="reason">{data.reason}</p>
+            </header>
+
+            <p class="zone">{zoneLine}</p>
+            <div class="options">
+                <template for:each={options} for:item="o">
+                    <button
+                        key={o.sku}
+                        type="button"
+                        class={o.cardClass}
+                        data-sku={o.sku}
+                        aria-pressed={o.ariaPressed}
+                        onclick={choose}
+                    >
+                        <span class="tier-row">
+                            <span class="tier">{o.tier}</span>
+                            <template lwc:if={o.badge}>
+                                <span class="badge">{o.badge}</span>
+                            </template>
+                        </span>
+                        <span class="name">{o.name}</span>
+                        <span class="headline">{o.headline}</span>
+                        <span class="price">{o.priceLabel}</span>
+                        <span class="features">
+                            <template for:each={o.featureItems} for:item="f">
+                                <span key={f.key} class="feature">{f.text}</span>
+                            </template>
+                        </span>
+                    </button>
+                </template>
+            </div>
+
+            <template lwc:if={error}>
+                <p class="error" role="alert">{error}</p>
+            </template>
+
+            <div class="footer">
+                <template lwc:if={quoted}>
+                    <p class="done">Replacement quote {data.quoteNumber} is ready. Send the proposal from the quote with Sign &amp; Pay.</p>
+                    <button type="button" class="primary" onclick={openQuote}>Open quote</button>
+                    <button type="button" class="secondary" onclick={close}>Close</button>
+                </template>
+                <template lwc:else>
+                    <button type="button" class="primary" disabled={busy} onclick={quote}>{quoteLabel}</button>
+                    <p class="hint">A separate quote from the comfort agreement, so the homeowner can decide on its own timeline.</p>
+                </template>
+            </div>
+        </section>
+    </template>
+    <template lwc:elseif={error}>
+        <p class="error" role="alert">{error}</p>
+    </template>
+</template>

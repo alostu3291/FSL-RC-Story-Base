@@ -1,0 +1,4 @@
+DependencyScope,DependsOnStepDefinition.Name,FulfillmentStepDefinition.Name,IsCompensateInReverse,Name,PropagateStateToDependentStep
+Plan,Create Initial Tune-up Work Order,Initial Tune-up Complete,false,Create WO to Tune-up Complete,
+Plan,Initial Tune-up Complete,Start Agreement Billing,false,Tune-up Complete to Bill,
+Plan,Create Replacement Install Work Order,Replacement Install Complete,false,Create WO to Install Complete,

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Urgency__c</fullName>
+    <description>Monitor: note it and check next visit. Repair Soon: quote a repair. Safety: needs attention before the system runs normally.</description>
+    <label>Urgency</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+                <value>
+                    <fullName>Monitor</fullName>
+                    <default>true</default>
+                    <label>Monitor</label>
+                </value>
+                <value>
+                    <fullName>Repair Soon</fullName>
+                    <default>false</default>
+                    <label>Repair Soon</label>
+                </value>
+                <value>
+                    <fullName>Safety</fullName>
+                    <default>false</default>
+                    <label>Safety</label>
+                </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

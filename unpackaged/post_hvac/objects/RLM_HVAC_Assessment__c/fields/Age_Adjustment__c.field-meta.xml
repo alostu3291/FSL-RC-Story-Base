@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Age_Adjustment__c</fullName>
+    <description>Monthly amount per system added to the agreement for the equipment age band.</description>
+    <label>Equipment Age Adjustment</label>
+    <precision>8</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <type>Currency</type>
+</CustomField>

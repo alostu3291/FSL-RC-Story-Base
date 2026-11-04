@@ -1,0 +1,10 @@
+Description,DurationType,EstimatedDuration,Name,ShouldAutoCreateSvcAppt
+Seasonal heating tune-up from a comfort agreement (October),Hours,1.5,Fall Furnace Tune-up,false
+Quarterly indoor air quality visit: filters and UV lamp (Indoor Air Quality add-on),Hours,1,Indoor Air Quality Visit,false
+First tune-up and any approved repairs after the comfort agreement signup,Hours,1.5,Initial Tune-up,true
+Covered priority-response call or billable diagnostic when the home has no cooling or heat,Hours,2,No-Cool / No-Heat Call,true
+Approved repair from a system check or tune-up,Hours,2,Repair,true
+Full system replacement install after a signed replacement quote,Hours,8,Replacement Install,true
+Seasonal cooling tune-up from a comfort agreement (April),Hours,1.5,Spring AC Tune-up,false
+Free in-home system check and quote before any work is booked,Hours,1,System Check,true
+Yearly water heater flush and anode check (Water Heater Care add-on),Hours,1,Water Heater Flush,false

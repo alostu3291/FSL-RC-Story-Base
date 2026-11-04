@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Plan_Explanation_Basis__c</fullName>
+    <description>The recommendation summary the explanation was written from; a new one is written when it changes.</description>
+    <label>Plan Explanation Basis</label>
+    <length>8000</length>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

@@ -1,0 +1,39 @@
+<template>
+    <section class="brief">
+        <div class="head">
+            <div class="title">
+                <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                <h2>Visit brief</h2>
+                <template lwc:if={brief}>
+                    <span class={badgeClass}>{sourceLabel}</span>
+                </template>
+            </div>
+            <button type="button" class="link" onclick={toggle}>{toggleLabel}</button>
+        </div>
+        <template lwc:if={open}>
+            <template lwc:if={loading}>
+                <p class="muted">Preparing the brief…</p>
+            </template>
+            <template lwc:elseif={error}>
+                <p class="muted">{error}</p>
+            </template>
+            <template lwc:elseif={brief}>
+                <p class="headline">{brief.headline}</p>
+                <ul>
+                    <template for:each={points} for:item="p">
+                        <li key={p.key}>{p.text}</li>
+                    </template>
+                </ul>
+                <template lwc:if={hasLookFor}>
+                    <p class="label">Look for</p>
+                    <ul class="look">
+                        <template for:each={lookFor} for:item="l">
+                            <li key={l.key}>{l.text}</li>
+                        </template>
+                    </ul>
+                </template>
+                <button type="button" class="link refresh" onclick={refresh}>Refresh</button>
+            </template>
+        </template>
+    </section>
+</template>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Reported_Issue__c</fullName>
+    <description>What the customer reported for a service call. Decides whether a comfort agreement covers the visit.</description>
+    <inlineHelpText>No cool, no heat and the rest map to a system. A system the agreement covers means a priority visit with the diagnostic fee waived; otherwise the diagnostic fee is billed on completion.</inlineHelpText>
+    <label>Reported Issue</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+                <value>
+                    <fullName>No Cool</fullName>
+                    <default>false</default>
+                    <label>No Cool</label>
+                </value>
+                <value>
+                    <fullName>No Heat</fullName>
+                    <default>false</default>
+                    <label>No Heat</label>
+                </value>
+                <value>
+                    <fullName>Noise</fullName>
+                    <default>false</default>
+                    <label>Noise</label>
+                </value>
+                <value>
+                    <fullName>Water Leak</fullName>
+                    <default>false</default>
+                    <label>Water Leak</label>
+                </value>
+                <value>
+                    <fullName>Thermostat</fullName>
+                    <default>false</default>
+                    <label>Thermostat</label>
+                </value>
+                <value>
+                    <fullName>Air Quality</fullName>
+                    <default>false</default>
+                    <label>Air Quality</label>
+                </value>
+                <value>
+                    <fullName>Water Heater</fullName>
+                    <default>false</default>
+                    <label>Water Heater</label>
+                </value>
+                <value>
+                    <fullName>Other</fullName>
+                    <default>false</default>
+                    <label>Other</label>
+                </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

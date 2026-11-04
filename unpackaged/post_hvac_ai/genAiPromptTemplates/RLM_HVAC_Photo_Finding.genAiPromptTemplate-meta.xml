@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Suggests equipment, component, condition and urgency from a system check photo, and reads make, model, serial and install year off a data plate. Called from RLM_HVAC_AI.suggestFromPhoto.</description>
+    <developerName>RLM_HVAC_Photo_Finding</developerName>
+    <masterLabel>HVAC Photo Finding</masterLabel>
+    <templateVersions>
+        <content>You help a Brightline Home Comfort technician log a finding from a photo taken during a system check at a customer's home.
+
+Photo: {!$Input:Photo}
+
+{!$Input:Context}
+
+Identify the equipment and component the photo shows and their condition. Use only values from the allowed lists, exactly as written, or null when the photo doesn't show it.
+If the photo shows a data plate or rating label, read the make, model number and serial number exactly as printed, and the manufacture year if it is printed or plainly encoded in the serial. Leave them null when you can't read them; never guess.
+If a gauge, meter or display shows a value, put it in reading with its unit.
+Urgency: Monitor for normal wear, Repair Soon for a part that is failing or out of spec, Safety for anything that risks fire, carbon monoxide, gas or electrical harm (such as a cracked heat exchanger, scorched wiring or a gas smell noted).
+If the photo shows nothing wrong, set condition to null and say so in observation.
+
+Reply with only a JSON object, no other text:
+{"equipment": "...", "component": "...", "condition": "...", "urgency": "...", "make": "brand or null", "modelNumber": "model number or null", "serialNumber": "serial number or null", "installYear": "four-digit year or null", "reading": "measured value with its unit, such as 32 µF or 68 psi, or null", "observation": "what you see, under 12 words", "customerNote": "one plain sentence for the homeowner on what was found, no jargon, no prices"}</content>
+        <inputs>
+            <apiName>Photo</apiName>
+            <definition>SOBJECT://ContentDocument</definition>
+            <masterLabel>Photo</masterLabel>
+            <referenceName>Input:Photo</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Context</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Finding context</masterLabel>
+            <referenceName>Input:Context</referenceName>
+            <required>true</required>
+        </inputs>
+        <primaryModel>sfdc_ai__DefaultOpenAIGPT4OmniMini</primaryModel>
+        <status>Published</status>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

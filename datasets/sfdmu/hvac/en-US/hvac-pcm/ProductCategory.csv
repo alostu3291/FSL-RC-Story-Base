@@ -1,0 +1,6 @@
+Catalog.Code,Code,Description,IsNavigational,Name,ParentCategory.Code,SortOrder
+CAT-HVAC-RES,PC-HVAC-PLANS,"Monthly comfort agreements, priced per system",true,Comfort Agreements,,1
+CAT-HVAC-RES,PC-HVAC-SERVICES,One-time visits,true,Services,,2
+CAT-HVAC-RES,PC-HVAC-ADDONS,Monthly add-ons to a comfort agreement,true,Add-ons,,3
+CAT-HVAC-RES,PC-HVAC-FIELD,Repairs a technician can quote on site,true,Repairs,,4
+CAT-HVAC-RES,PC-HVAC-REPLACE,"Good, better and best replacement systems",true,Replacement Systems,,5

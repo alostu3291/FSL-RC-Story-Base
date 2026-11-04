@@ -1,0 +1,20 @@
+$$Product2.StockKeepingUnit$ProductSellingModel.Name$ProductSellingModel.SellingModelType,IsDefault,Product2.StockKeepingUnit,ProductSellingModel.$$Name$SellingModelType,ProrationPolicy.Name
+HVAC-BASIC;Evergreen Monthly;Evergreen,true,HVAC-BASIC,Evergreen Monthly;Evergreen,Default Proration Policy
+HVAC-PLUS;Evergreen Monthly;Evergreen,true,HVAC-PLUS,Evergreen Monthly;Evergreen,Default Proration Policy
+HVAC-PREMIER;Evergreen Monthly;Evergreen,true,HVAC-PREMIER,Evergreen Monthly;Evergreen,Default Proration Policy
+HVAC-IAQ;Evergreen Monthly;Evergreen,true,HVAC-IAQ,Evergreen Monthly;Evergreen,Default Proration Policy
+HVAC-WATER-HEATER;Evergreen Monthly;Evergreen,true,HVAC-WATER-HEATER,Evergreen Monthly;Evergreen,Default Proration Policy
+HVAC-SYSTEM-CHECK;One-Time;OneTime,true,HVAC-SYSTEM-CHECK,One-Time;OneTime,
+HVAC-TUNEUP;One-Time;OneTime,true,HVAC-TUNEUP,One-Time;OneTime,
+HVAC-DIAGNOSTIC;One-Time;OneTime,true,HVAC-DIAGNOSTIC,One-Time;OneTime,
+HVAC-DRO-FSL;One-Time;OneTime,true,HVAC-DRO-FSL,One-Time;OneTime,
+HVAC-DRO-INSTALL;One-Time;OneTime,true,HVAC-DRO-INSTALL,One-Time;OneTime,
+HVAC-CAPACITOR;One-Time;OneTime,true,HVAC-CAPACITOR,One-Time;OneTime,
+HVAC-CONTACTOR;One-Time;OneTime,true,HVAC-CONTACTOR,One-Time;OneTime,
+HVAC-COIL-CLEAN;One-Time;OneTime,true,HVAC-COIL-CLEAN,One-Time;OneTime,
+HVAC-DRAIN-CLEAR;One-Time;OneTime,true,HVAC-DRAIN-CLEAR,One-Time;OneTime,
+HVAC-REFRIGERANT;One-Time;OneTime,true,HVAC-REFRIGERANT,One-Time;OneTime,
+HVAC-BLOWER-MOTOR;One-Time;OneTime,true,HVAC-BLOWER-MOTOR,One-Time;OneTime,
+HVAC-REPL-GOOD;One-Time;OneTime,true,HVAC-REPL-GOOD,One-Time;OneTime,
+HVAC-REPL-BETTER;One-Time;OneTime,true,HVAC-REPL-BETTER,One-Time;OneTime,
+HVAC-REPL-BEST;One-Time;OneTime,true,HVAC-REPL-BEST,One-Time;OneTime,

@@ -1,0 +1,8 @@
+feature: hvac
+feature_flag: hvac
+# Adds Sign & Pay next to Create Proposal for the Brightline kitchen-table close.
+patches:
+  - type: insert_action
+    after: "Quote.RLM_Create_Proposal"
+    actions:
+      - "Quote.RLM_HVAC_Sign_and_Pay"

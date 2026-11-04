@@ -1,0 +1,8 @@
+feature: hvac
+feature_flag: hvac
+# Adds Check & Quote next to Quick Quote on the Account highlights panel.
+patches:
+  - type: insert_action
+    after: "Account.RLM_QuickQuote"
+    actions:
+      - "Account.RLM_HVAC_Check_and_Quote"

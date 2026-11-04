@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Brightline Find and Add</masterLabel>
+    <description>Log a new finding during a visit and add customer-approved repairs to the work order.</description>
+</LightningComponentBundle>

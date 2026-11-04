@@ -1,0 +1,221 @@
+<template>
+    <div class="visit">
+        <header class="top">
+            <div>
+                <p class="eyebrow">Brightline · System check {workOrderNumber}</p>
+                <h1>{accountName}</h1>
+                <template lwc:if={serviceAddress}>
+                    <p class="address">{serviceAddress}</p>
+                </template>
+            </div>
+        </header>
+
+        <template lwc:if={showSteps}>
+            <ol class="steps">
+                <template for:each={steps} for:item="s">
+                    <li key={s.key} class={s.cls}>
+                        <span class="dot">{s.number}</span>
+                        <span class="label">{s.label}</span>
+                    </li>
+                </template>
+            </ol>
+        </template>
+
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+
+        <template lwc:if={showBrief}>
+            <c-rlm-hvac-visit-brief record-id={ctx.workOrderId}></c-rlm-hvac-visit-brief>
+        </template>
+
+        <template lwc:if={isLoading}>
+            <div class="center"><lightning-spinner alternative-text="Loading" size="small"></lightning-spinner></div>
+        </template>
+
+        <template lwc:if={isBlocked}>
+            <section class="panel">
+                <h2>Check &amp; Quote isn't available here</h2>
+                <p>Run it from a System Check appointment. Tune-up and repair work orders use the Service Checklist instead.</p>
+                <div class="bar"><button type="button" class="secondary" onclick={close}>Close</button></div>
+            </section>
+        </template>
+
+        <template lwc:if={isStart}>
+            <section class="panel">
+                <h2>Start the system check</h2>
+                <p>
+                    Check each piece of equipment and log what you find, with data-plate photos and readings. The
+                    findings pick the recommended comfort agreement and repairs, then the customer reviews and signs
+                    on this device.
+                </p>
+                <div class="bar">
+                    <button type="button" class="secondary" onclick={close}>Not now</button>
+                    <button type="button" class="primary" disabled={busy} onclick={begin}>Start system check</button>
+                </div>
+            </section>
+        </template>
+
+        <template lwc:if={isWalk}>
+            <c-rlm-hvac-system-walk
+                assessment-id={assessmentId}
+                account-name={accountName}
+                service-address={serviceAddress}
+            ></c-rlm-hvac-system-walk>
+            <div class="bar sticky">
+                <button type="button" class="primary" disabled={busy} onclick={toPlan}>Review agreement</button>
+            </div>
+        </template>
+
+        <template lwc:if={isPlan}>
+            <section class="panel why">
+                <p class="why-label">
+                    <lightning-icon icon-name="utility:sparkles" size="x-small" alternative-text=""></lightning-icon>
+                    Why this agreement
+                </p>
+                <template lwc:if={planExplanation}>
+                    <p>{planExplanation}</p>
+                </template>
+                <template lwc:else>
+                    <p class="muted">Writing a plain-language explanation for the customer…</p>
+                </template>
+            </section>
+            <c-rlm-hvac-assess-quote
+                account-name={accountName}
+                postal-code={postalCode}
+                recommendation-json={recommendationJson}
+                plan-sku={recPlanSku}
+                system-type={recSystemType}
+                system-count={recSystemCount}
+                equipment-age={recEquipmentAge}
+                include-iaq={recIaq}
+                include-water-heater={recWaterHeater}
+                repair-skus={recRepairSkus}
+            ></c-rlm-hvac-assess-quote>
+            <div class="bar sticky">
+                <button type="button" class="secondary" disabled={busy} onclick={backToWalk}>Back</button>
+                <button type="button" class="primary" disabled={busy} onclick={quote}>
+                    <template lwc:if={busy}>Pricing…</template>
+                    <template lwc:else>Create quote</template>
+                </button>
+            </div>
+        </template>
+
+        <template lwc:if={isCustomer}>
+            <p class="handoff">
+                <lightning-icon icon-name="utility:change_owner" size="x-small" alternative-text=""></lightning-icon>
+                Hand the device to the customer to review the findings and sign.
+            </p>
+            <c-rlm-hvac-findings quote-id={quoteId}></c-rlm-hvac-findings>
+            <template lwc:if={proposalGenerating}>
+                <div class="panel waiting">
+                    <lightning-spinner alternative-text="Preparing proposal" size="small"></lightning-spinner>
+                    <p>Preparing the proposal…</p>
+                </div>
+            </template>
+            <template lwc:if={proposalFailed}>
+                <section class="panel">
+                    <p class="error">{proposal.message}</p>
+                    <div class="bar"><button type="button" class="primary" onclick={retryProposal}>Try again</button></div>
+                </section>
+            </template>
+            <template lwc:if={proposalReady}>
+                <c-rlm-sign-and-pay
+                    quote-id={quoteId}
+                    content-document-id={proposalDocId}
+                    document-title={proposalTitle}
+                    embedded={embedded}
+                    onaccepted={handleAccepted}
+                ></c-rlm-sign-and-pay>
+            </template>
+        </template>
+
+        <template lwc:if={isBooking}>
+            <section class="panel waiting">
+                <lightning-spinner alternative-text="Booking" size="small"></lightning-spinner>
+                <p>{bookingLabel}</p>
+                <template lwc:if={error}>
+                    <div class="bar"><button type="button" class="primary" onclick={retryBooking}>Try again</button></div>
+                </template>
+            </section>
+        </template>
+
+        <template lwc:if={isDone}>
+            <section class="panel done">
+                <lightning-icon icon-name="utility:success" size="small" alternative-text=""></lightning-icon>
+                <h2>{doneTitle}</h2>
+                <template lwc:if={signMessage}>
+                    <p>{signMessage}</p>
+                </template>
+                <dl>
+                    <dt>Order</dt>
+                    <dd>{orderNumber}</dd>
+                    <template lwc:if={tuneUpNumber}>
+                        <dt>Tune-up work order</dt>
+                        <dd>{tuneUpNumber}</dd>
+                    </template>
+                    <template lwc:if={tuneUpWhen}>
+                        <dt>First visit</dt>
+                        <dd>{tuneUpWhen}</dd>
+                    </template>
+                    <template lwc:elseif={tuneUpNumber}>
+                        <dt>First visit</dt>
+                        <dd>Awaiting dispatch</dd>
+                    </template>
+                </dl>
+                <template lwc:if={showSlots}>
+                    <div class="slots">
+                        <h3>Book the Initial Tune-up</h3>
+                        <p class="muted">Pick a time with the customer. It's dispatched to you.</p>
+                        <template lwc:if={slotsLoading}>
+                            <div class="center"><lightning-spinner alternative-text="Finding times" size="small"></lightning-spinner></div>
+                        </template>
+                        <template lwc:elseif={hasSlots}>
+                            <div class="slot-grid">
+                                <template for:each={slotOptions} for:item="s">
+                                    <button key={s.key} type="button" class="slot" data-start={s.start}
+                                        disabled={slotBusy} onclick={pickSlot}>
+                                        <span class="slot-day">{s.day}</span>
+                                        <span class="slot-time">{s.time}</span>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+                        <template lwc:elseif={noSlots}>
+                            <p class="muted">No open times this week.</p>
+                        </template>
+                        <template lwc:if={slotError}>
+                            <p class="error">{slotError}</p>
+                        </template>
+                        <div class="bar">
+                            <button type="button" class="secondary" disabled={slotBusy} onclick={leaveForDispatch}>Leave for dispatch</button>
+                        </div>
+                    </div>
+                </template>
+                <template lwc:elseif={tuneUpWhen}>
+                    <p class="muted">The Initial Tune-up is on your schedule.</p>
+                </template>
+                <template lwc:elseif={tuneUpNumber}>
+                    <p class="muted">The tune-up visit shows on the schedule once it's dispatched.</p>
+                </template>
+                <template lwc:else>
+                    <p class="muted">The order is active. The tune-up work order appears once fulfillment creates it.</p>
+                </template>
+                <template lwc:if={visitCompleted}>
+                    <p class="handoff">System check {visitCompleted} is complete.</p>
+                    <c-rlm-hvac-visit-summary record-id={ctx.workOrderId}></c-rlm-hvac-visit-summary>
+                    <div class="bar"><button type="button" class="primary" onclick={close}>Done</button></div>
+                </template>
+                <template lwc:else>
+                    <template lwc:if={completeError}>
+                        <p class="error">{completeError}</p>
+                    </template>
+                    <div class="bar">
+                        <button type="button" class="secondary" onclick={close}>Close</button>
+                        <button type="button" class="primary" disabled={completing} onclick={completeCheck}>Complete visit</button>
+                    </div>
+                </template>
+            </section>
+        </template>
+    </div>
+</template>

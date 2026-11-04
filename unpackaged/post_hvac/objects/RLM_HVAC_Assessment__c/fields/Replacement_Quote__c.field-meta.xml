@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Replacement_Quote__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Replacement system quote created from this system check's good / better / best options.</description>
+    <label>Replacement Quote</label>
+    <referenceTo>Quote</referenceTo>
+    <relationshipLabel>Replacement System Checks</relationshipLabel>
+    <relationshipName>HVAC_Replacement_Assessments</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

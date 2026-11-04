@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_Line_of_Business__c</fullName>
+    <description>Line of business a field quote was created for (for example Residential Pest or Residential HVAC). Routes it to that business's location-aware pricing.</description>
+    <externalId>false</externalId>
+    <label>Line of Business</label>
+    <length>80</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

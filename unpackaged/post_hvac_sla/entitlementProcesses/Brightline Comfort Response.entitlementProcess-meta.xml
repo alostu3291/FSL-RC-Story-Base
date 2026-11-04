@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EntitlementProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <SObjectType>WorkOrder</SObjectType>
+    <active>true</active>
+    <businessHours>Brightline Service Hours</businessHours>
+    <description>Priority response for Brightline comfort agreements: a technician arrives within 4 service hours on Comfort Premier (Critical), 8 on Comfort Plus (High) and 24 on Comfort Basic and add-ons (Medium), counting 7 AM to 9 PM every day. RLM_HVAC_Coverage sets the work order Priority from the agreement and completes the milestone when the visit's appointment starts.</description>
+    <entryStartDateField>WorkOrder.CreatedDate</entryStartDateField>
+    <exitCriteriaFilterItems>
+        <field>WorkOrder.IsClosed</field>
+        <operation>equals</operation>
+        <value>true</value>
+    </exitCriteriaFilterItems>
+    <milestones>
+        <businessHours>Brightline Service Hours</businessHours>
+        <isDisplayedOnLinkedEntity>false</isDisplayedOnLinkedEntity>
+        <milestoneCriteriaFilterItems>
+            <field>WorkOrder.Priority</field>
+            <operation>equals</operation>
+            <value>Critical</value>
+        </milestoneCriteriaFilterItems>
+        <milestoneName>Priority Response</milestoneName>
+        <minutesToComplete>240</minutesToComplete>
+        <useCriteriaStartTime>false</useCriteriaStartTime>
+    </milestones>
+    <milestones>
+        <businessHours>Brightline Service Hours</businessHours>
+        <isDisplayedOnLinkedEntity>false</isDisplayedOnLinkedEntity>
+        <milestoneCriteriaFilterItems>
+            <field>WorkOrder.Priority</field>
+            <operation>equals</operation>
+            <value>High</value>
+        </milestoneCriteriaFilterItems>
+        <milestoneName>Priority Response</milestoneName>
+        <minutesToComplete>480</minutesToComplete>
+        <useCriteriaStartTime>false</useCriteriaStartTime>
+    </milestones>
+    <milestones>
+        <businessHours>Brightline Service Hours</businessHours>
+        <isDisplayedOnLinkedEntity>false</isDisplayedOnLinkedEntity>
+        <milestoneCriteriaFilterItems>
+            <field>WorkOrder.Priority</field>
+            <operation>equals</operation>
+            <value>Medium</value>
+        </milestoneCriteriaFilterItems>
+        <milestoneName>Priority Response</milestoneName>
+        <minutesToComplete>1440</minutesToComplete>
+        <useCriteriaStartTime>false</useCriteriaStartTime>
+    </milestones>
+</EntitlementProcess>
