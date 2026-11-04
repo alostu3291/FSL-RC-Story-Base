@@ -179,6 +179,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>RLM_HVAC_Finding__c.Replacement_Quote_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>RLM_HVAC_Finding__c.Recommended_Product__c</field>
         <readable>true</readable>

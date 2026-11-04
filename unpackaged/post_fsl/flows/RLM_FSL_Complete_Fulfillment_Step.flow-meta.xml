@@ -236,7 +236,7 @@
         <connector>
             <targetReference>Loop_Milestones</targetReference>
         </connector>
-        <filterLogic>1 AND (2 OR 3 OR 5) AND 4</filterLogic>
+        <filterLogic>1 AND (2 OR 3 OR 5 OR 6) AND 4</filterLogic>
         <filters>
             <field>BillingMilestonePlanId</field>
             <operator>In</operator>
@@ -270,6 +270,13 @@
             <operator>EqualTo</operator>
             <value>
                 <stringValue>Initial Tune-up Complete</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Name</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Replacement Install Complete</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>

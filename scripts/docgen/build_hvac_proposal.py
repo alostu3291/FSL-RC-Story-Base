@@ -1,11 +1,15 @@
-"""Build the Brightline HVAC proposal DocGen template (docx).
+"""Build the Brightline HVAC proposal DocGen template (docx), or the system replacement proposal.
 
 Usage:
     python scripts/docgen/build_hvac_proposal.py \
         scripts/docgen/assets/brightline_logo_white.png \
         unpackaged/post_hvac_docgen/documentTemplates/RLM_HVAC_Proposal_1.dt
+    python scripts/docgen/build_hvac_proposal.py \
+        scripts/docgen/assets/brightline_logo_white.png \
+        unpackaged/post_hvac_docgen/documentTemplates/RLM_HVAC_Replacement_Proposal_1.dt replacement
 
-Tokens must match the RLMHVACProposalTransform output and the template's tokenList.
+Tokens must match the RLMHVACProposalTransform (or RLMHVACReplacementProposalTransform) output and the
+template's tokenList.
 """
 import sys
 from docx import Document
@@ -24,6 +28,7 @@ TINT = "EEF3F7"
 RULE = "D5DFE8"
 LOGO_WHITE = sys.argv[1]
 OUT = sys.argv[2]
+REPLACEMENT = len(sys.argv) > 3 and sys.argv[3] == "replacement"
 
 doc = Document()
 sec = doc.sections[0]
@@ -81,6 +86,9 @@ def cell_margins(table, top=60, bottom=60, left=100, right=100):
 
 def widths(table, inches):
     table.autofit = False
+    # The DocGen renderer sizes columns from the table grid, not the cell widths.
+    for col, w in zip(table._tbl.tblGrid.findall(qn("w:gridCol")), inches):
+        col.set(qn("w:w"), str(int(w * 1440)))
     for row in table.rows:
         for cell, w in zip(row.cells, inches):
             cell.width = Inches(w)
@@ -144,7 +152,8 @@ for c in ht.rows[0].cells:
     c.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
 ht.cell(0, 0).paragraphs[0].add_run().add_picture(LOGO_WHITE, width=Inches(1.9))
 rc = ht.cell(0, 1)
-cell_text(rc, "Home Comfort Proposal", 14, True, "FFFFFF", WD_ALIGN_PARAGRAPH.RIGHT)
+cell_text(rc, "System Replacement Proposal" if REPLACEMENT else "Home Comfort Proposal", 14, True, "FFFFFF",
+          WD_ALIGN_PARAGRAPH.RIGHT)
 p = rc.add_paragraph()
 p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
 run(p, "Proposal {{QuoteNumber}}   |   Prepared {{CreatedDate}}", 8.5, False, "FFFFFF")
@@ -189,8 +198,9 @@ for i, lines in enumerate(blocks):
 
 # ---------- system check findings ----------
 section_title("What We Found on Your System")
-para(doc, "Your technician checked each piece of equipment. These findings are why we recommend the agreement below; "
-     "you can review the photos and readings with your technician before you sign.", 8.5, color=GREY, after=6)
+para(doc, "Your technician checked each piece of equipment. These findings are why we recommend "
+     + ("replacing your system" if REPLACEMENT else "the agreement below")
+     + "; you can review the photos and readings with your technician before you sign.", 8.5, color=GREY, after=6)
 found = doc.add_table(rows=2, cols=4)
 borders(found, RULE, inside_h=True)
 cell_margins(found, 70, 70, 120, 120)
@@ -205,7 +215,7 @@ cell_text(found.cell(1, 2), "{{Urgency}}", 9, True, EMBER)
 cell_text(found.cell(1, 3), "{{Note}}{{/Finding}}", 9, False, GREY)
 
 # ---------- why this plan ----------
-section_title("Why We Recommend This Agreement")
+section_title("Why We Recommend Replacing It" if REPLACEMENT else "Why We Recommend This Agreement")
 why = doc.add_table(rows=1, cols=1)
 borders(why, TINT)
 cell_margins(why, 110, 110, 160, 160)
@@ -214,36 +224,43 @@ shade(why.cell(0, 0), TINT)
 cell_text(why.cell(0, 0), "{{WhyThisPlan}}", 10, False, INK)
 
 # ---------- comfort agreement ----------
-section_title("Your Comfort Agreement")
-para(doc, "A maintenance agreement for every system in your home, priced per system. Billed monthly; cancel any time "
-     "with 30 days' notice.", 8.5, color=GREY, after=6)
-plans = doc.add_table(rows=3, cols=4)
-borders(plans, RULE, inside_h=True)
-cell_margins(plans, 70, 70, 120, 120)
-widths(plans, [2.0, 3.3, 0.9, 1.1])
-for i, h in enumerate(["AGREEMENT", "WHAT'S INCLUDED", "SYSTEMS", "PER MONTH"]):
-    c = plans.cell(0, i)
-    shade(c, INK)
-    cell_text(c, h, 8, True, "FFFFFF", WD_ALIGN_PARAGRAPH.RIGHT if i >= 2 else None)
-cell_text(plans.cell(1, 0), "{{#Plan}}{{Name}}", 10, True, INK)
-cell_text(plans.cell(1, 1), "{{Description}}", 9, False, GREY)
-cell_text(plans.cell(1, 2), "{{Quantity}}", 10, False, INK, WD_ALIGN_PARAGRAPH.RIGHT)
-cell_text(plans.cell(1, 3), "{{MonthlyPrice}}{{/Plan}}", 10, True, INK, WD_ALIGN_PARAGRAPH.RIGHT)
-tot = plans.rows[2].cells
-merged = tot[0].merge(tot[1]).merge(tot[2])
-for c in (merged, tot[3]):
-    shade(c, TINT)
-cell_text(merged, "Monthly agreement total", 10, True, INK)
-cell_text(tot[3], "{{MonthlyTotal}}", 11, True, NAVY, WD_ALIGN_PARAGRAPH.RIGHT)
+if not REPLACEMENT:
+    section_title("Your Comfort Agreement")
+    para(doc, "A maintenance agreement for every system in your home, priced per system. Billed monthly; cancel any time "
+         "with 30 days' notice.", 8.5, color=GREY, after=6)
+    plans = doc.add_table(rows=3, cols=4)
+    borders(plans, RULE, inside_h=True)
+    cell_margins(plans, 70, 70, 120, 120)
+    widths(plans, [2.0, 3.3, 0.9, 1.1])
+    for i, h in enumerate(["AGREEMENT", "WHAT'S INCLUDED", "SYSTEMS", "PER MONTH"]):
+        c = plans.cell(0, i)
+        shade(c, INK)
+        cell_text(c, h, 8, True, "FFFFFF", WD_ALIGN_PARAGRAPH.RIGHT if i >= 2 else None)
+    cell_text(plans.cell(1, 0), "{{#Plan}}{{Name}}", 10, True, INK)
+    cell_text(plans.cell(1, 1), "{{Description}}", 9, False, GREY)
+    cell_text(plans.cell(1, 2), "{{Quantity}}", 10, False, INK, WD_ALIGN_PARAGRAPH.RIGHT)
+    cell_text(plans.cell(1, 3), "{{MonthlyPrice}}{{/Plan}}", 10, True, INK, WD_ALIGN_PARAGRAPH.RIGHT)
+    tot = plans.rows[2].cells
+    merged = tot[0].merge(tot[1]).merge(tot[2])
+    for c in (merged, tot[3]):
+        shade(c, TINT)
+    cell_text(merged, "Monthly agreement total", 10, True, INK)
+    cell_text(tot[3], "{{MonthlyTotal}}", 11, True, NAVY, WD_ALIGN_PARAGRAPH.RIGHT)
 
 # ---------- one-time services ----------
-section_title("Tune-up and Repairs")
-para(doc, "Done at your first visit and billed once the work is complete. Repairs are only done with your approval.", 8.5, color=GREY, after=6)
+if REPLACEMENT:
+    section_title("Your New System")
+    para(doc, "Removal of the old equipment, installation, permit and start-up testing are included. Billed once the "
+         "installation is complete.", 8.5, color=GREY, after=6)
+else:
+    section_title("Tune-up and Repairs")
+    para(doc, "Done at your first visit and billed once the work is complete. Repairs are only done with your approval.",
+         8.5, color=GREY, after=6)
 one = doc.add_table(rows=3, cols=3)
 borders(one, RULE, inside_h=True)
 cell_margins(one, 70, 70, 120, 120)
 widths(one, [2.2, 3.9, 1.2])
-for i, h in enumerate(["SERVICE", "DETAILS", "PRICE"]):
+for i, h in enumerate(["SYSTEM" if REPLACEMENT else "SERVICE", "WHAT'S INCLUDED" if REPLACEMENT else "DETAILS", "PRICE"]):
     c = one.cell(0, i)
     shade(c, INK)
     cell_text(c, h, 8, True, "FFFFFF", WD_ALIGN_PARAGRAPH.RIGHT if i == 2 else None)
@@ -254,7 +271,7 @@ tot = one.rows[2].cells
 merged = tot[0].merge(tot[1])
 for c in (merged, tot[2]):
     shade(c, TINT)
-cell_text(merged, "One-time total", 10, True, INK)
+cell_text(merged, "System total" if REPLACEMENT else "One-time total", 10, True, INK)
 cell_text(tot[2], "{{OneTimeTotal}}", 11, True, NAVY, WD_ALIGN_PARAGRAPH.RIGHT)
 
 # ---------- summary band ----------
@@ -263,9 +280,13 @@ band = doc.add_table(rows=1, cols=3)
 borders(band)
 cell_margins(band, 110, 110, 160, 160)
 widths(band, [2.45, 2.45, 2.4])
-for i, (label, value) in enumerate([("MONTHLY AGREEMENT", "{{MonthlyTotal}} / mo"),
-                                    ("DUE AFTER FIRST VISIT", "{{OneTimeTotal}}"),
-                                    ("FIRST MONTH TOTAL", "{{GrandTotal}}")]):
+if REPLACEMENT:
+    band_values = [("DUE AFTER INSTALLATION", "{{OneTimeTotal}}"), ("INSTALLATION", "One day"),
+                   ("PARTS WARRANTY", "10 years")]
+else:
+    band_values = [("MONTHLY AGREEMENT", "{{MonthlyTotal}} / mo"), ("DUE AFTER FIRST VISIT", "{{OneTimeTotal}}"),
+                   ("FIRST MONTH TOTAL", "{{GrandTotal}}")]
+for i, (label, value) in enumerate(band_values):
     c = band.cell(0, i)
     shade(c, NAVY)
     cell_text(c, label, 7.5, True, "FFFFFF", WD_ALIGN_PARAGRAPH.CENTER)
@@ -275,7 +296,18 @@ for i, (label, value) in enumerate([("MONTHLY AGREEMENT", "{{MonthlyTotal}} / mo
 
 # ---------- visits ----------
 section_title("What Happens Next", before=16)
-steps = [
+replacement_steps = [
+    ("1", "Installation day",
+     "Once you accept, we schedule your installation. A two-person crew removes the old equipment, then installs, "
+     "starts up and tests the new system in one day."),
+    ("2", "Permit and inspection",
+     "We pull the permit with your village and schedule the inspection, so the work is done to code."),
+    ("3", "Old equipment recovered and recycled",
+     "EPA 608 certified technicians recover the refrigerant, and the old equipment is recycled."),
+    ("4", "Warranty and walkthrough",
+     "We register the manufacturer warranty for you and show you how to use the new thermostat before we leave."),
+]
+steps = replacement_steps if REPLACEMENT else [
     ("1", "Initial Tune-up visit",
      "Once you accept, we schedule your first visit automatically. Your technician tunes up each system "
      "and completes any repairs you approved."),
@@ -306,7 +338,8 @@ for r, (num, title, body) in enumerate(steps):
 section_title("Our Promise to You", before=16)
 for line in [
     "EPA 608 certified technicians who arrive in a marked vehicle and uniform.",
-    "Upfront pricing: you approve the price before we start any repair.",
+    "Upfront pricing: the price above is what you pay, unless you approve a change."
+    if REPLACEMENT else "Upfront pricing: you approve the price before we start any repair.",
     "Floors and furnishings protected, and the work area left clean.",
     "If you are not satisfied with a visit, tell us and we will make it right.",
 ]:
@@ -317,6 +350,13 @@ for line in [
 # ---------- terms ----------
 section_title("Service Terms", before=16)
 terms = [
+    "The system price is invoiced once the installation is complete and the system is running.",
+    "Prices in this proposal are valid for 30 days from {{CreatedDate}} and assume the equipment and ductwork captured "
+    "during the system check.",
+    "Ductwork changes, electrical upgrades and code-required work found during installation are quoted separately "
+    "and done only with your approval.",
+    "Manufacturer warranties require registration within 60 days, which we do for you.",
+] if REPLACEMENT else [
     "Agreements renew monthly until cancelled by either party with 30 days' written notice.",
     "Tune-ups and repairs are invoiced after the work is completed. Monthly agreements are billed in advance.",
     "Prices in this proposal are valid for 30 days from {{CreatedDate}} and assume the equipment captured during the system check.",

@@ -155,6 +155,27 @@ private class RLM_HVAC_FieldVisitTest {
     }
 
     @IsTest
+    static void replacementReasonGivesTheAgeTheProblemsAndTheChosenSystem() {
+        WorkOrder wo = systemCheckVisit();
+        Id assessmentId = RLM_HVAC_FieldVisit.startAssessment(wo.Id);
+        insert new List<RLM_HVAC_Finding__c>{
+            new RLM_HVAC_Finding__c(Assessment__c = assessmentId, Equipment__c = 'Outdoor Unit', Component__c = 'Refrigerant',
+                Condition__c = 'Low Charge', Urgency__c = 'Repair Soon', Install_Year__c = Date.today().year() - 18),
+            new RLM_HVAC_Finding__c(Assessment__c = assessmentId, Equipment__c = 'Furnace', Component__c = 'Heat Exchanger',
+                Condition__c = 'Cracked', Urgency__c = 'Safety', Install_Year__c = Date.today().year() - 18),
+            new RLM_HVAC_Finding__c(Assessment__c = assessmentId, Equipment__c = 'Furnace', Component__c = 'Filter',
+                Condition__c = 'Dirty', Urgency__c = 'Monitor')
+        };
+
+        String reason = RLM_HVAC_FieldVisit.replacementReason(assessmentId, 'HVAC-REPL-BETTER');
+
+        Assert.isTrue(reason.startsWith('Your oldest equipment is 18 years old, near the end of its life.'), reason);
+        Assert.isTrue(reason.indexOf('heat exchanger') < reason.indexOf('refrigerant'), 'Safety findings lead: ' + reason);
+        Assert.isFalse(reason.contains('filter'), 'Monitor findings are left out: ' + reason);
+        Assert.isTrue(reason.contains('the better option, a quieter two-stage heat pump'), reason);
+    }
+
+    @IsTest
     static void replacementNeedsASystemCheck() {
         WorkOrder wo = systemCheckVisit();
         try {

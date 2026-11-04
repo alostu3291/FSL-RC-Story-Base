@@ -7,6 +7,7 @@
  */
 public with sharing class RLM_HVAC_FieldVisit {
     public static final String PROPOSAL_TEMPLATE = 'RLM_HVAC_Proposal';
+    public static final String REPLACEMENT_PROPOSAL_TEMPLATE = 'RLM_HVAC_Replacement_Proposal';
 
     public class VisitContext {
         @AuraEnabled public Id workOrderId;
@@ -441,6 +442,8 @@ public with sharing class RLM_HVAC_FieldVisit {
             update new RLM_HVAC_Assessment__c(
                 Id = wo.RLM_HVAC_Assessment__c, Replacement_Quote__c = response.quoteId, Replacement_Sku__c = sku
             );
+            update new Quote(Id = response.quoteId,
+                RLM_HVAC_Plan_Explanation__c = replacementReason(wo.RLM_HVAC_Assessment__c, sku).abbreviate(2000));
             QuoteResult result = quoteResult(response.quoteId, response.message);
             result.zoneCode = response.zoneCode;
             result.zoneMultiplier = response.zoneMultiplier;
@@ -448,6 +451,36 @@ public with sharing class RLM_HVAC_FieldVisit {
         } catch (Exception e) {
             throw auraError(e);
         }
+    }
+
+    /** Why the replacement: the equipment age, what needs work, and what the chosen system changes. */
+    @TestVisible
+    private static String replacementReason(Id assessmentId, String sku) {
+        RLM_HVAC_Assessment.AssessmentState state = RLM_HVAC_Assessment.getState(assessmentId);
+        List<String> parts = new List<String>();
+        Integer oldest = state.recommendation?.oldestAge;
+        if (oldest != null) {
+            parts.add('Your oldest equipment is ' + oldest + ' years old'
+                + (oldest >= RLM_HVAC_Assessment.REPLACEMENT_AGE ? ', near the end of its life.' : '.'));
+        }
+        List<String> problems = new List<String>();
+        for (RLM_HVAC_Finding__c f : [
+            SELECT Equipment__c, Component__c, Condition__c, Urgency__c, Reading__c FROM RLM_HVAC_Finding__c
+            WHERE Assessment__c = :assessmentId AND Urgency__c IN ('Safety', 'Repair Soon')
+            ORDER BY Urgency__c DESC, CreatedDate
+        ]) {
+            problems.add(RLM_HVAC_Assessment.describe(f));
+        }
+        if (!problems.isEmpty()) {
+            parts.add('We found: ' + String.join(problems, '; ') + '.');
+        }
+        for (List<String> r : REPLACEMENTS) {
+            if (r[0] == sku) {
+                parts.add('Rather than repair it, we recommend replacing it. You chose the ' + r[1].toLowerCase()
+                    + ' option, a ' + r[2].uncapitalize() + ' (' + r[3].split('\\|')[0] + ').');
+            }
+        }
+        return String.join(parts, ' ');
     }
 
     private static Map<String, PricebookEntry> replacementEntries() {
@@ -479,9 +512,10 @@ public with sharing class RLM_HVAC_FieldVisit {
                 ready.title = existing.title;
                 return ready;
             }
+            String templateName = isReplacementQuote(quoteId) ? REPLACEMENT_PROPOSAL_TEMPLATE : PROPOSAL_TEMPLATE;
             List<DocumentTemplate> templates = [
                 SELECT Id FROM DocumentTemplate
-                WHERE Name = :PROPOSAL_TEMPLATE AND IsActive = true
+                WHERE Name = :templateName AND IsActive = true
                 ORDER BY VersionNumber DESC LIMIT 1
             ];
             if (templates.isEmpty()) {
@@ -868,7 +902,12 @@ public with sharing class RLM_HVAC_FieldVisit {
     }
 
     private static String proposalTitle(Id quoteId) {
-        return 'Brightline Proposal ' + [SELECT QuoteNumber FROM Quote WHERE Id = :quoteId].QuoteNumber;
+        return (isReplacementQuote(quoteId) ? 'Brightline Replacement Proposal ' : 'Brightline Proposal ')
+            + [SELECT QuoteNumber FROM Quote WHERE Id = :quoteId].QuoteNumber;
+    }
+
+    private static Boolean isReplacementQuote(Id quoteId) {
+        return [SELECT COUNT() FROM RLM_HVAC_Assessment__c WHERE Replacement_Quote__c = :quoteId] > 0;
     }
 
     private static String joinAddress(String street, String city, String state, String postalCode) {

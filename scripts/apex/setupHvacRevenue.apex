@@ -2,7 +2,7 @@
 //  1. Service zones (ZIP / prefix → multiplier) for location pricing
 //  2. Price book entries for HVAC-* products (agreements and add-ons are per system per month)
 //  3. Required Initial Tune-up ProductRelatedComponent on each comfort agreement
-//  4. Initial Tune-up milestone billing policy
+//  4. Milestone billing policies (Initial Tune-up, Replacement Install)
 //  5. Copy billing and tax policies onto HVAC products from a QuantumBit product when present
 
 final Map<String, Decimal> PRICES = new Map<String, Decimal>{
@@ -208,88 +208,106 @@ if (evergreen == null || oneTime == null) {
     }
 }
 
-// --- Milestone billing for the Initial Tune-up ---
-final String POLICY_NAME = 'Initial Tune-up Milestone Billing Policy';
-final String TREATMENT_NAME = 'Initial Tune-up Milestone Billing Treatment';
-final String ITEM_NAME = 'Initial Tune-up Complete';
+// --- Milestone billing: bill when the visit that delivers the product completes ---
+// Each entry: milestone item name => { policy name, treatment name, description, SKUs }
+final Map<String, List<String>> MILESTONES = new Map<String, List<String>>{
+    'Initial Tune-up Complete' => new List<String>{
+        'Initial Tune-up Milestone Billing Policy',
+        'Initial Tune-up Milestone Billing Treatment',
+        'Bill the Initial Tune-up and start the agreement when the first tune-up Work Order completes',
+        'HVAC-TUNEUP'
+    },
+    'Replacement Install Complete' => new List<String>{
+        'Replacement Install Milestone Billing Policy',
+        'Replacement Install Milestone Billing Treatment',
+        'Bill the new system when the Replacement Install Work Order completes',
+        'HVAC-REPL-GOOD,HVAC-REPL-BETTER,HVAC-REPL-BEST'
+    }
+};
 
-List<BillingPolicy> policies = [SELECT Id, Status, DefaultBillingTreatmentId FROM BillingPolicy WHERE Name = :POLICY_NAME LIMIT 1];
-BillingPolicy policy;
-if (policies.isEmpty()) {
-    policy = new BillingPolicy(
-        Name = POLICY_NAME,
-        Status = 'Draft',
-        BillingTreatmentSelection = 'Default',
-        Description = 'Bill the Initial Tune-up and start the agreement when the first tune-up Work Order completes'
-    );
-    insert policy;
-} else {
-    policy = policies[0];
-}
+for (String itemName : MILESTONES.keySet()) {
+    List<String> cfg = MILESTONES.get(itemName);
+    String policyName = cfg[0];
+    String treatmentName = cfg[1];
 
-List<BillingTreatment> treatments = [SELECT Id, Status FROM BillingTreatment WHERE Name = :TREATMENT_NAME LIMIT 1];
-BillingTreatment treatment;
-if (treatments.isEmpty()) {
-    treatment = new BillingTreatment(
-        Name = TREATMENT_NAME,
-        BillingPolicyId = policy.Id,
-        IsMilestoneBilling = true,
-        ExcludeFromBilling = 'No',
-        CanChangeBillingFrequency = false,
-        Status = 'Draft'
-    );
-    insert treatment;
-} else {
-    treatment = treatments[0];
-}
+    List<BillingPolicy> policies = [SELECT Id, Status, DefaultBillingTreatmentId FROM BillingPolicy WHERE Name = :policyName LIMIT 1];
+    BillingPolicy policy;
+    if (policies.isEmpty()) {
+        policy = new BillingPolicy(
+            Name = policyName,
+            Status = 'Draft',
+            BillingTreatmentSelection = 'Default',
+            Description = cfg[2]
+        );
+        insert policy;
+    } else {
+        policy = policies[0];
+    }
 
-List<BillingTreatmentItem> items = [
-    SELECT Id, Status FROM BillingTreatmentItem
-    WHERE BillingTreatmentId = :treatment.Id AND Name = :ITEM_NAME LIMIT 1
-];
-BillingTreatmentItem item;
-if (items.isEmpty()) {
-    item = new BillingTreatmentItem(
-        Name = ITEM_NAME,
-        BillingTreatmentId = treatment.Id,
-        Type = 'Percentage',
-        Percentage = 100,
-        MilestoneType = 'Event',
-        BillingType = 'None',
-        Controller = 'None',
-        Handling0Amount = 'None',
-        Sequencing = 'None',
-        ProcessingOrder = 1,
-        Status = 'Draft',
-        Description = 'Bill 100% when the Initial Tune-up Work Order is completed'
-    );
-    insert item;
-} else {
-    item = items[0];
-}
+    List<BillingTreatment> treatments = [SELECT Id, Status FROM BillingTreatment WHERE Name = :treatmentName LIMIT 1];
+    BillingTreatment treatment;
+    if (treatments.isEmpty()) {
+        treatment = new BillingTreatment(
+            Name = treatmentName,
+            BillingPolicyId = policy.Id,
+            IsMilestoneBilling = true,
+            ExcludeFromBilling = 'No',
+            CanChangeBillingFrequency = false,
+            Status = 'Draft'
+        );
+        insert treatment;
+    } else {
+        treatment = treatments[0];
+    }
 
-if (item.Status != 'Active') {
-    item.Status = 'Active';
-    update item;
-}
-if (treatment.Status != 'Active') {
-    treatment.Status = 'Active';
-    update treatment;
-}
-if (policy.DefaultBillingTreatmentId != treatment.Id || policy.Status != 'Active') {
-    policy.DefaultBillingTreatmentId = treatment.Id;
-    policy.Status = 'Active';
-    update policy;
-}
+    List<BillingTreatmentItem> items = [
+        SELECT Id, Status FROM BillingTreatmentItem
+        WHERE BillingTreatmentId = :treatment.Id AND Name = :itemName LIMIT 1
+    ];
+    BillingTreatmentItem item;
+    if (items.isEmpty()) {
+        item = new BillingTreatmentItem(
+            Name = itemName,
+            BillingTreatmentId = treatment.Id,
+            Type = 'Percentage',
+            Percentage = 100,
+            MilestoneType = 'Event',
+            BillingType = 'None',
+            Controller = 'None',
+            Handling0Amount = 'None',
+            Sequencing = 'None',
+            ProcessingOrder = 1,
+            Status = 'Draft',
+            Description = 'Bill 100% when the ' + itemName.removeEnd(' Complete') + ' Work Order is completed'
+        );
+        insert item;
+    } else {
+        item = items[0];
+    }
 
-List<Product2> initialProducts = [
-    SELECT Id, BillingPolicyId FROM Product2
-    WHERE StockKeepingUnit = 'HVAC-TUNEUP' AND BillingPolicyId != :policy.Id
-];
-for (Product2 p : initialProducts) {
-    p.BillingPolicyId = policy.Id;
+    if (item.Status != 'Active') {
+        item.Status = 'Active';
+        update item;
+    }
+    if (treatment.Status != 'Active') {
+        treatment.Status = 'Active';
+        update treatment;
+    }
+    if (policy.DefaultBillingTreatmentId != treatment.Id || policy.Status != 'Active') {
+        policy.DefaultBillingTreatmentId = treatment.Id;
+        policy.Status = 'Active';
+        update policy;
+    }
+
+    List<Product2> milestoneProducts = [
+        SELECT Id, BillingPolicyId FROM Product2
+        WHERE StockKeepingUnit IN :cfg[3].split(',') AND BillingPolicyId != :policy.Id
+    ];
+    for (Product2 p : milestoneProducts) {
+        p.BillingPolicyId = policy.Id;
+    }
+    update milestoneProducts;
 }
-update initialProducts;
 
 // Copy tax / billing policy from a known-good product onto all HVAC catalog products
 List<Product2> template = [

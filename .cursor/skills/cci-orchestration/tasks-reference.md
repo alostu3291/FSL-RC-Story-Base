@@ -1434,7 +1434,7 @@
 
 ### `deploy_post_hvac_docgen`
 
-**Description:** Deploy Brightline-branded DocGen templates (RLM_HVAC_Proposal for quotes, with system check findings and per-system agreement pricing; RLM_HVAC_Invoice for invoices) and the RLMHVACProposalExtract/Transform data mappings. Requires prepare_docgen plus the Quote total roll-ups and assessment objects from deploy_post_hvac. Rebuild with scripts/docgen/build_hvac_proposal.py, build_hvac_proposal_odts.py and build_hvac_invoice.py.
+**Description:** Deploy Brightline-branded DocGen templates (RLM_HVAC_Proposal for quotes, with system check findings and per-system agreement pricing; RLM_HVAC_Replacement_Proposal for Good / Better / Best system replacement quotes; RLM_HVAC_Invoice for invoices) and the RLMHVACProposalExtract/Transform and RLMHVACReplacementProposalExtract/Transform data mappings. Requires prepare_docgen plus the Quote total roll-ups and assessment objects from deploy_post_hvac. Rebuild with scripts/docgen/build_hvac_proposal.py, build_hvac_proposal_odts.py and build_hvac_invoice.py.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -2722,7 +2722,7 @@
 
 ### `setup_hvac_revenue`
 
-**Description:** Idempotently seed Brightline service zones, price book entries, Initial Tune-up milestone billing, agreement entitlement template, and Maintenance Plan defaults. Runs after the HVAC catalog load.
+**Description:** Idempotently seed Brightline service zones, price book entries, Initial Tune-up and Replacement Install milestone billing, agreement entitlement template, and Maintenance Plan defaults. Runs after the HVAC catalog load.
 
 **Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
 

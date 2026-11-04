@@ -1,4 +1,5 @@
-"""Generate the Brightline HVAC proposal OmniDataTransforms (extract + pass-through transform).
+"""Generate the Brightline HVAC proposal OmniDataTransforms (extract + pass-through transform) for the
+agreement proposal and the system replacement proposal.
 
 Usage:
     python scripts/docgen/build_hvac_proposal_odts.py unpackaged/post_hvac_docgen/omniDataTransforms
@@ -108,8 +109,36 @@ SAMPLE_OUTPUT = {
     ],
 }
 
+REPLACEMENT_SAMPLE = {
+    **{k: v for k, v in SAMPLE_OUTPUT.items() if k not in ("Plan", "OneTime", "Finding")},
+    "MonthlyTotal": "$0.00",
+    "OneTimeTotal": "$11,500.00",
+    "GrandTotal": "$11,500.00",
+    "WhyThisPlan": "The oldest equipment is 18 years old, near the end of its life. We found a cracked furnace heat exchanger "
+                   "and an AC low on R-22 refrigerant, which is no longer made.",
+    "Plan": [],
+    "OneTime": [
+        {"Name": "Comfort Plus System", "Description": "Better: 16 SEER2 two-stage heat pump with 96% furnace backup, installed.",
+         "Quantity": 1, "Price": "$11,500.00"},
+    ],
+    "Finding": [
+        {"Equipment": "Furnace", "Observation": "Heat Exchanger \u2013 Cracked", "Urgency": "Safety",
+         "Note": "The heat exchanger has a crack, which can let carbon monoxide into the home."},
+    ],
+}
+
+# (extract, transform, field that holds the finding's quote Id, key namespace, target file, sample)
+VARIANTS = [
+    (EXTRACT, TRANSFORM, "Quote_Id__c", "rlm-hvac-proposal", "Brightline_Proposal(Version 1)", SAMPLE_OUTPUT),
+    ("RLMHVACReplacementProposalExtract", "RLMHVACReplacementProposalTransform", "Replacement_Quote_Id__c",
+     "rlm-hvac-replacement-proposal", "Brightline_Replacement_Proposal(Version 1)", REPLACEMENT_SAMPLE),
+]
+
+NAMESPACE = "rlm-hvac-proposal"
+
+
 def key(name):
-    return str(uuid.uuid5(uuid.NAMESPACE_URL, f"rlm-hvac-proposal/{name}"))
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, f"{NAMESPACE}/{name}"))
 
 
 def item(name, fields):
@@ -167,10 +196,12 @@ def doc(name, dtype, items, preview, expected=None, target=None):
     return head + "\n".join(items) + "\n" + tail
 
 
-def build_extract():
+def build_extract(extract, finding_field):
     items = []
     for seq, obj, field, op, value, out in QUERIES:
-        f = common(EXTRACT, key(f"q/{seq}/{field}/{op}"))
+        if obj == "RLM_HVAC_Finding__c":
+            field = finding_field
+        f = common(extract, key(f"q/{seq}/{field}/{op}"))
         f.update({
             "filterOperator": op,
             "filterValue": value,
@@ -181,9 +212,9 @@ def build_extract():
             "outputFieldName": out,
             "outputObjectName": "json",
         })
-        items.append(item(EXTRACT, f))
+        items.append(item(extract, f))
     for src, out, fmt in MAPPINGS:
-        f = common(EXTRACT, key(f"m/{out}"))
+        f = common(extract, key(f"m/{out}"))
         f.update({
             "inputFieldName": src,
             "inputObjectQuerySequence": "0.0",
@@ -195,14 +226,14 @@ def build_extract():
         })
         if out in DEFAULTS:
             f["defaultValue"] = DEFAULTS[out]
-        items.append(item(EXTRACT, f))
-    return doc(EXTRACT, "Extract", items, {"Id": "0Q0Ka000000EXAMPLE"})
+        items.append(item(extract, f))
+    return doc(extract, "Extract", items, {"Id": "0Q0Ka000000EXAMPLE"})
 
 
-def build_transform():
+def build_transform(transform, target, sample):
     items = []
     for _, out, _ in MAPPINGS:
-        f = common(TRANSFORM, key(f"t/{out}"))
+        f = common(transform, key(f"t/{out}"))
         f.update({
             "inputFieldName": out,
             "inputObjectQuerySequence": "0.0",
@@ -211,13 +242,13 @@ def build_transform():
             "outputObjectName": "json",
             "transformValuesMappings": "{ }",
         })
-        items.append(item(TRANSFORM, f))
-    return doc(TRANSFORM, "Transform", items, SAMPLE_OUTPUT, expected=SAMPLE_OUTPUT,
-               target="Brightline_Proposal(Version 1)")
+        items.append(item(transform, f))
+    return doc(transform, "Transform", items, sample, expected=sample, target=target)
 
 
 os.makedirs(OUT, exist_ok=True)
-for name, body in [(EXTRACT, build_extract()), (TRANSFORM, build_transform())]:
-    with open(os.path.join(OUT, f"{name}_1.rpt-meta.xml"), "w", encoding="utf-8") as fh:
-        fh.write(body)
+for extract, transform, finding_field, NAMESPACE, target, sample in VARIANTS:
+    for name, body in [(extract, build_extract(extract, finding_field)), (transform, build_transform(transform, target, sample))]:
+        with open(os.path.join(OUT, f"{name}_1.rpt-meta.xml"), "w", encoding="utf-8") as fh:
+            fh.write(body)
 print("wrote", OUT)
