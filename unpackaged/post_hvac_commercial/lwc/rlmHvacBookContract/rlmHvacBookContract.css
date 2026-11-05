@@ -1,0 +1,73 @@
+:host {
+    display: block;
+    position: relative;
+}
+
+.eyebrow {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5c6b7a;
+}
+
+.intro {
+    margin-bottom: 0.75rem;
+    color: #3e4c59;
+}
+
+.notice {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 0.25rem;
+}
+
+.notice.warn {
+    background: #fff4e0;
+    color: #7a4a00;
+}
+
+.steps {
+    border-top: 1px solid #e5e9ed;
+}
+
+.step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.625rem 0.25rem;
+    border-bottom: 1px solid #e5e9ed;
+    color: #5c6b7a;
+}
+
+.step.done {
+    color: #16222e;
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-weight: 600;
+}
+
+.detail {
+    font-size: 0.8125rem;
+    color: #5c6b7a;
+}
+
+.hint {
+    margin-top: 0.75rem;
+    color: #5c6b7a;
+}
+
+.error {
+    margin-top: 0.75rem;
+    color: #b3261e;
+}
+
+.gap {
+    margin-left: 0.5rem;
+}

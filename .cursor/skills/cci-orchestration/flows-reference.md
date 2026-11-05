@@ -375,11 +375,12 @@ Deploy Brightline Home Comfort residential HVAC demo: comfort agreement catalog,
 
 ### `prepare_hvac_commercial`
 
-Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and rooftop unit fields, the commercial catalog and prices, and the Lakeshore Property Group fixture (HQ, six sites with Locations, 42 rooftop units). Requires hvac=true.
+Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and rooftop unit fields, the contract quote, order and site coverage, the commercial catalog, prices and work type, and the Lakeshore Property Group fixture (HQ, six sites with Locations, 42 rooftop units). Requires hvac=true.
 
 **Steps:**
 
 2.5. **task** `apply_context_hvac_commercial_site`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+3.5. **task** `insert_hvac_com_fsl_data`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__fsl`
 1. **task** `deploy_post_hvac_commercial`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
 2. **task** `assign_permission_sets`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
    - `api_names`: `['RLM_Brightline_HVAC_Commercial']`

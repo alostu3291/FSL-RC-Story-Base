@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**259 tasks** across **9 groups**.
+**260 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*175 task(s)*
+*176 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1449,7 +1449,7 @@
 
 ### `deploy_post_hvac_commercial`
 
-**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
+**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase), the PO Number on Quote, contract booking (RLM_HVAC_ContractOrder activates the order with the PO, accounts payable as bill-to and the facility director as ship-to, after any required approval), site coverage (RLM_HVAC_CommercialCoverage, from RLM_HVAC_CommercialAssetTrigger, stamps each contract asset's site from its order product, then gives each site a response Entitlement on the Brightline Comfort Response process and a Maintenance Plan at its Location with a quarterly rule per rooftop unit; RLM_HVAC_CommercialWorkOrderTrigger fills the generated visits' address, Location, territory and contact) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1457,7 +1457,7 @@
 
 - `path`: `unpackaged/post_hvac_commercial`
 - `test_level`: `RunSpecifiedTests`
-- `specified_tests`: `RLM_HVAC_ContractQuoteTest`
+- `specified_tests`: `RLM_HVAC_ContractQuoteTest,RLM_HVAC_CommercialCoverageTest`
 
 ---
 
@@ -1974,6 +1974,18 @@
 **Options:**
 
 - `pathtoexportjson`: `datasets/sfdmu/qb/en-US/qb-clm`
+
+---
+
+### `insert_hvac_com_fsl_data`
+
+**Description:** Insert the Brightline Commercial work type (Commercial RTU Maintenance, the quarterly site visit with a line per rooftop unit that each site's maintenance plan generates). Requires insert_hvac_fsl_data.
+
+**Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-com-fsl`
 
 ---
 

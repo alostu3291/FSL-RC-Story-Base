@@ -92,6 +92,20 @@ public with sharing class RLM_HVAC_Coverage {
             'Water Heater', 'Medium', 24)
     };
 
+    /**
+     * Brightline Commercial site response coverage (RLM_HVAC_CommercialCoverage gives each site an
+     * entitlement on it): call Priority and response hours, like an agreement tier.
+     */
+    @TestVisible
+    private static final Map<String, Cadence> SITE_RESPONSE = new Map<String, Cadence>{
+        'HVAC-COM-RESP-4H' => new Cadence(SERVICE_CALL, null, null, null, HEATING_COOLING, 'Critical', 4),
+        'HVAC-COM-RESP-NBD' => new Cadence(SERVICE_CALL, null, null, null, HEATING_COOLING, 'Medium', 24)
+    };
+
+    private static Cadence responseTier(String sku) {
+        return CADENCES.containsKey(sku) ? CADENCES.get(sku) : SITE_RESPONSE.get(sku);
+    }
+
     /** The systems a reported issue is about. A call is covered when an entitlement covers any of them. */
     @TestVisible
     private static final Map<String, Set<String>> SYSTEMS_FOR_ISSUE = new Map<String, Set<String>>{
@@ -824,7 +838,7 @@ public with sharing class RLM_HVAC_Coverage {
             if (match != null && wo.AssetId == null) {
                 wo.AssetId = match.AssetId;
             }
-            Cadence tier = match == null ? null : CADENCES.get(match.Asset?.Product2?.StockKeepingUnit);
+            Cadence tier = match == null ? null : responseTier(match.Asset?.Product2?.StockKeepingUnit);
             if (tier != null) {
                 wo.Priority = tier.priority;
             }
@@ -848,7 +862,7 @@ public with sharing class RLM_HVAC_Coverage {
             if (covered.isEmpty()) {
                 continue;
             }
-            Cadence c = CADENCES.get(e.Asset?.Product2?.StockKeepingUnit);
+            Cadence c = responseTier(e.Asset?.Product2?.StockKeepingUnit);
             Integer hours = c == null ? 24 : c.responseHours;
             if (best == null || hours < bestHours) {
                 best = e;

@@ -1,0 +1,54 @@
+<template>
+    <lightning-quick-action-panel header="Book contract">
+        <template lwc:if={status}>
+            <p class="eyebrow">{status.quoteName}</p>
+            <template lwc:if={booked}>
+                <ul class="steps">
+                    <template for:each={steps} for:item="step">
+                        <li key={step.key} class={step.cls}>
+                            <lightning-icon icon-name={step.icon} variant={step.variant} size="x-small"></lightning-icon>
+                            <span class="text">
+                                <span class="label">{step.label}</span>
+                                <span class="detail">{step.detail}</span>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+                <template lwc:if={settingUp}>
+                    <p class="hint">Setting up coverage for each site. This takes a minute or two.</p>
+                </template>
+            </template>
+            <template lwc:else>
+                <template lwc:if={status.awaitingApproval}>
+                    <p class="notice warn">The discount on this quote needs approval before the contract can be booked.</p>
+                </template>
+                <p class="intro">
+                    Books the order on the property group, billed monthly on Net 30 to accounts payable. Each site
+                    then gets its response coverage and a quarterly maintenance plan for its rooftop units.
+                </p>
+                <lightning-input label="Customer PO number" value={poNumber} max-length="40" required
+                    onchange={changePo}></lightning-input>
+            </template>
+        </template>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Booking" size="small"></lightning-spinner>
+        </template>
+
+        <div slot="footer">
+            <template lwc:if={booked}>
+                <lightning-button label="Close" onclick={close}></lightning-button>
+                <template lwc:if={status.orderId}>
+                    <lightning-button variant="brand" class="gap" label="Open order" onclick={openOrder}></lightning-button>
+                </template>
+            </template>
+            <template lwc:else>
+                <lightning-button label="Cancel" onclick={close}></lightning-button>
+                <lightning-button variant="brand" class="gap" label="Book contract" disabled={bookDisabled}
+                    onclick={book}></lightning-button>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

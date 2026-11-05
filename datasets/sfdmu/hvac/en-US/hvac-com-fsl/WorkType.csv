@@ -1,0 +1,2 @@
+Description,DurationType,EstimatedDuration,Name,ShouldAutoCreateSvcAppt
+"Quarterly preventive maintenance at a commercial site: one visit with a line per rooftop unit (filters, belts, coils, refrigerant check)",Hours,4,Commercial RTU Maintenance,false

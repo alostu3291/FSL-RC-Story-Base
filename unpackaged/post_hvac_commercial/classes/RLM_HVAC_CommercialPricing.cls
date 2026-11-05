@@ -50,6 +50,11 @@ public with sharing class RLM_HVAC_CommercialPricing {
         return sku == RESPONSE_PRIORITY_SKU ? 4 : 24;
     }
 
+    /** True for a site response coverage SKU (4-hour or next business day). */
+    public static Boolean isResponse(String sku) {
+        return sku != null && sku.startsWith('HVAC-COM-RESP-');
+    }
+
     public static Boolean needsApproval(Decimal discountPercent) {
         return discountPercent != null && discountPercent >= APPROVAL_DISCOUNT;
     }

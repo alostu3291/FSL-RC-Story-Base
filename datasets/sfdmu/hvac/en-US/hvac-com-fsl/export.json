@@ -1,0 +1,17 @@
+{
+  "apiVersion": "66.0",
+  "excludeIdsFromCSVFiles": "true",
+  "objectSets": [
+    {
+      "objects": [
+        {
+          "query": "SELECT Name, Description, EstimatedDuration, DurationType, ShouldAutoCreateSvcAppt FROM WorkType WHERE Name = 'Commercial RTU Maintenance' ORDER BY Name ASC",
+          "operation": "Upsert",
+          "externalId": "Name",
+          "excluded": false
+        }
+      ]
+    }
+  ],
+  "orgs": []
+}

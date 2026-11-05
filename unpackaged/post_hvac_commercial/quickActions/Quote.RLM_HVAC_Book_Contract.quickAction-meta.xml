@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Book a signed Brightline Commercial contract: record the customer's PO number, place and activate the order, and follow each site's response coverage and maintenance plan as they are set up.</description>
+    <label>Book Contract</label>
+    <lightningWebComponent>rlmHvacBookContract</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

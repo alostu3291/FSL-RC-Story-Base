@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_PO_Number__c</fullName>
+    <description>The customer's purchase order number for a Commercial HVAC contract; copied to Order.PoNumber when the contract is booked.</description>
+    <label>PO Number</label>
+    <length>40</length>
+    <required>false</required>
+    <type>Text</type>
+</CustomField>
