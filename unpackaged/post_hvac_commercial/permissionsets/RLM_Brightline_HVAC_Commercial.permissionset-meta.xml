@@ -4,6 +4,10 @@
     <hasActivationRequired>false</hasActivationRequired>
     <label>RLM Brightline HVAC Commercial</label>
     <classAccesses>
+        <apexClass>RLM_HVAC_CapitalProject</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>RLM_HVAC_CommercialPricing</apexClass>
         <enabled>true</enabled>
     </classAccesses>

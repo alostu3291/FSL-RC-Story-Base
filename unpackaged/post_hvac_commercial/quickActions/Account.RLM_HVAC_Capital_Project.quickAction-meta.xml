@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Quote a Brightline Commercial capital project: replace a site's aging rooftop units with a crane lift, billed 40% at booking, 40% at install and 20% at commissioning.</description>
+    <label>Capital Project</label>
+    <lightningWebComponent>rlmHvacCapitalProject</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

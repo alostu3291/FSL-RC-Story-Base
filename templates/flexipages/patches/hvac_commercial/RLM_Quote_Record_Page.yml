@@ -1,8 +1,10 @@
 feature: hvac_commercial
 feature_flag: hvac_commercial
-# Adds Book Contract after Sign & Pay for signed Commercial HVAC contract quotes.
+# Adds Book Contract and Book Project after Sign & Pay for signed Commercial HVAC contract and
+# capital project quotes.
 patches:
   - type: insert_action
     after: "Quote.RLM_HVAC_Sign_and_Pay"
     actions:
       - "Quote.RLM_HVAC_Book_Contract"
+      - "Quote.RLM_HVAC_Book_Project"

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Book a signed Brightline Commercial capital project with the customer's PO: bills the deposit, then follows the milestone invoices and the crane lift, install and commissioning work orders.</description>
+    <label>Book Project</label>
+    <lightningWebComponent>rlmHvacBookProject</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

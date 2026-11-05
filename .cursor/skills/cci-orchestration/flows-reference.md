@@ -381,6 +381,8 @@ Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and roof
 
 2.5. **task** `apply_context_hvac_commercial_site`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
 3.5. **task** `insert_hvac_com_fsl_data`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__fsl`
+3.6. **task** `insert_hvac_com_dro_data`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__fsl and project_config.project__custom__dro`
+3.7. **task** `update_product_fulfillment_decomp_rules`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__fsl and project_config.project__custom__dro`
 1. **task** `deploy_post_hvac_commercial`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
 2. **task** `assign_permission_sets`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
    - `api_names`: `['RLM_Brightline_HVAC_Commercial']`

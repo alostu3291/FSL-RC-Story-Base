@@ -1,0 +1,2 @@
+DestinationProduct.StockKeepingUnit,Name,Priority,SourceProduct.StockKeepingUnit,SourceProductClassification.Name
+HVAC-COM-DRO-PROJECT,RTU Replacement to Capital Project,,HVAC-COM-RTU-REPL,

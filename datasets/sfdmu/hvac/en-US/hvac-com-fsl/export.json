@@ -5,7 +5,7 @@
     {
       "objects": [
         {
-          "query": "SELECT Name, Description, EstimatedDuration, DurationType, ShouldAutoCreateSvcAppt FROM WorkType WHERE Name = 'Commercial RTU Maintenance' ORDER BY Name ASC",
+          "query": "SELECT Name, Description, EstimatedDuration, DurationType, ShouldAutoCreateSvcAppt FROM WorkType WHERE Name IN ('Commercial RTU Maintenance', 'Commercial Crane Lift', 'Commercial RTU Replacement', 'Commercial RTU Commissioning') ORDER BY Name ASC",
           "operation": "Upsert",
           "externalId": "Name",
           "excluded": false

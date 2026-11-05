@@ -1,0 +1,7 @@
+AssignedTo.Name,CustomBaseExecutionDate,CustomFulfillmentScope,DelayOf,DelayUnit,ExecuteOn,FlowDefinitionName,ForcePlanFreezeDuringExecution,IsSkipBranch,Name,OmniscriptName,PointOfNoReturn,Scope,StepDefinitionGroup.Name,StepType,TaskAllocationType,UsageType
+__DRO_ASSIGNED_TO_USER__,,,,,,RLM_HVAC_Create_Crane_Work_Order,Never,false,Create Crane Lift Work Order,,,Plan,Capital Project,AutoTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,,Never,false,Crane Lift Complete,,,Plan,Capital Project,ManualTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,RLM_HVAC_Create_Project_Install_Work_Order,Never,false,Create Rooftop Install Work Order,,,Plan,Capital Project,AutoTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,,Never,false,Rooftop Install Complete,,,Plan,Capital Project,ManualTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,RLM_HVAC_Create_Commissioning_Work_Order,Never,false,Create Commissioning Work Order,,,Plan,Capital Project,AutoTask,,Fulfillment
+__DRO_ASSIGNED_TO_USER__,,,,,,,Never,false,Commissioning Complete,,,Plan,Capital Project,ManualTask,,Fulfillment

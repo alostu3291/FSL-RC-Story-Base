@@ -1,0 +1,84 @@
+<template>
+    <lightning-quick-action-panel header="Book project">
+        <template lwc:if={status}>
+            <p class="eyebrow">{status.quoteName}</p>
+            <template lwc:if={notProject}>
+                <p class="notice warn">This quote has no rooftop unit replacement. Book contract quotes with Book Contract.</p>
+            </template>
+            <template lwc:elseif={booked}>
+                <p class="order">{orderText}</p>
+                <p class="section">Billing</p>
+                <ul class="rows">
+                    <template for:each={milestones} for:item="m">
+                        <li key={m.key} class={m.cls}>
+                            <lightning-icon icon-name={m.icon} variant={m.variant} size="x-small"></lightning-icon>
+                            <span class="label">{m.label}</span>
+                            <span class="invoice">{m.invoice}</span>
+                            <span class="num">
+                                <lightning-formatted-number value={m.amount} format-style="currency" currency-code="USD"
+                                    maximum-fraction-digits="0"></lightning-formatted-number>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+                <p class="invoiced">{invoicedText}</p>
+                <p class="section">Fulfillment</p>
+                <ul class="rows">
+                    <template for:each={steps} for:item="st">
+                        <li key={st.key} class={st.cls}>
+                            <lightning-icon icon-name={st.icon} variant={st.variant} size="x-small"></lightning-icon>
+                            <span class="text">
+                                <template lwc:if={st.workOrderId}>
+                                    <a class="label" data-id={st.workOrderId} onclick={openWorkOrder}>{st.label}</a>
+                                </template>
+                                <template lwc:else>
+                                    <span class="label">{st.label}</span>
+                                </template>
+                                <span class="detail">{st.detail}</span>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+                <template lwc:if={settingUp}>
+                    <p class="hint">Billing the deposit and creating the crane lift work order. This takes a minute or two.</p>
+                </template>
+            </template>
+            <template lwc:else>
+                <p class="intro">{introText}</p>
+                <ul class="rows">
+                    <template for:each={milestones} for:item="m">
+                        <li key={m.key} class="row">
+                            <span class="label">{m.label}</span>
+                            <span class="num">
+                                <lightning-formatted-number value={m.amount} format-style="currency" currency-code="USD"
+                                    maximum-fraction-digits="0"></lightning-formatted-number>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+                <lightning-input class="po" label="Customer PO number" value={poNumber} max-length="40" required
+                    onchange={changePo}></lightning-input>
+            </template>
+        </template>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Booking" size="small"></lightning-spinner>
+        </template>
+
+        <div slot="footer">
+            <template lwc:if={canBook}>
+                <lightning-button label="Cancel" onclick={close}></lightning-button>
+                <lightning-button variant="brand" class="gap" label="Book project" disabled={bookDisabled}
+                    onclick={bookProject}></lightning-button>
+            </template>
+            <template lwc:else>
+                <lightning-button label="Close" onclick={close}></lightning-button>
+                <template lwc:if={hasOrder}>
+                    <lightning-button variant="brand" class="gap" label="Open order" onclick={openOrder}></lightning-button>
+                </template>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

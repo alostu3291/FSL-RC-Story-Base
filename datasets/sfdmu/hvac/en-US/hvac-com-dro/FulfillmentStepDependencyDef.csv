@@ -1,0 +1,6 @@
+DependencyScope,DependsOnStepDefinition.Name,FulfillmentStepDefinition.Name,IsCompensateInReverse,Name,PropagateStateToDependentStep
+Plan,Create Crane Lift Work Order,Crane Lift Complete,false,Create Crane WO to Crane Complete,
+Plan,Crane Lift Complete,Create Rooftop Install Work Order,false,Crane Complete to Create Install WO,
+Plan,Create Rooftop Install Work Order,Rooftop Install Complete,false,Create Install WO to Install Complete,
+Plan,Rooftop Install Complete,Create Commissioning Work Order,false,Install Complete to Create Commissioning WO,
+Plan,Create Commissioning Work Order,Commissioning Complete,false,Create Commissioning WO to Commissioning Complete,

@@ -39,6 +39,9 @@ public with sharing class RLM_HVAC_ContractOrder {
     public static Status placeOrder(Id quoteId, String poNumber) {
         try {
             Status current = statusFor(quoteId, false);
+            if (RLM_HVAC_CapitalProject.isProject(quoteId)) {
+                throw new ContractException('This is a capital project quote; book it with Book Project so the deposit is billed.');
+            }
             if (current.awaitingApproval) {
                 throw new ContractException('The discount on ' + current.quoteName + ' needs approval before the order can be placed.');
             }

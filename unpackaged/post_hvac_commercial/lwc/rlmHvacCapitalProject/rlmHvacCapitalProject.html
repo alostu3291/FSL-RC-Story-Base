@@ -1,0 +1,93 @@
+<template>
+    <lightning-quick-action-panel header="Capital project">
+        <template lwc:if={proposal}>
+            <p class="eyebrow">{proposal.groupName}</p>
+            <lightning-combobox class="site" label="Site" value={proposal.siteId} options={siteOptions}
+                onchange={changeSite}></lightning-combobox>
+            <template lwc:if={quoteId}>
+                <p class="notice ok">
+                    The project quote is ready. Send it for signature, then book it with the customer's PO to bill the deposit.
+                </p>
+            </template>
+            <template lwc:elseif={proposal.openQuoteId}>
+                <p class="notice">Project quote {proposal.openQuoteName} is already open for this site.</p>
+            </template>
+            <template lwc:elseif={hasUnits}>
+                <p class="intro">{introText}</p>
+            </template>
+            <template lwc:if={hasUnits}>
+                <ul class="units">
+                    <template for:each={units} for:item="u">
+                        <li key={u.key} class={u.cls}>
+                            <lightning-input type="checkbox" label={u.tag} checked={u.checked} disabled={u.disabled}
+                                data-id={u.assetId} onchange={toggle}></lightning-input>
+                            <span class="text">
+                                <span class="detail">{u.detail}</span>
+                                <span class="reason">{u.reason}</span>
+                            </span>
+                        </li>
+                    </template>
+                </ul>
+                <table class="price">
+                    <tbody>
+                        <tr>
+                            <td>{unitsText}</td>
+                            <td class="num">
+                                <lightning-formatted-number value={unitsTotal} format-style="currency" currency-code="USD"
+                                    maximum-fraction-digits="0"></lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Crane lift, install day</td>
+                            <td class="num">
+                                <lightning-formatted-number value={proposal.cranePrice} format-style="currency"
+                                    currency-code="USD" maximum-fraction-digits="0"></lightning-formatted-number>
+                            </td>
+                        </tr>
+                        <tr class="total">
+                            <th scope="row">Project</th>
+                            <td class="num">
+                                <lightning-formatted-number value={total} format-style="currency" currency-code="USD"
+                                    maximum-fraction-digits="0"></lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="section">Billing</p>
+                <table class="price">
+                    <tbody>
+                        <template for:each={milestones} for:item="m">
+                            <tr key={m.key}>
+                                <td>{m.label}</td>
+                                <td class="num">
+                                    <lightning-formatted-number value={m.value} format-style="currency" currency-code="USD"
+                                        maximum-fraction-digits="0"></lightning-formatted-number>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </template>
+            <template lwc:else>
+                <p class="notice warn">This site has no rooftop units on record.</p>
+            </template>
+        </template>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Working" size="small"></lightning-spinner>
+        </template>
+
+        <div slot="footer">
+            <lightning-button label={closeLabel} onclick={close}></lightning-button>
+            <template lwc:if={hasOpenQuote}>
+                <lightning-button variant="brand" class="gap" label="Open project quote" onclick={openQuote}></lightning-button>
+            </template>
+            <template lwc:else>
+                <lightning-button variant="brand" class="gap" label="Create project quote" disabled={createDisabled}
+                    onclick={create}></lightning-button>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

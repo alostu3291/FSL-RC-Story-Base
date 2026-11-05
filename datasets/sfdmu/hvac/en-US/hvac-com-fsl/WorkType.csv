@@ -1,2 +1,5 @@
 Description,DurationType,EstimatedDuration,Name,ShouldAutoCreateSvcAppt
 "Quarterly preventive maintenance at a commercial site: one visit with a line per rooftop unit (filters, belts, coils, refrigerant check)",Hours,4,Commercial RTU Maintenance,false
+"Capital project install day: crane and rigging lift the new rooftop units onto the roof and the old units off",Hours,4,Commercial Crane Lift,true
+"Capital project install: disconnect and recover the old rooftop units, set the new units on the curbs and connect power, gas and ductwork",Hours,8,Commercial RTU Replacement,true
+"Capital project commissioning: start up each new rooftop unit, record readings and airflow, set controls and hand over to the facility",Hours,3,Commercial RTU Commissioning,true

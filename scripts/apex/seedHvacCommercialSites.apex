@@ -193,6 +193,8 @@ for (String code : UNIT_SPECS.keySet()) {
         a.RLM_HVAC_Refrigerant_Charge__c = Decimal.valueOf(p[3]);
         a.InstallDate = Date.newInstance(Integer.valueOf(p[1]), 5, 1);
         a.Status = 'Installed';
+        // A completed capital project rewrites its units in place; a rerun restores the original equipment.
+        a.Description = null;
         units.add(a);
     }
 }

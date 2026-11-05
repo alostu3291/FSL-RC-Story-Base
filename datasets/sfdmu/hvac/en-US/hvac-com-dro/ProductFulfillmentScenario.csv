@@ -1,0 +1,2 @@
+Action,FulfillmentStepDefnGroup.Name,Name,Product.StockKeepingUnit,Type
+Add;Amend;Renew;No Change;Cancel,Capital Project,Capital Project Fulfillment,HVAC-COM-DRO-PROJECT,

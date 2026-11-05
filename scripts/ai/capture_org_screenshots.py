@@ -56,7 +56,9 @@ def main():
             [args.chrome, "--headless=new", "--disable-gpu", "--no-first-run", "--hide-scrollbars",
              f"--user-data-dir={profile}", f"--window-size={args.window}",
              f"--force-device-scale-factor={args.scale}",
-             f"--virtual-time-budget={args.budget}", f"--screenshot={dest}",
+             # Virtual time can stall on a Lightning page; the hard timeout still takes the screenshot.
+             f"--virtual-time-budget={args.budget}", f"--timeout={int(args.budget) + 30000}",
+             f"--screenshot={dest}",
              login_url(args.target_org, path)],
             capture_output=True, text=True, timeout=240,
         )

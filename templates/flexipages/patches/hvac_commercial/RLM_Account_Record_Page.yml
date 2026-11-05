@@ -1,7 +1,7 @@
 feature: hvac_commercial
 feature_flag: hvac_commercial
 # Adds the contract actions after Check & Quote on the Account highlights panel: Contract Quote for a
-# new contract, Add Site mid-term, and Renew Contract.
+# new contract, Add Site mid-term, Renew Contract, and Capital Project for rooftop unit replacements.
 patches:
   - type: insert_action
     after: "Account.RLM_HVAC_Check_and_Quote"
@@ -9,3 +9,4 @@ patches:
       - "Account.RLM_HVAC_Contract_Quote"
       - "Account.RLM_HVAC_Add_Site"
       - "Account.RLM_HVAC_Renew_Contract"
+      - "Account.RLM_HVAC_Capital_Project"

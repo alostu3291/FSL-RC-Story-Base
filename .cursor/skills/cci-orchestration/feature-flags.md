@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**43 feature flags**, **89 configuration values**, **33 YAML anchors** under `project.custom`.
+**43 feature flags**, **90 configuration values**, **33 YAML anchors** under `project.custom`.
 
 ---
 
@@ -29,13 +29,13 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `constraints_data` | `True` | 5 flow step(s) |
 | `dev_ed` | `False` | 1 flow step(s) |
 | `docgen` | `True` | 16 flow step(s) |
-| `dro` | `True` | 15 flow step(s) |
+| `dro` | `True` | 17 flow step(s) |
 | `einstein` | `True` | 7 flow step(s) |
-| `fsl` | `False` | 23 flow step(s) |
+| `fsl` | `False` | 25 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
-| `hvac` | `False` | 32 flow step(s) |
-| `hvac_commercial` | `False` | 8 flow step(s) |
+| `hvac` | `False` | 34 flow step(s) |
+| `hvac_commercial` | `False` | 10 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -216,6 +216,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac` step 8 → `insert_hvac_dro_fsl_data`
 - `prepare_hvac` step 8.5 → `setup_hvac_dro_steps`
 - `prepare_hvac` step 9 → `update_product_fulfillment_decomp_rules`
+- `prepare_hvac_commercial` step 3.6 → `insert_hvac_com_dro_data`
+- `prepare_hvac_commercial` step 3.7 → `update_product_fulfillment_decomp_rules`
 
 ### `einstein` (default: `True`)
 
@@ -252,6 +254,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac` step 11 → `setup_hvac_grow`
 - `prepare_hvac` step 11.5 → `seed_hvac_prospect_check`
 - `prepare_hvac_commercial` step 3.5 → `insert_hvac_com_fsl_data`
+- `prepare_hvac_commercial` step 3.6 → `insert_hvac_com_dro_data`
+- `prepare_hvac_commercial` step 3.7 → `update_product_fulfillment_decomp_rules`
 
 ### `fsl_managed_package` (default: `False`)
 
@@ -293,6 +297,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac_commercial` step 2.5 → `apply_context_hvac_commercial_site`
 - `prepare_hvac_commercial` step 3 → `insert_hvac_com_pcm_data`
 - `prepare_hvac_commercial` step 3.5 → `insert_hvac_com_fsl_data`
+- `prepare_hvac_commercial` step 3.6 → `insert_hvac_com_dro_data`
+- `prepare_hvac_commercial` step 3.7 → `update_product_fulfillment_decomp_rules`
 - `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
 - `prepare_hvac_commercial` step 5 → `refresh_dt_default_pricing`
 - `prepare_hvac_commercial` step 6 → `seed_hvac_commercial_sites`
@@ -304,6 +310,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac_commercial` step 2.5 → `apply_context_hvac_commercial_site`
 - `prepare_hvac_commercial` step 3 → `insert_hvac_com_pcm_data`
 - `prepare_hvac_commercial` step 3.5 → `insert_hvac_com_fsl_data`
+- `prepare_hvac_commercial` step 3.6 → `insert_hvac_com_dro_data`
+- `prepare_hvac_commercial` step 3.7 → `update_product_fulfillment_decomp_rules`
 - `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
 - `prepare_hvac_commercial` step 5 → `refresh_dt_default_pricing`
 - `prepare_hvac_commercial` step 6 → `seed_hvac_commercial_sites`
@@ -542,6 +550,7 @@ Non-boolean scalar values under `project.custom` used as YAML anchors for contex
 | `fulfillment_asset_context_base_reference` | `FulfillmentAssetContext__stdctx` |
 | `fulfillment_asset_context_default_mapping` | `FulfillAssetEntitiesMapping` |
 | `fulfillment_asset_context_name` | `RLM_FulfillmentAssetContext` |
+| `hvac_com_dro_dataset` | `datasets/sfdmu/hvac/en-US/hvac-com-dro` |
 | `hvac_com_fsl_dataset` | `datasets/sfdmu/hvac/en-US/hvac-com-fsl` |
 | `hvac_com_pcm_dataset` | `datasets/sfdmu/hvac/en-US/hvac-com-pcm` |
 | `hvac_dro_fsl_dataset` | `datasets/sfdmu/hvac/en-US/hvac-dro-fsl` |
