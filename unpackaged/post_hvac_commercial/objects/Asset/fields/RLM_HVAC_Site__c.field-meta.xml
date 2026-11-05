@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Site__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Commercial site this line covers. Same API name on QuoteLineItem, OrderItem and Asset so it follows the line from quote to order to asset.</description>
+    <label>Site</label>
+    <referenceTo>Account</referenceTo>
+    <relationshipLabel>Site Contract Assets</relationshipLabel>
+    <relationshipName>HVAC_Site_Assets</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

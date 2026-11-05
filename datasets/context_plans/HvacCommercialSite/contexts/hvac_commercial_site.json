@@ -1,0 +1,38 @@
+{
+  "planName": "HvacCommercialSite",
+  "developerName": "RLM_SalesTransactionContext",
+  "contextAttributesByName": [
+    {
+      "nodeName": "SalesTransactionItem",
+      "name": "HvacSite__c",
+      "dataType": "STRING",
+      "fieldType": "INPUTOUTPUT"
+    }
+  ],
+  "contextTagsByName": [
+    {
+      "nodeName": "SalesTransactionItem",
+      "attributeName": "HvacSite__c",
+      "name": "HvacSite__c"
+    }
+  ],
+  "mappingRules": [
+    {
+      "mappingName": "QuoteEntitiesMapping",
+      "contextNode": "SalesTransactionItem",
+      "contextAttribute": "HvacSite__c",
+      "mappingType": "SOBJECT",
+      "sObject": "QuoteLineItem",
+      "sObjectField": "RLM_HVAC_Site__c"
+    },
+    {
+      "mappingName": "OrderEntitiesMapping",
+      "contextNode": "SalesTransactionItem",
+      "contextAttribute": "HvacSite__c",
+      "mappingType": "SOBJECT",
+      "sObject": "OrderItem",
+      "sObjectField": "RLM_HVAC_Site__c"
+    }
+  ],
+  "activate": true
+}

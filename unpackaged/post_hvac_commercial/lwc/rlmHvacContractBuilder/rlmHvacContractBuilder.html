@@ -1,0 +1,110 @@
+<template>
+    <lightning-quick-action-panel header="Planned maintenance contract">
+        <template lwc:if={plan}>
+            <div class="head">
+                <div>
+                    <p class="eyebrow">{plan.accountName}</p>
+                    <p class="totals">
+                        <span class="big">{monthlyLabel}</span><span class="unit"> / month</span>
+                        <span class="annual">{annualLabel} a year · {plan.sites.length} sites · {plan.unitCount} units · {plan.tons} tons</span>
+                    </p>
+                    <p class="term">{termLabel}</p>
+                    <template lwc:if={plan.contactName}>
+                        <p class="term">Signer: {plan.contactName}</p>
+                    </template>
+                </div>
+                <div class="controls">
+                    <lightning-input type="toggle" label="Filter program" checked={filterProgram}
+                        message-toggle-active="Included" message-toggle-inactive="Not included"
+                        onchange={changeFilter}></lightning-input>
+                    <lightning-input type="number" label="Maintenance discount %" value={discountPercent}
+                        min="0" max="40" step="1" onchange={changeDiscount}></lightning-input>
+                    <lightning-input type="date" label="Contract start" value={startDate}
+                        onchange={changeStart}></lightning-input>
+                </div>
+            </div>
+
+            <template lwc:if={plan.openQuoteId}>
+                <p class="notice">
+                    {plan.openQuoteName} is still open for this account.
+                    <button type="button" class="link" onclick={openExisting}>Open it</button>
+                </p>
+            </template>
+            <template lwc:if={needsApproval}>
+                <p class="notice warn">A discount of 15% or more routes the quote to approval.</p>
+            </template>
+
+            <template lwc:if={hasSites}>
+                <ul class="sites">
+                    <template for:each={sites} for:item="s">
+                        <li key={s.accountId} class="site">
+                            <button type="button" class="site-row" data-id={s.accountId} onclick={toggleSite}
+                                aria-expanded={s.ariaExpanded}>
+                                <lightning-icon icon-name={s.toggleIcon} size="x-small"></lightning-icon>
+                                <span class="site-name">{s.name}</span>
+                                <span class="site-type">{s.siteType}</span>
+                                <span class="site-summary">{s.summary}</span>
+                                <template lwc:if={s.compliance}>
+                                    <span class="pill">{s.compliance}</span>
+                                </template>
+                                <template lwc:if={s.age}>
+                                    <span class="pill muted">{s.age}</span>
+                                </template>
+                                <span class="site-monthly">{s.monthlyLabel}</span>
+                            </button>
+                            <template lwc:if={s.open}>
+                                <table class="lines">
+                                    <tbody>
+                                        <template for:each={s.lines} for:item="l">
+                                            <tr key={l.key}>
+                                                <td class="line-name">
+                                                    {l.name}
+                                                    <template lwc:if={l.units}>
+                                                        <span class="units">{l.units}</span>
+                                                    </template>
+                                                </td>
+                                                <td class="qty">{l.quantity} ×</td>
+                                                <td class="price">
+                                                    <template lwc:if={l.listLabel}>
+                                                        <s class="list">{l.listLabel}</s>
+                                                    </template>
+                                                    {l.priceLabel}
+                                                </td>
+                                                <td class="amount">{l.monthlyLabel}</td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template lwc:else>
+                <p class="notice">No rooftop units with a tonnage are recorded for this account or its sites.</p>
+            </template>
+
+            <template lwc:if={result}>
+                <p class="done">{result.message}</p>
+            </template>
+        </template>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Working" size="small"></lightning-spinner>
+        </template>
+
+        <div slot="footer">
+            <template lwc:if={result}>
+                <lightning-button label="Close" onclick={close}></lightning-button>
+                <lightning-button variant="brand" class="gap" label="Open quote" onclick={openQuote}></lightning-button>
+            </template>
+            <template lwc:else>
+                <lightning-button label="Cancel" onclick={close}></lightning-button>
+                <lightning-button variant="brand" class="gap" label={quoteLabel} disabled={quoteDisabled}
+                    onclick={quote}></lightning-button>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

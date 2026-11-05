@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**258 tasks** across **9 groups**.
+**259 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*174 task(s)*
+*175 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -901,6 +901,21 @@
 - `deactivate_before`: `False`
 - `activate`: `True`
 - `verify`: `True`
+
+---
+
+### `apply_context_hvac_commercial_site`
+
+**Description:** Add the HvacSite__c item attribute to RLM_SalesTransactionContext, mapped to RLM_HVAC_Site__c on QuoteLineItem and OrderItem, so Place Sales Transaction keeps each commercial contract line's site
+
+**Class:** `tasks.rlm_context_service.ManageContextDefinition`
+
+**Options:**
+
+- `developer_name`: `RLM_SalesTransactionContext`
+- `plan_file`: `datasets/context_plans/HvacCommercialSite/manifest.json`
+- `translate_plan`: `True`
+- `activate`: `True`
 
 ---
 
@@ -1434,13 +1449,15 @@
 
 ### `deploy_post_hvac_commercial`
 
-**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
+**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
 **Options:**
 
 - `path`: `unpackaged/post_hvac_commercial`
+- `test_level`: `RunSpecifiedTests`
+- `specified_tests`: `RLM_HVAC_ContractQuoteTest`
 
 ---
 

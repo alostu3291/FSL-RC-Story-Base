@@ -727,12 +727,14 @@ class AssembleAndDeployUX(SFDXBaseTask):
             "qb", "billing", "billing_ui", "tax", "rating", "rates", "clm", "dro",
             "guidedselling", "ramps", "tso", "prm", "agents", "docgen",
             "payments", "constraints", "analytics", "procedureplans",
-            "collections", "fsl", "pest", "hvac",
+            "collections", "fsl", "pest", "hvac", "hvac_commercial",
         ]
         flags = {}
         for flag in known_flags:
             val = custom.get(flag, False)
             flags[flag] = process_bool_arg(val) if isinstance(val, (str, bool)) else bool(val)
+        # Commercial HVAC metadata only deploys on top of residential HVAC.
+        flags["hvac_commercial"] = flags["hvac_commercial"] and flags["hvac"]
         return flags
 
     # ------------------------------------------------------------------
@@ -816,6 +818,7 @@ class AssembleAndDeployUX(SFDXBaseTask):
             ("fsl",         "fsl"),
             ("pest",        "pest"),
             ("hvac",        "hvac"),
+            ("hvac_commercial", "hvac_commercial"),
         ]
 
         # Flexipage types that cannot be deployed via Metadata API (platform restriction)

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Build the Brightline Commercial planned maintenance contract for a property group: every site's rooftop units priced by tonnage band, filters and response coverage, placed as one quote with a line group per site.</description>
+    <label>Contract Quote</label>
+    <lightningWebComponent>rlmHvacContractBuilder</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

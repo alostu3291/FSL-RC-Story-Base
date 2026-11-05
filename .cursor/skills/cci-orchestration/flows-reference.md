@@ -379,6 +379,7 @@ Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and roof
 
 **Steps:**
 
+2.5. **task** `apply_context_hvac_commercial_site`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
 1. **task** `deploy_post_hvac_commercial`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
 2. **task** `assign_permission_sets`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
    - `api_names`: `['RLM_Brightline_HVAC_Commercial']`

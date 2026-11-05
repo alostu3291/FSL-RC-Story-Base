@@ -1,0 +1,170 @@
+:host {
+    display: block;
+    position: relative;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5c6b7a;
+}
+
+.big {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #0b3a5c;
+}
+
+.unit {
+    color: #5c6b7a;
+}
+
+.annual {
+    display: block;
+    color: #3e4c59;
+}
+
+.term {
+    font-size: 0.8125rem;
+    color: #5c6b7a;
+}
+
+.controls {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 12rem;
+}
+
+.notice {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+    background: #eef4f8;
+    color: #0b3a5c;
+}
+
+.notice.warn {
+    background: #fff4e0;
+    color: #7a4a00;
+}
+
+.link {
+    margin-left: 0.25rem;
+    border: 0;
+    background: none;
+    padding: 0;
+    color: #0b5cab;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.sites {
+    border-top: 1px solid #e5e9ed;
+}
+
+.site {
+    border-bottom: 1px solid #e5e9ed;
+}
+
+.site-row {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.625rem 0.25rem;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+.site-row:hover {
+    background: #f6f8fa;
+}
+
+.site-name {
+    font-weight: 600;
+    color: #16222e;
+}
+
+.site-type {
+    font-size: 0.75rem;
+    color: #5c6b7a;
+}
+
+.site-summary {
+    flex: 1;
+    font-size: 0.8125rem;
+    color: #3e4c59;
+}
+
+.pill {
+    padding: 0.0625rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    background: #fde8e4;
+    color: #8c2a17;
+}
+
+.pill.muted {
+    background: #eef1f4;
+    color: #3e4c59;
+}
+
+.site-monthly {
+    min-width: 6rem;
+    text-align: right;
+    font-weight: 600;
+}
+
+.lines {
+    width: 100%;
+    margin: 0 0 0.625rem 1.75rem;
+    font-size: 0.8125rem;
+}
+
+.lines td {
+    padding: 0.25rem 0.5rem;
+    vertical-align: top;
+}
+
+.units {
+    display: block;
+    font-size: 0.75rem;
+    color: #5c6b7a;
+}
+
+.qty,
+.price,
+.amount {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.list {
+    margin-right: 0.25rem;
+    color: #8a96a3;
+}
+
+.done {
+    margin-top: 0.75rem;
+    color: #1d6b32;
+    font-weight: 600;
+}
+
+.error {
+    margin-top: 0.75rem;
+    color: #b3261e;
+}
+
+.gap {
+    margin-left: 0.5rem;
+}

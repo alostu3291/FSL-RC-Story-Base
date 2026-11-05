@@ -34,8 +34,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `fsl` | `False` | 22 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
-| `hvac` | `False` | 30 flow step(s) |
-| `hvac_commercial` | `False` | 6 flow step(s) |
+| `hvac` | `False` | 31 flow step(s) |
+| `hvac_commercial` | `False` | 7 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -289,6 +289,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac` step 19 → `deploy_post_hvac_brand`
 - `prepare_hvac_commercial` step 1 → `deploy_post_hvac_commercial`
 - `prepare_hvac_commercial` step 2 → `assign_permission_sets`
+- `prepare_hvac_commercial` step 2.5 → `apply_context_hvac_commercial_site`
 - `prepare_hvac_commercial` step 3 → `insert_hvac_com_pcm_data`
 - `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
 - `prepare_hvac_commercial` step 5 → `refresh_dt_default_pricing`
@@ -298,6 +299,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 - `prepare_hvac_commercial` step 1 → `deploy_post_hvac_commercial`
 - `prepare_hvac_commercial` step 2 → `assign_permission_sets`
+- `prepare_hvac_commercial` step 2.5 → `apply_context_hvac_commercial_site`
 - `prepare_hvac_commercial` step 3 → `insert_hvac_com_pcm_data`
 - `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
 - `prepare_hvac_commercial` step 5 → `refresh_dt_default_pricing`

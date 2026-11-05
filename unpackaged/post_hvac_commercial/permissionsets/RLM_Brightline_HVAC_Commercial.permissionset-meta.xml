@@ -3,6 +3,14 @@
     <description>Brightline Commercial HVAC demo: site type, site code and response tier on Account, and rooftop unit details on Asset.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>RLM Brightline HVAC Commercial</label>
+    <classAccesses>
+        <apexClass>RLM_HVAC_CommercialPricing</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_HVAC_ContractQuote</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.RLM_HVAC_Site_Code__c</field>
@@ -40,6 +48,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Asset.RLM_HVAC_Site__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Asset.RLM_HVAC_Tonnage__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -51,6 +64,16 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Asset.RLM_HVAC_Unit_Tag__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>OrderItem.RLM_HVAC_Site__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>QuoteLineItem.RLM_HVAC_Site__c</field>
         <readable>true</readable>
     </fieldPermissions>
 </PermissionSet>
