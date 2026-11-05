@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Leak_Limit__c</fullName>
+    <description>The leak rate limit for the appliance type when the refrigerant was added (10% for comfort cooling).</description>
+    <label>Leak Rate Limit</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>1</scale>
+    <type>Percent</type>
+</CustomField>

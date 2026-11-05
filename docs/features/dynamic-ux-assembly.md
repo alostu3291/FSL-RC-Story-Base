@@ -184,6 +184,10 @@ be added again.
 1. `templates/layouts/base/` — always
 2. `templates/layouts/billing/` — when `billing=true`
 3. `templates/layouts/constraints/` — when `constraints=true` (overrides `OrderItem` and `QuoteLineItem`)
+4. `templates/layouts/fsl/` — when `fsl=true`
+5. `templates/layouts/pest/` — when `pest=true`
+6. `templates/layouts/hvac/` — when `hvac=true`
+7. `templates/layouts/hvac_commercial/` — when `hvac_commercial=true` (adds the Refrigerant Log action to the Work Order layout)
 
 No patching — layouts are copied as-is.
 

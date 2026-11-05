@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Repair_Work_Order__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>The leak repair work order opened because this addition put the unit over the leak rate limit.</description>
+    <label>Repair Work Order</label>
+    <referenceTo>WorkOrder</referenceTo>
+    <relationshipLabel>Leak Repair Logs</relationshipLabel>
+    <relationshipName>RLM_HVAC_Leak_Repair_Logs</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

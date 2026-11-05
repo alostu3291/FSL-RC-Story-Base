@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Technician__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Who added the refrigerant.</description>
+    <label>Technician</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Refrigerant Logs</relationshipLabel>
+    <relationshipName>RLM_HVAC_Refrigerant_Logs</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

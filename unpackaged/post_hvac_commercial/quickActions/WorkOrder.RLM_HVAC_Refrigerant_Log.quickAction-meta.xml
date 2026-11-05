@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Log refrigerant added to a rooftop unit at this site: calculates the annualized leak rate, and a unit holding 50 lb or more over the limit gets a leak repair work order and a compliance flag.</description>
+    <label>Refrigerant Log</label>
+    <lightningWebComponent>rlmHvacRefrigerantLog</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>

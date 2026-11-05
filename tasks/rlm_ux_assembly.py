@@ -932,6 +932,7 @@ class AssembleAndDeployUX(SFDXBaseTask):
             ("fsl", templates_path / "layouts" / "fsl", features.get("fsl", False)),
             ("pest", templates_path / "layouts" / "pest", features.get("pest", False)),
             ("hvac", templates_path / "layouts" / "hvac", features.get("hvac", False)),
+            ("hvac_commercial", templates_path / "layouts" / "hvac_commercial", features.get("hvac_commercial", False)),
         ]
 
         copied_names: Set[str] = set()

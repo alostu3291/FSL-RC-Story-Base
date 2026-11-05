@@ -1,0 +1,84 @@
+<template>
+    <div class="card">
+        <template lwc:if={state}>
+            <p class="eyebrow">Refrigerant compliance</p>
+            <h2>{state.siteName}</h2>
+            <p class="limit">{limitText}</p>
+
+            <template lwc:if={selected}>
+                <div class="unit-head">
+                    <template lwc:if={showBack}>
+                        <button type="button" class="link" onclick={back}>All units</button>
+                    </template>
+                    <div class="unit-title">
+                        <strong>{selected.tag}</strong>
+                        <span class={selected.pillCls}>{selected.pill}</span>
+                    </div>
+                    <p class="meta">{selectedSummary}</p>
+                    <template lwc:if={repairText}>
+                        <p class="due">{repairText}</p>
+                    </template>
+                </div>
+
+                <template lwc:if={result}>
+                    <p class={resultCls} role="status">{resultText}</p>
+                </template>
+
+                <template lwc:if={canLog}>
+                    <div class="form">
+                        <lightning-input type="number" label="Refrigerant added (lb)" step="0.1" min="0" value={pounds}
+                            onchange={changePounds}></lightning-input>
+                        <lightning-textarea label="Leak notes" value={notes} max-length="255"
+                            placeholder="Where it's leaking, what you checked" onchange={changeNotes}></lightning-textarea>
+                        <button type="button" class="primary" disabled={logDisabled} onclick={log}>Log refrigerant</button>
+                    </div>
+                </template>
+
+                <template lwc:if={hasHistory}>
+                    <p class="section">History</p>
+                    <ul class="history">
+                        <template for:each={history} for:item="h">
+                            <li key={h.key}>
+                                <span class="when">{h.when}</span>
+                                <span class="what">
+                                    {h.what}
+                                    <template lwc:if={h.notes}>
+                                        <span class="notes">{h.notes}</span>
+                                    </template>
+                                </span>
+                                <span class={h.rateCls}>{h.rate}</span>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+            </template>
+
+            <template lwc:else>
+                <ul class="units">
+                    <template for:each={units} for:item="u">
+                        <li key={u.key}>
+                            <button type="button" class={u.cls} data-id={u.assetId} onclick={pick}>
+                                <span class="tag">{u.tag}</span>
+                                <span class="meta">{u.meta}</span>
+                                <span class={u.pillCls}>{u.pill}</span>
+                            </button>
+                        </li>
+                    </template>
+                </ul>
+                <template lwc:if={showToggle}>
+                    <button type="button" class="link" onclick={toggleAll}>{toggleLabel}</button>
+                </template>
+            </template>
+        </template>
+
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Saving" size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={isAction}>
+            <button type="button" class="secondary" onclick={close}>Close</button>
+        </template>
+    </div>
+</template>

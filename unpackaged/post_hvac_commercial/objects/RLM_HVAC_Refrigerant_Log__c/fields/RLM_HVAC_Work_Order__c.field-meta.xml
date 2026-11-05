@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Work_Order__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>The visit the refrigerant was added on.</description>
+    <label>Work Order</label>
+    <referenceTo>WorkOrder</referenceTo>
+    <relationshipLabel>Refrigerant Logs</relationshipLabel>
+    <relationshipName>RLM_HVAC_Refrigerant_Logs</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

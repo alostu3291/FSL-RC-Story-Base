@@ -3,3 +3,4 @@ Description,DurationType,EstimatedDuration,Name,ShouldAutoCreateSvcAppt
 "Capital project install day: crane and rigging lift the new rooftop units onto the roof and the old units off",Hours,4,Commercial Crane Lift,true
 "Capital project install: disconnect and recover the old rooftop units, set the new units on the curbs and connect power, gas and ductwork",Hours,8,Commercial RTU Replacement,true
 "Capital project commissioning: start up each new rooftop unit, record readings and airflow, set controls and hand over to the facility",Hours,3,Commercial RTU Commissioning,true
+"Refrigerant leak repair on a leak-rate tracked rooftop unit: find and repair the leak, then run the initial and follow-up verification tests within the 30-day EPA deadline",Hours,4,Commercial Leak Repair,true

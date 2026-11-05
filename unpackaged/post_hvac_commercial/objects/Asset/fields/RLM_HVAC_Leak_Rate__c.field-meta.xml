@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Leak_Rate__c</fullName>
+    <description>The leak rate from the latest refrigerant addition.</description>
+    <label>Leak Rate</label>
+    <precision>6</precision>
+    <required>false</required>
+    <scale>1</scale>
+    <type>Percent</type>
+</CustomField>

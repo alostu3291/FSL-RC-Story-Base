@@ -1,0 +1,8 @@
+feature: hvac_commercial
+feature_flag: hvac_commercial
+# Refrigerant Log after the Service Checklist on the Work Order highlights panel.
+patches:
+  - type: insert_action
+    after: "WorkOrder.RLM_HVAC_Service_Checklist"
+    actions:
+      - "WorkOrder.RLM_HVAC_Refrigerant_Log"

@@ -1,0 +1,25 @@
+feature: hvac_commercial
+feature_flag: hvac_commercial
+# Refrigerant compliance card above the tabs on leak-rate tracked rooftop units (50 lb or more):
+# leak rate, compliance status, repair deadline and the refrigerant log history.
+patches:
+  - type: insert_after_xml
+    anchor: |-
+      <name>maintabs</name>
+              <type>Facet</type>
+          </flexiPageRegions>
+          <flexiPageRegions>
+    xml: |2
+              <itemInstances>
+                  <componentInstance>
+                      <componentName>rlmHvacRefrigerantLog</componentName>
+                      <identifier>c_rlmHvacRefrigerantLog</identifier>
+                      <visibilityRule>
+                          <criteria>
+                              <leftValue>{!Record.RLM_HVAC_Leak_Rate_Tracked__c}</leftValue>
+                              <operator>EQUAL</operator>
+                              <rightValue>true</rightValue>
+                          </criteria>
+                      </visibilityRule>
+                  </componentInstance>
+              </itemInstances>
