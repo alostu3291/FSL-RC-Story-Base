@@ -13,7 +13,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 | Flag | Default | Used in `when:` clauses |
 |------|---------|------------------------|
-| `agents` | `False` | 15 flow step(s) |
+| `agents` | `True` | 15 flow step(s) |
 | `analytics` | `True` | 2 flow step(s) |
 | `approvals` | `True` | 4 flow step(s) |
 | `billing` | `True` | 23 flow step(s) |
@@ -31,11 +31,11 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `docgen` | `True` | 19 flow step(s) |
 | `dro` | `True` | 17 flow step(s) |
 | `einstein` | `True` | 7 flow step(s) |
-| `fsl` | `False` | 25 flow step(s) |
+| `fsl` | `True` | 25 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
-| `hvac` | `False` | 44 flow step(s) |
-| `hvac_commercial` | `False` | 20 flow step(s) |
+| `hvac` | `True` | 44 flow step(s) |
+| `hvac_commercial` | `True` | 20 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -61,7 +61,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 ## Flag Usage Detail
 
-### `agents` (default: `False`)
+### `agents` (default: `True`)
 
 - `prepare_pest` step 15 → `deploy_agents_settings`
 - `prepare_pest` step 16 → `deploy_post_pest_agent`
@@ -235,7 +235,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac` step 1.6 → `deploy_post_hvac_ai`
 - `prepare_hvac` step 1.7 → `activate_hvac_prompt_templates`
 
-### `fsl` (default: `False`)
+### `fsl` (default: `True`)
 
 - `prepare_rlm_org` step 13.5 → `setup_fsl_revenue`
 - `prepare_fsl` step 1 → `assign_permission_set_licenses`
@@ -272,7 +272,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_guidedselling` step 1 → `insert_qb_guidedselling_data`
 - `prepare_guidedselling` step 2 → `deploy_post_guidedselling`
 
-### `hvac` (default: `False`)
+### `hvac` (default: `True`)
 
 - `prepare_hvac` step 0.5 → `deploy_post_hvac_sla`
 - `prepare_hvac` step 1 → `deploy_post_hvac`
@@ -319,7 +319,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `reset_hvac_commercial_demo` step 3 → `seed_hvac_refrigerant_leak`
 - `reset_hvac_commercial_demo` step 4 → `seed_hvac_commercial_service_call`
 
-### `hvac_commercial` (default: `False`)
+### `hvac_commercial` (default: `True`)
 
 - `prepare_hvac_commercial` step 1 → `deploy_post_hvac_commercial`
 - `prepare_hvac_commercial` step 2 → `assign_permission_sets`

@@ -118,7 +118,7 @@ project:
     ramps: true               # Ramps
 
     # ── Field Service ──────────────────────────────────────────────────────────
-    fsl: false                # Field Service Core + DRO Field Installation (requires FieldService PSLs)
+    fsl: true                 # Field Service Core + DRO Field Installation (requires FieldService PSLs)
     fsl_managed_package: false  # Install the FSL managed package (Dispatcher Console, scheduling optimization)
     fsl_package_version_id: ""  # 04t version Id of the FSL managed package (required when fsl_managed_package)
 
@@ -126,8 +126,8 @@ project:
     pest: false               # Verdant residential pest catalog, location pricing, field quote (requires fsl)
 
     # ── HVAC (Brightline Home Comfort residential demo) ────────────────────────
-    hvac: false               # Brightline residential HVAC agreements, system check and quote, replacement quote (requires fsl)
-    hvac_commercial: false    # Brightline Commercial: multi-site contracts, rooftop unit maintenance, site response tiers (requires hvac)
+    hvac: true                # Brightline residential HVAC agreements, system check and quote, replacement quote (requires fsl)
+    hvac_commercial: true     # Brightline Commercial: multi-site contracts, rooftop unit maintenance, site response tiers (requires hvac)
 
     # ── Contracts & CLM ────────────────────────────────────────────────────────
     clm: true                 # Contract Lifecycle Management
@@ -140,7 +140,7 @@ project:
 
     # ── AI & Analytics ─────────────────────────────────────────────────────────
     einstein: true            # Einstein AI
-    agents: false             # Agentforce agent configurations
+    agents: true              # Agentforce agent configurations
     analytics: true           # Data Sync / CRM Analytics replication (enableWaveReplication)
 
     # ── Configurators & Tooling ────────────────────────────────────────────────
