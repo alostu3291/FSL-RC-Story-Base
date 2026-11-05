@@ -1,6 +1,6 @@
 ---
 name: hvac-demo-seed-visits
-description: Seeds fresh Brightline Home Comfort (HVAC) demo data for the three stories - a new homeowner's System Check (Check & Quote, Sign & Pay, Initial Tune-up), a system replacement quote (Replacement Options, Replacement Install), and a covered No-Cool / No-Heat call for an existing agreement customer (priority response countdown, Find & Add member pricing) - and verifies each seed. Use when asked to seed, reset or prepare demo data, customers or visits for the HVAC or Brightline demo.
+description: Seeds fresh Brightline Home Comfort (HVAC) demo data for the three stories - a new homeowner's System Check (Check & Quote, Sign & Pay, Initial Tune-up), a system replacement quote (Replacement Options, Replacement Install), and a covered No-Cool / No-Heat call for an existing agreement customer (priority response countdown, Find & Add member pricing) - and verifies each seed. Also resets the Brightline Commercial (Lakeshore Property Group) stories - refrigerant leak history with a dispatched data room visit, a covered emergency call at a restaurant site, and the capital project. Use when asked to seed, reset or prepare demo data, customers or visits for the HVAC or Brightline demo.
 ---
 
 # HVAC Demo Seed Visits
@@ -122,9 +122,43 @@ System.debug(JSON.serialize(s));
 <priority> priority, response due <day time> Central.
 ```
 
+## Commercial (Lakeshore Property Group)
+
+The commercial stories reset in place on one fixture rather than seeding new customers. The
+Lakeshore contract must be booked first, because the leak visit and the covered call need it.
+
+```bash
+cci flow run reset_hvac_commercial_demo --org <cci_alias>    # all four steps below
+cci task run seed_hvac_refrigerant_leak --org <cci_alias>    # -o account_name, -o hour, -o days_ahead
+cci task run seed_hvac_commercial_service_call --org <cci_alias> -o account_name "Ember & Oak Bistro"
+cci task run reset_hvac_capital_project --org <cci_alias>
+```
+
+The flow's steps are gated on `hvac` and `hvac_commercial`.
+
+- **Refrigerant leak:** cancels open leak repairs at the site, deletes its refrigerant logs and
+  seeds a year of history, then dispatches the site's next quarterly maintenance visit to the
+  running user, tomorrow at 9 Central. The first tracked unit by tag is the one near the limit;
+  at the Data Room that's RTU-03 (62 lb) at 7.9%. On that visit, Refrigerant Log with 2.5 lb or
+  more on RTU-03 crosses 10%. The unit turns Leak Repair Due with a 30-day deadline, and a
+  Commercial Leak Repair work order opens. Re-running the task undoes it.
+- **Emergency call:** defaults to Harvest Table Restaurant, No Cool, at the next hour (`-o hour
+  next`). Restaurants and the data room get Critical priority and a 4-hour countdown; offices
+  get next business day. It first moves the group's not-yet-started site response entitlements
+  to start today (contracts start on the first of next month).
+- **Capital project:** rejects unbooked project quotes, cancels open project step work orders
+  and restores replaced units. Booked project orders and their invoices stay.
+- **Add a site:** `seed_hvac_commercial_new_site` (Westfield Commons Office) can only be shown
+  once per contract; it isn't reset.
+
+Report: the maintenance visit's work order and appointment, the watch unit and the pounds that
+trip the limit; the call's work order, priority and response due time in Central.
+
 ## Additional resources
 
-- Scripts: `scripts/apex/seedHvacProspectCheck.apex`, `scripts/apex/seedHvacNoCoolCall.apex`
+- Scripts: `scripts/apex/seedHvacProspectCheck.apex`, `scripts/apex/seedHvacNoCoolCall.apex`,
+  `scripts/apex/seedHvacRefrigerantLeak.apex`, `scripts/apex/coverHvacCommercialFromToday.apex`,
+  `scripts/apex/resetHvacCapitalProject.apex`
 - Task classes: `tasks/rlm_hvac_seed_visit.py` (prospect check and service call),
   `tasks/rlm_hvac_seed_agreement.py` (agreement customer)
 - Build plan and story: `docs/analysis/hvac-demo-build-plan.md`

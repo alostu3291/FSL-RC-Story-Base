@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**45 flows** across **5 groups**.
+**46 flows** across **5 groups**.
 
 ---
 
@@ -664,6 +664,19 @@ Deploy Create Ramp Schedule V4 feature into the target org. Deploys QuoteLineGro
 4. **task** `refresh_dt_rating`  `when: project_config.project__custom__rating`
 5. **task** `refresh_dt_rating_discovery`  `when: project_config.project__custom__rating`
 6. **task** `refresh_dt_commerce`  `when: project_config.project__custom__commerce`
+
+---
+
+### `reset_hvac_commercial_demo`
+
+Put the Brightline Commercial demo back in its starting state after a run-through, once the Lakeshore contract is booked: restores the site and rooftop unit fixture, resets the capital project story, reseeds the refrigerant history at the data room with its maintenance visit dispatched tomorrow, and books a covered emergency No Cool call at Harvest Table Restaurant for the next hour. Orders, invoices and the contract stay. Requires hvac=true and hvac_commercial=true.
+
+**Steps:**
+
+1. **task** `seed_hvac_commercial_sites`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+2. **task** `reset_hvac_capital_project`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+3. **task** `seed_hvac_refrigerant_leak`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+4. **task** `seed_hvac_commercial_service_call`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
 
 ---
 

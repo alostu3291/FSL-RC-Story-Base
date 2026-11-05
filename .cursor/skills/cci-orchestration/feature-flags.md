@@ -34,8 +34,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `fsl` | `False` | 25 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
-| `hvac` | `False` | 40 flow step(s) |
-| `hvac_commercial` | `False` | 16 flow step(s) |
+| `hvac` | `False` | 44 flow step(s) |
+| `hvac_commercial` | `False` | 20 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -314,6 +314,10 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac_commercial` step 10 → `deactivate_hvac_billing_agent`
 - `prepare_hvac_commercial` step 11 → `deploy_post_hvac_commercial_agent`
 - `prepare_hvac_commercial` step 12 → `activate_hvac_billing_agent`
+- `reset_hvac_commercial_demo` step 1 → `seed_hvac_commercial_sites`
+- `reset_hvac_commercial_demo` step 2 → `reset_hvac_capital_project`
+- `reset_hvac_commercial_demo` step 3 → `seed_hvac_refrigerant_leak`
+- `reset_hvac_commercial_demo` step 4 → `seed_hvac_commercial_service_call`
 
 ### `hvac_commercial` (default: `False`)
 
@@ -333,6 +337,10 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac_commercial` step 10 → `deactivate_hvac_billing_agent`
 - `prepare_hvac_commercial` step 11 → `deploy_post_hvac_commercial_agent`
 - `prepare_hvac_commercial` step 12 → `activate_hvac_billing_agent`
+- `reset_hvac_commercial_demo` step 1 → `seed_hvac_commercial_sites`
+- `reset_hvac_commercial_demo` step 2 → `reset_hvac_capital_project`
+- `reset_hvac_commercial_demo` step 3 → `seed_hvac_refrigerant_leak`
+- `reset_hvac_commercial_demo` step 4 → `seed_hvac_commercial_service_call`
 
 ### `payments` (default: `True`)
 

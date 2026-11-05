@@ -2087,6 +2087,36 @@ tasks:
     options:
       path: scripts/apex/seedHvacCommercialNewSite.apex
 
+  seed_hvac_refrigerant_leak:
+    group: Revenue Lifecycle Management
+    description: Reset and seed the refrigerant compliance story at a commercial site (account_name, default Lakeshore Data Room; hour, days_ahead) - cancels open leak repairs, deletes the site's refrigerant logs, puts its leak-rate tracked units back In Compliance, seeds a year of adds that leaves the first tracked unit near the 10% limit, and dispatches the site's next quarterly maintenance visit to the running user. Logging about 4% of that unit's charge on the visit trips the limit and opens a leak repair. Safe to re-run.
+    class_path: tasks.rlm_hvac_seed_visit.SeedHvacVisit
+    options:
+      path: scripts/apex/seedHvacRefrigerantLeak.apex
+      account_name: Lakeshore Data Room
+      hour: 9
+
+  seed_hvac_commercial_service_call:
+    group: Revenue Lifecycle Management
+    description: Idempotently book a covered emergency No Cool call at a commercial site (account_name, default Harvest Table Restaurant; issue, subject, description, hour - default next, the next full hour today - and days_ahead), dispatched to the running user, for the site priority story - 4 hours, 24/7 at restaurants and the data room, next business day at offices. Contract quotes start on the first of next month, so the group's site response entitlements that haven't started yet are moved to start today first (demo only; the contract and billing keep their dates). Reports the priority, covering entitlement and response milestone.
+    class_path: tasks.rlm_hvac_seed_visit.SeedHvacVisit
+    options:
+      prelude: scripts/apex/coverHvacCommercialFromToday.apex
+      path: scripts/apex/seedHvacNoCoolCall.apex
+      account_name: Harvest Table Restaurant
+      issue: No Cool
+      subject: No Cool - dining room
+      description: Dining room is at 84 and climbing during the lunch rush; a rooftop unit is running but blowing warm air.
+      hour: next
+      days_ahead: 0
+
+  reset_hvac_capital_project:
+    group: Revenue Lifecycle Management
+    description: Reset the capital project story for a property group (param1 site code, default LPG-HQ) so Capital Project proposes the rooftop unit replacement again - marks open project quotes Rejected, cancels open crane, install and commissioning work orders, and gives replaced units their original install year and refrigerant back. Booked orders and invoices stay. Safe to re-run.
+    class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
+    options:
+      path: scripts/apex/resetHvacCapitalProject.apex
+
   extract_hvac_pcm_data:
     group: Data Management - Extract
     description: "Extract hvac-pcm from org to CSV. Output in datasets/sfdmu/extractions/hvac-pcm/<timestamp>."
@@ -3609,6 +3639,28 @@ flows:
       12:
         task: activate_hvac_billing_agent
         when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__agents
+
+  reset_hvac_commercial_demo:
+    group: Revenue Lifecycle Management
+    description: >
+      Put the Brightline Commercial demo back in its starting state after a run-through, once the
+      Lakeshore contract is booked: restores the site and rooftop unit fixture, resets the capital
+      project story, reseeds the refrigerant history at the data room with its maintenance visit
+      dispatched tomorrow, and books a covered emergency No Cool call at Harvest Table Restaurant for
+      the next hour. Orders, invoices and the contract stay. Requires hvac=true and hvac_commercial=true.
+    steps:
+      1:
+        task: seed_hvac_commercial_sites
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+      2:
+        task: reset_hvac_capital_project
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+      3:
+        task: seed_hvac_refrigerant_leak
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+      4:
+        task: seed_hvac_commercial_service_call
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
 
   prepare_clm:
     group: Revenue Lifecycle Management

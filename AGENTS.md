@@ -177,7 +177,7 @@ that topic.
 | Debug a build/deploy failure | `.cursor/skills/troubleshooting/SKILL.md` |
 | Deploy or repair the pest / FSL demo in an existing org | `.cursor/skills/pest-demo-org-deploy/SKILL.md` |
 | Seed pest demo visits (prospect inspection, Covered re-service) | `.cursor/skills/pest-demo-seed-visits/SKILL.md` |
-| Seed HVAC demo data (System Check prospect, replacement, agreement customer with a covered No-Cool call) | `.cursor/skills/hvac-demo-seed-visits/SKILL.md` |
+| Seed HVAC demo data (System Check prospect, replacement, agreement customer with a covered No-Cool call; reset the commercial stories) | `.cursor/skills/hvac-demo-seed-visits/SKILL.md` |
 | Build or debug LWC actions for the Field Service mobile app | `.cursor/skills/fsl-mobile-lwc/SKILL.md` |
 | Set up Field Service mobile login, settings and licensing | `docs/guides/fsl-mobile-setup.md` |
 | Revise a demo deck or replace its screenshots | `.cursor/skills/demo-deck-refresh/SKILL.md` |

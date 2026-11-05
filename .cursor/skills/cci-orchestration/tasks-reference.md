@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**266 tasks** across **9 groups**.
+**269 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*182 task(s)*
+*185 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -2702,6 +2702,18 @@
 
 ---
 
+### `reset_hvac_capital_project`
+
+**Description:** Reset the capital project story for a property group (param1 site code, default LPG-HQ) so Capital Project proposes the rooftop unit replacement again - marks open project quotes Rejected, cancels open crane, install and commissioning work orders, and gives replaced units their original install year and refrigerant back. Booked orders and invoices stay. Safe to re-run.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/resetHvacCapitalProject.apex`
+
+---
+
 ### `restore_decision_tables`
 
 **Description:** Restore skipped decision tables after deploy
@@ -2742,6 +2754,25 @@
 
 ---
 
+### `seed_hvac_commercial_service_call`
+
+**Description:** Idempotently book a covered emergency No Cool call at a commercial site (account_name, default Harvest Table Restaurant; issue, subject, description, hour - default next, the next full hour today - and days_ahead), dispatched to the running user, for the site priority story - 4 hours, 24/7 at restaurants and the data room, next business day at offices. Contract quotes start on the first of next month, so the group's site response entitlements that haven't started yet are moved to start today first (demo only; the contract and billing keep their dates). Reports the priority, covering entitlement and response milestone.
+
+**Class:** `tasks.rlm_hvac_seed_visit.SeedHvacVisit`
+
+**Options:**
+
+- `prelude`: `scripts/apex/coverHvacCommercialFromToday.apex`
+- `path`: `scripts/apex/seedHvacNoCoolCall.apex`
+- `account_name`: `Harvest Table Restaurant`
+- `issue`: `No Cool`
+- `subject`: `No Cool - dining room`
+- `description`: `Dining room is at 84 and climbing during the lunch rush; a rooftop unit is running but blowing warm air.`
+- `hour`: `next`
+- `days_ahead`: `0`
+
+---
+
 ### `seed_hvac_commercial_sites`
 
 **Description:** Idempotently seed the Lakeshore Property Group fixture - HQ account with a facility director and accounts payable contact, six child site accounts (three offices, two restaurants, a data room) with a Field Service Location each, and 42 rooftop units as Assets with tag, tonnage, install year and refrigerant. Keyed on Site Code and serial number.
@@ -2764,6 +2795,20 @@
 
 - `path`: `scripts/apex/seedHvacProspectCheck.apex`
 - `hour`: `10`
+
+---
+
+### `seed_hvac_refrigerant_leak`
+
+**Description:** Reset and seed the refrigerant compliance story at a commercial site (account_name, default Lakeshore Data Room; hour, days_ahead) - cancels open leak repairs, deletes the site's refrigerant logs, puts its leak-rate tracked units back In Compliance, seeds a year of adds that leaves the first tracked unit near the 10% limit, and dispatches the site's next quarterly maintenance visit to the running user. Logging about 4% of that unit's charge on the visit trips the limit and opens a leak repair. Safe to re-run.
+
+**Class:** `tasks.rlm_hvac_seed_visit.SeedHvacVisit`
+
+**Options:**
+
+- `path`: `scripts/apex/seedHvacRefrigerantLeak.apex`
+- `account_name`: `Lakeshore Data Room`
+- `hour`: `9`
 
 ---
 

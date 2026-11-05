@@ -12,7 +12,14 @@ Usage:
         -o account_name "Priya Raman" -o street "1240 Aurora Ave" -o hour 15
     cci task run seed_hvac_service_call --org hvac \
         -o account_name "Marcus Bell" -o issue "No Cool" -o hour 8
+    cci task run seed_hvac_commercial_service_call --org hvac -o hour next
+
+``hour next`` books the next full hour on the territory's clock (Central).
+``prelude`` names a script run before ``path`` in the same transaction.
 """
+
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 try:
     from cumulusci.core.exceptions import CommandException
@@ -22,6 +29,7 @@ except ImportError:
 from tasks.rlm_rtk_seed_visit import SeedRtkVisit, _apex_string
 
 SERVICE_CALL = "No-Cool / No-Heat Call"
+TERRITORY_ZONE = "America/Chicago"
 
 
 class SeedHvacVisit(SeedRtkVisit):
@@ -39,6 +47,10 @@ class SeedHvacVisit(SeedRtkVisit):
             "description": "Service call only: fail unless an agreement covers the issue. Defaults to true.",
             "required": False,
         },
+        "prelude": {
+            "description": "Apex script run before path, in the same transaction (same %%%...%%% tokens).",
+            "required": False,
+        },
     }
 
     DEFAULTS = {
@@ -51,6 +63,23 @@ class SeedHvacVisit(SeedRtkVisit):
         "days_ahead": "1",
         "require_coverage": "true",
     }
+
+    def _validate_options(self):
+        if str(self.options.get("hour", "")).lower() == "next":
+            now = datetime.now(ZoneInfo(TERRITORY_ZONE))
+            if now.hour >= 22:
+                self.options["hour"] = "8"
+                self.options["days_ahead"] = str(int(self.options.get("days_ahead", 0)) + 1)
+            else:
+                self.options["hour"] = str(now.hour + 1)
+        super()._validate_options()
+
+    def _process_apex_from_path(self, apex_path):
+        apex = super()._process_apex_from_path(apex_path)
+        prelude = self.options.get("prelude")
+        if not prelude:
+            return apex
+        return super()._process_apex_from_path(prelude) + "\n" + apex
 
     def _report(self):
         name = _apex_string(self.options["account_name"])

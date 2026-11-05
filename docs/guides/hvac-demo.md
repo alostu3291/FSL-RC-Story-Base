@@ -56,6 +56,23 @@ full workflow, checks and report template.
 `prepare_hvac` step 11.5 books Priya Raman's System Check. A prospect who signed is used up;
 pick a new name and street for the next run.
 
+**Commercial (Lakeshore Property Group).** Once the contract is booked, `cci flow run
+reset_hvac_commercial_demo` puts the commercial stories back in their starting state. The flow
+leaves orders, invoices and the contract alone. Each step is also a task you can run on its own:
+
+| Story | Task |
+|-------|------|
+| Site survey | `seed_hvac_commercial_sites` restores the six sites and 42 rooftop units, including units a capital project replaced |
+| Capital project | `reset_hvac_capital_project` rejects unbooked project quotes, cancels open crane, install and commissioning work orders, and restores replaced units |
+| Refrigerant compliance | `seed_hvac_refrigerant_leak` resets the Lakeshore Data Room's logs and seeds a year of history: RTU-03 (62 lb) is at 7.9% with its last add 140 days ago. The site's next maintenance visit is dispatched for tomorrow; logging 2.5 lb or more on RTU-03 crosses 10% and opens a leak repair |
+| Emergency call | `seed_hvac_commercial_service_call` books a covered No Cool call at Harvest Table Restaurant for the next hour, with Critical priority and a 4-hour response countdown. Pass `-o account_name "Lakeshore Office Park B"` for next business day |
+| Add a site | `seed_hvac_commercial_new_site` adds Westfield Commons Office; it isn't reset, because adding it amends the contract |
+
+Contract quotes start on the first of next month, so before that date no site is covered.
+`seed_hvac_commercial_service_call` moves the group's site response entitlements that haven't
+started yet to start today. This is a demo-only change: the contract and its billing keep their
+dates.
+
 ## Catalog (HVAC-*)
 
 | SKU | Type | Price | Role |
