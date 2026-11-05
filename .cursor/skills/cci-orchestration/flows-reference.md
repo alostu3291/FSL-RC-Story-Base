@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**44 flows** across **5 groups**.
+**45 flows** across **5 groups**.
 
 ---
 
@@ -373,6 +373,22 @@ Deploy Brightline Home Comfort residential HVAC demo: comfort agreement catalog,
 
 ---
 
+### `prepare_hvac_commercial`
+
+Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and rooftop unit fields, the commercial catalog and prices, and the Lakeshore Property Group fixture (HQ, six sites with Locations, 42 rooftop units). Requires hvac=true.
+
+**Steps:**
+
+1. **task** `deploy_post_hvac_commercial`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+2. **task** `assign_permission_sets`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+   - `api_names`: `['RLM_Brightline_HVAC_Commercial']`
+3. **task** `insert_hvac_com_pcm_data`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+4. **task** `setup_hvac_commercial_revenue`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__billing`
+5. **task** `refresh_dt_default_pricing`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+6. **task** `seed_hvac_commercial_sites`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial`
+
+---
+
 ### `prepare_payments`
 
 **Steps:**
@@ -562,6 +578,7 @@ Deploy Create Ramp Schedule V4 feature into the target org. Deploys QuoteLineGro
 13.5. **task** `setup_fsl_revenue`  `when: project_config.project__custom__fsl and project_config.project__custom__billing and project_config.project__custom__qb`
 13.6. **flow** `prepare_pest`
 13.7. **flow** `prepare_hvac`
+13.8. **flow** `prepare_hvac_commercial`
 1. **flow** `prepare_core`
 2. **flow** `prepare_decision_tables`
 3. **flow** `prepare_expression_sets`

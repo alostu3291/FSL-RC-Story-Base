@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**254 tasks** across **9 groups**.
+**258 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*170 task(s)*
+*174 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1432,6 +1432,18 @@
 
 ---
 
+### `deploy_post_hvac_commercial`
+
+**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_commercial`
+
+---
+
 ### `deploy_post_hvac_docgen`
 
 **Description:** Deploy Brightline-branded DocGen templates (RLM_HVAC_Proposal for quotes, with system check findings and per-system agreement pricing; RLM_HVAC_Replacement_Proposal for Good / Better / Best system replacement quotes; RLM_HVAC_Invoice for invoices) and the RLMHVACProposalExtract/Transform and RLMHVACReplacementProposalExtract/Transform data mappings. Requires prepare_docgen plus the Quote total roll-ups and assessment objects from deploy_post_hvac. Rebuild with scripts/docgen/build_hvac_proposal.py, build_hvac_proposal_odts.py and build_hvac_invoice.py.
@@ -1945,6 +1957,18 @@
 **Options:**
 
 - `pathtoexportjson`: `datasets/sfdmu/qb/en-US/qb-clm`
+
+---
+
+### `insert_hvac_com_pcm_data`
+
+**Description:** Insert Brightline Commercial product catalog (HVAC-COM- planned maintenance per unit by tonnage band, filter program, 4-hour and next-business-day response coverage per site, site survey, emergency labor, repairs and parts, rooftop unit replacement and crane lift, with Term Monthly and One-Time selling models and categories)
+
+**Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
+
+**Options:**
+
+- `pathtoexportjson`: `datasets/sfdmu/hvac/en-US/hvac-com-pcm`
 
 ---
 
@@ -2616,6 +2640,18 @@
 
 ---
 
+### `seed_hvac_commercial_sites`
+
+**Description:** Idempotently seed the Lakeshore Property Group fixture - HQ account with a facility director and accounts payable contact, six child site accounts (three offices, two restaurants, a data room) with a Field Service Location each, and 42 rooftop units as Assets with tag, tonnage, install year and refrigerant. Keyed on Site Code and serial number.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/seedHvacCommercialSites.apex`
+
+---
+
 ### `seed_hvac_prospect_check`
 
 **Description:** Idempotently book a free System Check for a new prospect (account_name, street, optional phone, hour, days_ahead), dispatched to the running user, for the Check and Quote flow. Creates the Naperville account and contact if missing, refuses an account that already has agreements, and reports the work order and appointment it booked.
@@ -2689,6 +2725,18 @@
 **Options:**
 
 - `path`: `scripts/apex/setupFslRevenue.apex`
+
+---
+
+### `setup_hvac_commercial_revenue`
+
+**Description:** Idempotently seed Brightline Commercial price book entries (planned maintenance $38 / $55 / $85 / $130 per unit per month by tonnage band, filter program $9 per unit, response coverage $175 or $45 per site, one-time services, repairs and capital items) and copy billing and tax policies from the residential agreement. Runs after insert_hvac_com_pcm_data.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/setupHvacCommercialRevenue.apex`
 
 ---
 

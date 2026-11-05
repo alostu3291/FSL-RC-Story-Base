@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Site_Code__c</fullName>
+    <description>Short code for a commercial site, such as LPG-OPA; the key the commercial seed uses.</description>
+    <externalId>true</externalId>
+    <label>Site Code</label>
+    <length>20</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+    <caseSensitive>false</caseSensitive>
+</CustomField>

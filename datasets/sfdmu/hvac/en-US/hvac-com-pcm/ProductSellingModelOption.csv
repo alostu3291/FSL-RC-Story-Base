@@ -1,0 +1,16 @@
+$$Product2.StockKeepingUnit$ProductSellingModel.Name$ProductSellingModel.SellingModelType,IsDefault,Product2.StockKeepingUnit,ProductSellingModel.$$Name$SellingModelType,ProrationPolicy.Name
+HVAC-COM-BELT;One-Time;OneTime,true,HVAC-COM-BELT,One-Time;OneTime,
+HVAC-COM-COMPRESSOR;One-Time;OneTime,true,HVAC-COM-COMPRESSOR,One-Time;OneTime,
+HVAC-COM-CRANE;One-Time;OneTime,true,HVAC-COM-CRANE,One-Time;OneTime,
+HVAC-COM-FILTER;Term Monthly;TermDefined,true,HVAC-COM-FILTER,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-LABOR;One-Time;OneTime,true,HVAC-COM-LABOR,One-Time;OneTime,
+HVAC-COM-LEAK-REPAIR;One-Time;OneTime,true,HVAC-COM-LEAK-REPAIR,One-Time;OneTime,
+HVAC-COM-PM-L;Term Monthly;TermDefined,true,HVAC-COM-PM-L,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-PM-M;Term Monthly;TermDefined,true,HVAC-COM-PM-M,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-PM-S;Term Monthly;TermDefined,true,HVAC-COM-PM-S,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-PM-XL;Term Monthly;TermDefined,true,HVAC-COM-PM-XL,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-REFRIGERANT;One-Time;OneTime,true,HVAC-COM-REFRIGERANT,One-Time;OneTime,
+HVAC-COM-RESP-4H;Term Monthly;TermDefined,true,HVAC-COM-RESP-4H,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-RESP-NBD;Term Monthly;TermDefined,true,HVAC-COM-RESP-NBD,Term Monthly;TermDefined,Default Proration Policy
+HVAC-COM-RTU-REPL;One-Time;OneTime,true,HVAC-COM-RTU-REPL,One-Time;OneTime,
+HVAC-COM-SURVEY;One-Time;OneTime,true,HVAC-COM-SURVEY,One-Time;OneTime,

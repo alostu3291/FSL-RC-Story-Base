@@ -1,0 +1,5 @@
+Catalog.Code,Code,Description,IsNavigational,Name,ParentCategory.Code,SortOrder
+CAT-HVAC-COM,PC-HVAC-COM-PM,"Quarterly planned maintenance, priced per unit by tonnage",true,Planned Maintenance,,1
+CAT-HVAC-COM,PC-HVAC-COM-RESP,"Emergency response coverage, priced per site",true,Response Coverage,,2
+CAT-HVAC-COM,PC-HVAC-COM-REPAIRS,"Surveys, labor, repairs and parts",true,Services and Repairs,,3
+CAT-HVAC-COM,PC-HVAC-COM-CAPITAL,Equipment replacement projects,true,Capital Projects,,4

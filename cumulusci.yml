@@ -127,6 +127,7 @@ project:
 
     # ── HVAC (Brightline Home Comfort residential demo) ────────────────────────
     hvac: false               # Brightline residential HVAC agreements, system check and quote, replacement quote (requires fsl)
+    hvac_commercial: false    # Brightline Commercial: multi-site contracts, rooftop unit maintenance, site response tiers (requires hvac)
 
     # ── Contracts & CLM ────────────────────────────────────────────────────────
     clm: true                 # Contract Lifecycle Management
@@ -562,6 +563,7 @@ project:
     hvac_pcm_dataset: &hvac_pcm_dataset "datasets/sfdmu/hvac/en-US/hvac-pcm"                                         # Brightline residential HVAC product catalog
     hvac_fsl_dataset: &hvac_fsl_dataset "datasets/sfdmu/hvac/en-US/hvac-fsl"                                         # Brightline Field Service foundation (Naperville territory)
     hvac_dro_fsl_dataset: &hvac_dro_fsl_dataset "datasets/sfdmu/hvac/en-US/hvac-dro-fsl"                             # Brightline DRO Initial Tune-up and Replacement Install overlay
+    hvac_com_pcm_dataset: &hvac_com_pcm_dataset "datasets/sfdmu/hvac/en-US/hvac-com-pcm"                             # Brightline Commercial product catalog
     quantumbit_tax_dataset: &quantumbit_tax_dataset "datasets/sfdmu/qb/en-US/qb-tax"                                 # QuantumBit tax data
     quantumbit_rating_dataset: &quantumbit_rating_dataset "datasets/sfdmu/qb/en-US/qb-rating"                    # QuantumBit rating data
     quantumbit_rates_dataset: &quantumbit_rates_dataset "datasets/sfdmu/qb/en-US/qb-rates"                           # QuantumBit rates data
@@ -1993,6 +1995,34 @@ tasks:
     options:
       path: scripts/apex/deleteHvacData.apex
 
+  deploy_post_hvac_commercial:
+    group: Revenue Lifecycle Management
+    description: Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
+    class_path: cumulusci.tasks.salesforce.Deploy
+    options:
+      path: unpackaged/post_hvac_commercial
+
+  insert_hvac_com_pcm_data:
+    group: Revenue Lifecycle Management
+    description: Insert Brightline Commercial product catalog (HVAC-COM- planned maintenance per unit by tonnage band, filter program, 4-hour and next-business-day response coverage per site, site survey, emergency labor, repairs and parts, rooftop unit replacement and crane lift, with Term Monthly and One-Time selling models and categories)
+    class_path: tasks.rlm_sfdmu.LoadSFDMUData
+    options:
+      pathtoexportjson: *hvac_com_pcm_dataset
+
+  setup_hvac_commercial_revenue:
+    group: Revenue Lifecycle Management
+    description: Idempotently seed Brightline Commercial price book entries (planned maintenance $38 / $55 / $85 / $130 per unit per month by tonnage band, filter program $9 per unit, response coverage $175 or $45 per site, one-time services, repairs and capital items) and copy billing and tax policies from the residential agreement. Runs after insert_hvac_com_pcm_data.
+    class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
+    options:
+      path: scripts/apex/setupHvacCommercialRevenue.apex
+
+  seed_hvac_commercial_sites:
+    group: Revenue Lifecycle Management
+    description: Idempotently seed the Lakeshore Property Group fixture - HQ account with a facility director and accounts payable contact, six child site accounts (three offices, two restaurants, a data room) with a Field Service Location each, and 42 rooftop units as Assets with tag, tonnage, install year and refrigerant. Keyed on Site Code and serial number.
+    class_path: cumulusci.tasks.apex.anon.AnonymousApexTask
+    options:
+      path: scripts/apex/seedHvacCommercialSites.apex
+
   extract_hvac_pcm_data:
     group: Data Management - Extract
     description: "Extract hvac-pcm from org to CSV. Output in datasets/sfdmu/extractions/hvac-pcm/<timestamp>."
@@ -2929,6 +2959,8 @@ flows:
         flow: prepare_pest
       13.7:
         flow: prepare_hvac
+      13.8:
+        flow: prepare_hvac_commercial
       14:
         flow: prepare_analytics
       15:
@@ -3451,6 +3483,35 @@ flows:
       19:
         task: deploy_post_hvac_brand
         when: project_config.project__custom__hvac
+
+  prepare_hvac_commercial:
+    group: Revenue Lifecycle Management
+    description: >
+      Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and rooftop unit
+      fields, the commercial catalog and prices, and the Lakeshore Property Group fixture
+      (HQ, six sites with Locations, 42 rooftop units). Requires hvac=true.
+    steps:
+      1:
+        task: deploy_post_hvac_commercial
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+      2:
+        task: assign_permission_sets
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+        options:
+          api_names:
+            - RLM_Brightline_HVAC_Commercial
+      3:
+        task: insert_hvac_com_pcm_data
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+      4:
+        task: setup_hvac_commercial_revenue
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__billing
+      5:
+        task: refresh_dt_default_pricing
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
+      6:
+        task: seed_hvac_commercial_sites
+        when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial
 
   prepare_clm:
     group: Revenue Lifecycle Management

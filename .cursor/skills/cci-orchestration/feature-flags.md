@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**42 feature flags**, **87 configuration values**, **33 YAML anchors** under `project.custom`.
+**43 feature flags**, **88 configuration values**, **33 YAML anchors** under `project.custom`.
 
 ---
 
@@ -16,7 +16,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `agents` | `False` | 12 flow step(s) |
 | `analytics` | `True` | 2 flow step(s) |
 | `approvals` | `True` | 4 flow step(s) |
-| `billing` | `True` | 22 flow step(s) |
+| `billing` | `True` | 23 flow step(s) |
 | `billing_portal` | `False` | 3 flow step(s) |
 | `billing_portal_deploy` | `True` | 1 flow step(s) |
 | `billing_ui` | `True` | 4 flow step(s) |
@@ -34,7 +34,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `fsl` | `False` | 22 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
-| `hvac` | `False` | 24 flow step(s) |
+| `hvac` | `False` | 30 flow step(s) |
+| `hvac_commercial` | `False` | 6 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -95,6 +96,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `extend_context_definitions` step 5 → `extend_context_collection_plan_segment`
 - `prepare_pest` step 5 → `setup_rtk_revenue`
 - `prepare_hvac` step 5 → `setup_hvac_revenue`
+- `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
 - `prepare_billing` step 1 → `deploy_post_billing`
 - `prepare_billing` step 2 → `insert_billing_data`
 - `prepare_billing` step 3 → `insert_q3_billing_data`
@@ -285,6 +287,21 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac` step 17 → `assign_permission_sets`
 - `prepare_hvac` step 18 → `activate_hvac_billing_agent`
 - `prepare_hvac` step 19 → `deploy_post_hvac_brand`
+- `prepare_hvac_commercial` step 1 → `deploy_post_hvac_commercial`
+- `prepare_hvac_commercial` step 2 → `assign_permission_sets`
+- `prepare_hvac_commercial` step 3 → `insert_hvac_com_pcm_data`
+- `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
+- `prepare_hvac_commercial` step 5 → `refresh_dt_default_pricing`
+- `prepare_hvac_commercial` step 6 → `seed_hvac_commercial_sites`
+
+### `hvac_commercial` (default: `False`)
+
+- `prepare_hvac_commercial` step 1 → `deploy_post_hvac_commercial`
+- `prepare_hvac_commercial` step 2 → `assign_permission_sets`
+- `prepare_hvac_commercial` step 3 → `insert_hvac_com_pcm_data`
+- `prepare_hvac_commercial` step 4 → `setup_hvac_commercial_revenue`
+- `prepare_hvac_commercial` step 5 → `refresh_dt_default_pricing`
+- `prepare_hvac_commercial` step 6 → `seed_hvac_commercial_sites`
 
 ### `payments` (default: `True`)
 
@@ -520,6 +537,7 @@ Non-boolean scalar values under `project.custom` used as YAML anchors for contex
 | `fulfillment_asset_context_base_reference` | `FulfillmentAssetContext__stdctx` |
 | `fulfillment_asset_context_default_mapping` | `FulfillAssetEntitiesMapping` |
 | `fulfillment_asset_context_name` | `RLM_FulfillmentAssetContext` |
+| `hvac_com_pcm_dataset` | `datasets/sfdmu/hvac/en-US/hvac-com-pcm` |
 | `hvac_dro_fsl_dataset` | `datasets/sfdmu/hvac/en-US/hvac-dro-fsl` |
 | `hvac_fsl_dataset` | `datasets/sfdmu/hvac/en-US/hvac-fsl` |
 | `hvac_pcm_dataset` | `datasets/sfdmu/hvac/en-US/hvac-pcm` |

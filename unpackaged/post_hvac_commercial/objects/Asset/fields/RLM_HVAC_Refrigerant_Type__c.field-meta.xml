@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Refrigerant_Type__c</fullName>
+    <description>Refrigerant the unit runs on.</description>
+    <label>Refrigerant Type</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>R-410A</fullName>
+                <default>false</default>
+                <label>R-410A</label>
+            </value>
+            <value>
+                <fullName>R-454B</fullName>
+                <default>false</default>
+                <label>R-454B</label>
+            </value>
+            <value>
+                <fullName>R-32</fullName>
+                <default>false</default>
+                <label>R-32</label>
+            </value>
+            <value>
+                <fullName>R-22</fullName>
+                <default>false</default>
+                <label>R-22</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

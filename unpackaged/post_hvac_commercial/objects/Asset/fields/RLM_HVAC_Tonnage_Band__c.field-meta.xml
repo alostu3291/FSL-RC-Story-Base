@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Tonnage_Band__c</fullName>
+    <description>Planned maintenance price band from the unit's tonnage. Keep in step with RLM_HVAC_CommercialPricing.bandSku.</description>
+    <formula>IF(ISBLANK(RLM_HVAC_Tonnage__c), &quot;&quot;,
+IF(RLM_HVAC_Tonnage__c &lt;= 5, &quot;Up to 5 tons&quot;,
+IF(RLM_HVAC_Tonnage__c &lt;= 12, &quot;6 to 12 tons&quot;,
+IF(RLM_HVAC_Tonnage__c &lt;= 25, &quot;13 to 25 tons&quot;, &quot;Over 25 tons&quot;))))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Tonnage Band</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

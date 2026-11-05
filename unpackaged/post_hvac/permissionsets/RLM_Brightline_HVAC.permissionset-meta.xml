@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Brightline residential pest demo: service zones, property inspections, findings and treatment checklist, field quote Apex, and Line of Business on Quote.</description>
+    <description>Brightline residential HVAC demo: service zones, system check assessments, findings and service checklist, field quote Apex, and Line of Business on Quote.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>RLM Brightline Pest</label>
+    <label>RLM Brightline HVAC</label>
     <classAccesses>
         <apexClass>RLM_HVAC_AI</apexClass>
         <enabled>true</enabled>
