@@ -17,8 +17,8 @@
           "excluded": false
         },
         {
-          "query": "SELECT ArePartialPeriodsAllowed, Name, ProrationPolicyType, RemainderStrategy FROM ProrationPolicy",
-          "operation": "Upsert",
+          "query": "SELECT Name FROM ProrationPolicy",
+          "operation": "Readonly",
           "externalId": "Name",
           "excluded": false
         },

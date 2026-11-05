@@ -1,2 +1,2 @@
-ArePartialPeriodsAllowed,Name,ProrationPolicyType,RemainderStrategy
-true,Default Proration Policy,Prorate,AddToFirst
+Name
+Default Proration Policy
