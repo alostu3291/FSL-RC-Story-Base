@@ -30,6 +30,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>RLM_HVAC_SiteInvoiceExplainer</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>RLM_HVAC_CommercialPricing</apexClass>
         <enabled>true</enabled>
     </classAccesses>

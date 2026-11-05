@@ -375,7 +375,7 @@ Deploy Brightline Home Comfort residential HVAC demo: comfort agreement catalog,
 
 ### `prepare_hvac_commercial`
 
-Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and rooftop unit fields, the contract quote, order and site coverage, the commercial catalog, prices and work type, and the Lakeshore Property Group fixture (HQ, six sites with Locations, 42 rooftop units). With docgen=true, also the contract proposal, capital project proposal and consolidated invoice templates. Requires hvac=true.
+Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and rooftop unit fields, the contract quote, order and site coverage, the commercial catalog, prices and work type, and the Lakeshore Property Group fixture (HQ, six sites with Locations, 42 rooftop units). With docgen=true, also the contract proposal, capital project proposal and consolidated invoice templates. With agents=true, the billing agent also explains commercial invoices by site. Requires hvac=true.
 
 **Steps:**
 
@@ -393,6 +393,9 @@ Deploy the Brightline Commercial HVAC demo on top of prepare_hvac: site and roof
 7. **task** `deploy_post_hvac_commercial_docgen`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__docgen`
 8. **task** `activate_docgen_templates`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__docgen`
 9. **task** `fix_hvac_commercial_document_template_binaries`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__docgen`
+10. **task** `deactivate_hvac_billing_agent`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__agents`
+11. **task** `deploy_post_hvac_commercial_agent`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__agents`
+12. **task** `activate_hvac_billing_agent`  `when: project_config.project__custom__hvac and project_config.project__custom__hvac_commercial and project_config.project__custom__agents`
 
 ---
 

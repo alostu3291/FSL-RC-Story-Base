@@ -13,7 +13,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 
 | Flag | Default | Used in `when:` clauses |
 |------|---------|------------------------|
-| `agents` | `False` | 12 flow step(s) |
+| `agents` | `False` | 15 flow step(s) |
 | `analytics` | `True` | 2 flow step(s) |
 | `approvals` | `True` | 4 flow step(s) |
 | `billing` | `True` | 23 flow step(s) |
@@ -34,8 +34,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `fsl` | `False` | 25 flow step(s) |
 | `fsl_managed_package` | `False` | 1 flow step(s) |
 | `guidedselling` | `False` | 2 flow step(s) |
-| `hvac` | `False` | 37 flow step(s) |
-| `hvac_commercial` | `False` | 13 flow step(s) |
+| `hvac` | `False` | 40 flow step(s) |
+| `hvac_commercial` | `False` | 16 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
 | `pest` | `False` | 25 flow step(s) |
@@ -71,6 +71,9 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac` step 16 → `deploy_post_hvac_agent`
 - `prepare_hvac` step 17 → `assign_permission_sets`
 - `prepare_hvac` step 18 → `activate_hvac_billing_agent`
+- `prepare_hvac_commercial` step 10 → `deactivate_hvac_billing_agent`
+- `prepare_hvac_commercial` step 11 → `deploy_post_hvac_commercial_agent`
+- `prepare_hvac_commercial` step 12 → `activate_hvac_billing_agent`
 - `prepare_agents` step 1 → `assign_permission_set_groups`
 - `prepare_agents` step 2 → `deploy_agents_settings`
 - `prepare_agents` step 3 → `deploy_agents`
@@ -308,6 +311,9 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac_commercial` step 7 → `deploy_post_hvac_commercial_docgen`
 - `prepare_hvac_commercial` step 8 → `activate_docgen_templates`
 - `prepare_hvac_commercial` step 9 → `fix_hvac_commercial_document_template_binaries`
+- `prepare_hvac_commercial` step 10 → `deactivate_hvac_billing_agent`
+- `prepare_hvac_commercial` step 11 → `deploy_post_hvac_commercial_agent`
+- `prepare_hvac_commercial` step 12 → `activate_hvac_billing_agent`
 
 ### `hvac_commercial` (default: `False`)
 
@@ -324,6 +330,9 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_hvac_commercial` step 7 → `deploy_post_hvac_commercial_docgen`
 - `prepare_hvac_commercial` step 8 → `activate_docgen_templates`
 - `prepare_hvac_commercial` step 9 → `fix_hvac_commercial_document_template_binaries`
+- `prepare_hvac_commercial` step 10 → `deactivate_hvac_billing_agent`
+- `prepare_hvac_commercial` step 11 → `deploy_post_hvac_commercial_agent`
+- `prepare_hvac_commercial` step 12 → `activate_hvac_billing_agent`
 
 ### `payments` (default: `True`)
 

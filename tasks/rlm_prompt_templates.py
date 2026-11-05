@@ -98,3 +98,36 @@ class ActivateAgents(BaseSalesforceApiTask):
             if completed.returncode != 0:
                 raise CommandException(f"{name}: {completed.stderr.strip() or completed.stdout.strip()}")
             self.logger.info(completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else f"{name}: activated")
+
+
+class DeactivateAgents(BaseSalesforceApiTask):
+    """Deactivate Agentforce agents with `sf agent deactivate`, so their planner bundles can be redeployed.
+
+    An agent that is missing or already inactive is logged and skipped.
+    """
+
+    task_options = {
+        "api_names": {
+            "description": "Comma-separated Bot API names to deactivate.",
+            "required": True,
+        },
+    }
+
+    def _run_task(self):
+        names = self.options["api_names"]
+        if isinstance(names, str):
+            names = [n.strip() for n in names.split(",") if n.strip()]
+        for name in names:
+            completed = subprocess.run(
+                [
+                    "sf", "agent", "deactivate",
+                    "--api-name", name,
+                    "--target-org", self.org_config.username,
+                ],
+                capture_output=True,
+                text=True,
+            )
+            if completed.returncode != 0:
+                self.logger.warning(f"{name}: not deactivated ({completed.stderr.strip() or completed.stdout.strip()})")
+                continue
+            self.logger.info(completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else f"{name}: deactivated")

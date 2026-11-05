@@ -265,6 +265,17 @@ agreement-change credits and proration, and tax. Ask "Why is Dana Whitfield's bi
 (first month of Comfort Plus $35 and IAQ $15, the tune-up $129 and a capacitor $157.25, plus
 10% tax). Test it in the Agentforce panel.
 
+**Commercial invoices by site.** With `hvac_commercial: true` as well, `prepare_hvac_commercial`
+steps 10–12 deactivate the agent, deploy `unpackaged/post_hvac_commercial_agent` and activate it
+again. That bundle is a full copy of the planner with a second topic, Commercial Invoice by Site,
+so keep the HVAC Bill Questions topic in step with `unpackaged/post_hvac_agent`. Its action,
+`RLM_HVAC_SiteInvoiceExplainer`, finds the property group's invoice by record, number, amount or
+site. It lists each site's services, charges and tax, the PO and due date, and for a capital
+project invoice the milestone and its share of each line. Ask "Explain the latest Lakeshore
+Property Group invoice by site" ($4,551.13 across seven sites under PO LPG-PO-2026-118), "What is
+Harvest Table Restaurant paying for on it?" ($540.50, 11.9% of the invoice) or "What milestone
+is DOC-000000009 billing?" (the 40% installation milestone).
+
 ## Nine scenes
 
 | # | Scene | What to show |

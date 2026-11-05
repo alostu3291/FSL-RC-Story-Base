@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Answers Brightline billing questions from the posted invoice lines: residential customers' bills, such as "why is my first bill $316?", and Brightline Commercial consolidated invoices by site, such as "what is Harvest Table paying for on the Lakeshore invoice?".</description>
+    <localTopicLinks>
+        <genAiPluginName>RLM_HVAC_Bill_Questions</genAiPluginName>
+    </localTopicLinks>
+    <localTopicLinks>
+        <genAiPluginName>RLM_HVAC_Commercial_Invoice_Questions</genAiPluginName>
+    </localTopicLinks>
+    <localTopics>
+        <fullName>RLM_HVAC_Bill_Questions</fullName>
+        <aiPluginUtterances>
+            <developerName>utterance1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 1</masterLabel>
+            <utterance>Why is my first bill $316?</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance2</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 2</masterLabel>
+            <utterance>Marcus Bell is asking what the $185 charge is for.</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance3</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 3</masterLabel>
+            <utterance>Explain this customer's latest bill.</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance4</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 4</masterLabel>
+            <utterance>Why did Dana's bill go up after she moved to Comfort Premier?</utterance>
+        </aiPluginUtterances>
+        <canEscalate>false</canEscalate>
+        <description>Explains what makes up a Brightline residential HVAC (home) customer's bill: monthly comfort agreements and add-ons priced per system, the Initial Tune-up, repairs approved on a visit, agreement-change credits and proration, and tax. Use it when someone asks why a homeowner's bill is a certain amount, what a charge is for, or what they owe. Don't use it for property groups, sites or commercial contract and project invoices.</description>
+        <developerName>RLM_HVAC_Bill_Questions</developerName>
+        <genAiPluginInstructions>
+            <description>Always call the Explain HVAC Bill action before answering. Pass the amount the user mentioned as a number, the customer name if given, the invoice number if given, and currentRecordId as accountId whenever the user is on an Account or Invoice record. Don't ask for the customer's name when currentRecordId is available.</description>
+            <developerName>Instruction1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 1</masterLabel>
+            <sortOrder>0</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>Answer only from the action's explanation. Never calculate, estimate or change any amount, and never offer discounts or credits. If the explanation says no bill matches, say so and describe the most recent bill it returned.</description>
+            <developerName>Instruction2</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 2</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>Lead with one sentence that answers the question, for example "Your first bill is $258 for the Initial Tune-up on your two systems plus $58 for the first month of Comfort Plus on both, plus tax." Then list each charge with its amount, and end with what the customer should expect next month: the monthly agreement and add-ons repeat, tune-ups and repairs don't.</description>
+            <developerName>Instruction3</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 3</masterLabel>
+            <sortOrder>2</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>If you can't tell which customer the user means, ask for the customer's name. Never show Salesforce record Ids; refer to bills by their document number.</description>
+            <developerName>Instruction4</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 4</masterLabel>
+            <sortOrder>3</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localActionLinks>
+            <functionName>RLM_HVAC_Explain_Bill</functionName>
+        </localActionLinks>
+        <localActions>
+            <fullName>RLM_HVAC_Explain_Bill</fullName>
+            <description>Returns a line-by-line explanation of an HVAC customer's bill: comfort agreements and add-ons per system, tune-ups, repairs, agreement-change credits, proration and tax, with the totals already worked out.</description>
+            <developerName>RLM_HVAC_Explain_Bill</developerName>
+            <invocationTarget>RLM_HVAC_BillExplainer</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+            <localDeveloperName>Explain_HVAC_Bill</localDeveloperName>
+            <masterLabel>Explain HVAC Bill</masterLabel>
+            <progressIndicatorMessage>Reading the bill ...</progressIndicatorMessage>
+        </localActions>
+        <localDeveloperName>HVAC_Bill_Questions</localDeveloperName>
+        <masterLabel>HVAC Bill Questions</masterLabel>
+        <pluginType>Topic</pluginType>
+        <scope>Explain Brightline HVAC bills from the posted invoices. Don't change bills, prices, agreements or payments.</scope>
+    </localTopics>
+    <localTopics>
+        <fullName>RLM_HVAC_Commercial_Invoice_Questions</fullName>
+        <aiPluginUtterances>
+            <developerName>utterance1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 1</masterLabel>
+            <utterance>Explain the Lakeshore Property Group invoice by site.</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance2</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 2</masterLabel>
+            <utterance>Why is this invoice $4,551.13?</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance3</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 3</masterLabel>
+            <utterance>What is Harvest Table Restaurant paying for on this invoice?</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance4</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 4</masterLabel>
+            <utterance>Which site costs the most on the latest Lakeshore invoice?</utterance>
+        </aiPluginUtterances>
+        <aiPluginUtterances>
+            <developerName>utterance5</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>utterance 5</masterLabel>
+            <utterance>What milestone is DOC-000000009 billing?</utterance>
+        </aiPluginUtterances>
+        <canEscalate>false</canEscalate>
+        <description>Explains a Brightline Commercial consolidated invoice for a property group site by site: each site's services, charges and tax, the PO number, payment terms and due date, and capital project milestone invoices (deposit, installation, commissioning). Use it for property groups, their sites, and commercial contract or project invoices.</description>
+        <developerName>RLM_HVAC_Commercial_Invoice_Questions</developerName>
+        <genAiPluginInstructions>
+            <description>Always call the Explain Commercial Invoice by Site action before answering. Pass currentRecordId as recordId whenever the user is on an Invoice or Account record, the property group or site name the user mentioned, the site they asked about as siteName, the invoice number if given, and any amount they mentioned as a number. Don't ask for the customer's name when currentRecordId is available.</description>
+            <developerName>Instruction1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 1</masterLabel>
+            <sortOrder>0</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>Answer only from the action's explanation. Never calculate, estimate, round or change any amount, never split costs differently from the explanation, and never offer discounts or credits. If the explanation says no invoice or site matches, say so and describe the invoice it returned.</description>
+            <developerName>Instruction2</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 2</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>Lead with one sentence that answers the question, for example "Invoice DOC-000000007 is $4,551.13 for all seven Lakeshore sites under PO LPG-PO-2026-118, due Dec 5, 2026." Then give a short list with each site's total and its charges plus tax. If the user asked about one site, explain that site's services line by line and say what share of the invoice it is.</description>
+            <developerName>Instruction3</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 3</masterLabel>
+            <sortOrder>2</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>For a capital project invoice, say which milestone it bills (deposit, installation or commissioning) and the share of the project. End by noting the invoice goes to accounts payable at headquarters with the PO number, so each site's subtotal can be allocated to that site's budget.</description>
+            <developerName>Instruction4</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 4</masterLabel>
+            <sortOrder>3</sortOrder>
+        </genAiPluginInstructions>
+        <genAiPluginInstructions>
+            <description>If you can't tell which property group the user means, ask for its name. Never show Salesforce record Ids; refer to invoices by their document number.</description>
+            <developerName>Instruction5</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 5</masterLabel>
+            <sortOrder>4</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localActionLinks>
+            <functionName>RLM_HVAC_Explain_Site_Invoice</functionName>
+        </localActionLinks>
+        <localActions>
+            <fullName>RLM_HVAC_Explain_Site_Invoice</fullName>
+            <description>Returns a site-by-site explanation of a Brightline Commercial consolidated invoice: each site's services, subtotal and tax, the PO number, terms and due date, capital project milestones, and the property group's other recent invoices, with the totals already worked out.</description>
+            <developerName>RLM_HVAC_Explain_Site_Invoice</developerName>
+            <invocationTarget>RLM_HVAC_SiteInvoiceExplainer</invocationTarget>
+            <invocationTargetType>apex</invocationTargetType>
+            <isConfirmationRequired>false</isConfirmationRequired>
+            <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+            <localDeveloperName>Explain_Commercial_Invoice_by_Site</localDeveloperName>
+            <masterLabel>Explain Commercial Invoice by Site</masterLabel>
+            <progressIndicatorMessage>Reading the invoice by site ...</progressIndicatorMessage>
+        </localActions>
+        <localDeveloperName>HVAC_Commercial_Invoice_Questions</localDeveloperName>
+        <masterLabel>Commercial Invoice by Site</masterLabel>
+        <pluginType>Topic</pluginType>
+        <scope>Explain Brightline Commercial invoices by site from the posted invoices. Don't change invoices, prices, contracts, projects or payments.</scope>
+    </localTopics>
+    <masterLabel>Brightline Billing Agent</masterLabel>
+    <plannerType>AiCopilot__ReAct</plannerType>
+</GenAiPlannerBundle>

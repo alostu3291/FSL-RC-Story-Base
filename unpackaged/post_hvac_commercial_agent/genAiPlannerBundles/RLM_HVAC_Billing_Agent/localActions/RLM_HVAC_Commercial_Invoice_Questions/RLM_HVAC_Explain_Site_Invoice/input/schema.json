@@ -1,0 +1,41 @@
+{
+  "unevaluatedProperties": false,
+  "properties": {
+    "recordId": {
+      "title": "Record Id",
+      "description": "The record the user is on. Always pass currentRecordId when the user is on an Invoice or Account record, for example when they say 'this invoice' or 'this property group'.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": false
+    },
+    "accountName": {
+      "title": "Account Name",
+      "description": "The property group or site the user mentioned, for example Lakeshore Property Group.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    },
+    "siteName": {
+      "title": "Site Name",
+      "description": "The site the user asked about, for example Harvest Table Restaurant.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    },
+    "invoiceNumber": {
+      "title": "Invoice Number",
+      "description": "The invoice document number, for example DOC-000000007, if the user gave one.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    },
+    "amount": {
+      "title": "Amount",
+      "description": "The invoice or site amount the user asked about, as a number without the dollar sign, for example 4551.13.",
+      "lightning:type": "lightning__numberType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

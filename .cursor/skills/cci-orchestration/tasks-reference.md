@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**264 tasks** across **9 groups**.
+**266 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*180 task(s)*
+*182 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1137,6 +1137,18 @@
 
 ---
 
+### `deactivate_hvac_billing_agent`
+
+**Description:** Deactivate the Brightline Billing Agent so its planner bundle can be redeployed (an active agent rejects deploys). Skips an agent that is missing or already inactive.
+
+**Class:** `tasks.rlm_prompt_templates.DeactivateAgents`
+
+**Options:**
+
+- `api_names`: `RLM_HVAC_Billing_Agent`
+
+---
+
 ### `deploy_agents`
 
 **Description:** Deploy Agentforce Agent Configurations
@@ -1449,7 +1461,7 @@
 
 ### `deploy_post_hvac_commercial`
 
-**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase), the PO Number on Quote, contract booking (RLM_HVAC_ContractOrder activates the order with the PO, accounts payable as bill-to and the facility director as ship-to, after any required approval), site coverage (RLM_HVAC_CommercialCoverage, from RLM_HVAC_CommercialAssetTrigger, stamps each contract asset's site from its order product, then gives each site a response Entitlement on the Brightline Comfort Response process and a Maintenance Plan at its Location with a quarterly rule per rooftop unit; RLM_HVAC_CommercialWorkOrderTrigger fills the generated visits' address, Location, territory and contact), consolidated billing (RLM_HVAC_ContractInvoice bills the contract and its amendments as one invoice to the property group, RLM_HVAC_CommercialInvoiceTrigger stamps the PO Number on Invoice, and the rlmHvacInvoiceSites card shows the invoice by site), the Add Site action (RLM_HVAC_ContractAmend adds an uncovered site mid-term on an amendment order at the contract discount, co-terminated with the contract), the Renew Contract action (RLM_HVAC_ContractRenew creates the 12-month renewal quote with a line group per site at this year's price plus 3%; booking it extends each site's entitlement and maintenance plan), refrigerant compliance (RLM_HVAC_Refrigerant_Log__c and RLM_HVAC_RefrigerantCompliance compute each addition's annualized leak rate, and a unit holding 50 lb or more over the 10% limit gets a leak repair work order and a Leak Repair Due flag with a 30-day deadline; the rlmHvacRefrigerantLog Work Order action and Asset card), the Capital Project and Book Project actions (RLM_HVAC_CapitalProject quotes a site's aging rooftop unit replacements with a crane lift, books it with the PO and bills the 40% deposit; three DRO step flows create the crane lift, install and commissioning work orders in turn, and completing the install and commissioning bills the next milestone, with the install updating each unit in place), commercial documents (RLM_HVAC_CommercialDocuments and the rlmHvacDocument button on Book Contract, Book Project and the invoice by site card create the contract proposal, project proposal and consolidated invoice PDFs; the Quote milestone and installment amounts and RLM_HVAC_Invoice_Site__c, which holds each invoice's site subtotals, feed them) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
+**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase), the PO Number on Quote, contract booking (RLM_HVAC_ContractOrder activates the order with the PO, accounts payable as bill-to and the facility director as ship-to, after any required approval), site coverage (RLM_HVAC_CommercialCoverage, from RLM_HVAC_CommercialAssetTrigger, stamps each contract asset's site from its order product, then gives each site a response Entitlement on the Brightline Comfort Response process and a Maintenance Plan at its Location with a quarterly rule per rooftop unit; RLM_HVAC_CommercialWorkOrderTrigger fills the generated visits' address, Location, territory and contact), consolidated billing (RLM_HVAC_ContractInvoice bills the contract and its amendments as one invoice to the property group, RLM_HVAC_CommercialInvoiceTrigger stamps the PO Number on Invoice, the rlmHvacInvoiceSites card shows the invoice by site, and RLM_HVAC_SiteInvoiceExplainer is the billing agent's invoice-by-site action), the Add Site action (RLM_HVAC_ContractAmend adds an uncovered site mid-term on an amendment order at the contract discount, co-terminated with the contract), the Renew Contract action (RLM_HVAC_ContractRenew creates the 12-month renewal quote with a line group per site at this year's price plus 3%; booking it extends each site's entitlement and maintenance plan), refrigerant compliance (RLM_HVAC_Refrigerant_Log__c and RLM_HVAC_RefrigerantCompliance compute each addition's annualized leak rate, and a unit holding 50 lb or more over the 10% limit gets a leak repair work order and a Leak Repair Due flag with a 30-day deadline; the rlmHvacRefrigerantLog Work Order action and Asset card), the Capital Project and Book Project actions (RLM_HVAC_CapitalProject quotes a site's aging rooftop unit replacements with a crane lift, books it with the PO and bills the 40% deposit; three DRO step flows create the crane lift, install and commissioning work orders in turn, and completing the install and commissioning bills the next milestone, with the install updating each unit in place), commercial documents (RLM_HVAC_CommercialDocuments and the rlmHvacDocument button on Book Contract, Book Project and the invoice by site card create the contract proposal, project proposal and consolidated invoice PDFs; the Quote milestone and installment amounts and RLM_HVAC_Invoice_Site__c, which holds each invoice's site subtotals, feed them) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1458,6 +1470,18 @@
 - `path`: `unpackaged/post_hvac_commercial`
 - `test_level`: `RunSpecifiedTests`
 - `specified_tests`: `RLM_HVAC_ContractQuoteTest,RLM_HVAC_CommercialCoverageTest,RLM_HVAC_ContractChangeTest,RLM_HVAC_CapitalProjectTest,RL...`
+
+---
+
+### `deploy_post_hvac_commercial_agent`
+
+**Description:** Redeploy the Brightline Billing Agent planner with a second topic, Commercial Invoice by Site, that calls RLM_HVAC_SiteInvoiceExplainer to explain a property group's consolidated invoice site by site (services, subtotals and tax, PO and terms, capital project milestones). The bundle is a full copy of unpackaged/post_hvac_agent's planner with the residential HVAC Bill Questions topic kept, so keep the two in step. Requires deploy_post_hvac_agent and deploy_post_hvac_commercial; deactivate the agent first.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_hvac_commercial_agent`
 
 ---
 
