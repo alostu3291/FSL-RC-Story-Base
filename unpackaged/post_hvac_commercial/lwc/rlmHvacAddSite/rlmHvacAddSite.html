@@ -1,0 +1,83 @@
+<template>
+    <lightning-quick-action-panel header="Add a site to the contract">
+        <template lwc:if={state}>
+            <p class="eyebrow">{state.groupName}</p>
+            <template lwc:if={noContract}>
+                <p class="notice warn">There is no active contract to add a site to. Book a contract quote first.</p>
+            </template>
+            <template lwc:if={result}>
+                <p class="notice ok">{result.message}</p>
+                <p class="intro">
+                    The site gets its response coverage and quarterly maintenance plan in a minute or two, and its
+                    lines bill on the group's next consolidated invoice.
+                </p>
+            </template>
+            <template lwc:if={ready}>
+                <p class="intro">{introText}</p>
+                <template lwc:if={noCandidates}>
+                    <p class="notice">Every site with rooftop units on record is already on the contract.</p>
+                </template>
+                <template lwc:else>
+                    <ul class="candidates">
+                        <template for:each={candidates} for:item="c">
+                            <li key={c.accountId}>
+                                <button class={c.cls} data-id={c.accountId} aria-pressed={c.pressed} onclick={choose}>
+                                    <span class="head">
+                                        <span class="name">{c.name}</span>
+                                        <span class="price">
+                                            <lightning-formatted-number value={c.site.monthly} format-style="currency"
+                                                currency-code="USD"></lightning-formatted-number>/mo
+                                        </span>
+                                    </span>
+                                    <span class="detail">{c.summary}</span>
+                                </button>
+                                <template lwc:if={c.selected}>
+                                    <ul class="lines">
+                                        <template for:each={c.lines} for:item="l">
+                                            <li key={l.key} class="line">
+                                                <span class="line-name">{l.name}<span class="detail">{l.detail}</span></span>
+                                                <lightning-formatted-number value={l.amount} format-style="currency"
+                                                    currency-code="USD"></lightning-formatted-number>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                    <lightning-input type="date" label="Effective date" value={effectiveDate} min={state.contractStart}
+                        max={state.contractEnd} required onchange={changeDate}></lightning-input>
+                    <template lwc:if={selected}>
+                        <p class="term">
+                            <span>{termText}</span>
+                            <span class="term-value">
+                                <lightning-formatted-number value={termValue} format-style="currency"
+                                    currency-code="USD"></lightning-formatted-number>
+                            </span>
+                        </p>
+                    </template>
+                </template>
+            </template>
+        </template>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Adding the site" size="small"></lightning-spinner>
+        </template>
+
+        <div slot="footer">
+            <template lwc:if={result}>
+                <lightning-button label="Close" onclick={close}></lightning-button>
+                <lightning-button variant="brand" class="gap" label="Open order" onclick={openOrder}></lightning-button>
+            </template>
+            <template lwc:else>
+                <lightning-button label="Cancel" onclick={close}></lightning-button>
+                <template lwc:if={ready}>
+                    <lightning-button variant="brand" class="gap" label="Add site" disabled={addDisabled}
+                        onclick={add}></lightning-button>
+                </template>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

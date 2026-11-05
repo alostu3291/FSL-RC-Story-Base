@@ -103,6 +103,32 @@ public with sharing class RLM_HVAC_ContractQuote {
             FROM Account WHERE ParentId = :accountId OR Id = :accountId
             ORDER BY RLM_HVAC_Site_Code__c NULLS LAST, Name
         ];
+        Plan plan = planForSites(sites, filterProgram, discountPercent);
+        plan.accountId = parent.Id;
+        plan.accountName = parent.Name;
+        Date start = startDate == null ? RLM_HVAC_CommercialPricing.defaultStart(Date.today()) : startDate;
+        plan.startDate = String.valueOf(start);
+        plan.endDate = String.valueOf(RLM_HVAC_CommercialPricing.endFor(start));
+        Contact signer = signerFor(accountId);
+        plan.contactName = signer == null ? null : signer.Name;
+        for (Quote q : [
+            SELECT Id, Name FROM Quote
+            WHERE QuoteAccountId = :accountId AND RLM_Line_of_Business__c = :RLM_HVAC_CommercialPricing.LOB
+                AND Status NOT IN ('Accepted', 'Rejected', 'Denied')
+            ORDER BY CreatedDate DESC LIMIT 1
+        ]) {
+            plan.openQuoteId = q.Id;
+            plan.openQuoteName = q.Name;
+        }
+        return plan;
+    }
+
+    /** The contract lines for these sites, from their rooftop units and the commercial price book. */
+    /** Product SKUs are unique org-wide, so tests can't create the catalog's price book entries. */
+    @TestVisible
+    private static Map<String, Decimal> testPrices;
+
+    public static Plan planForSites(List<Account> sites, Boolean filterProgram, Decimal discountPercent) {
         List<Asset> units = [
             SELECT Id, AccountId, RLM_HVAC_Unit_Tag__c, RLM_HVAC_Tonnage__c, RLM_HVAC_Install_Year__c,
                 RLM_HVAC_Leak_Rate_Tracked__c
@@ -121,24 +147,13 @@ public with sharing class RLM_HVAC_ContractQuote {
             prices.put(e.Product2.StockKeepingUnit, e.UnitPrice);
             names.put(e.Product2.StockKeepingUnit, e.Product2.Name);
         }
-        Plan plan = buildPlan(sites, units, prices, names, filterProgram != false, discountPercent);
-        plan.accountId = parent.Id;
-        plan.accountName = parent.Name;
-        Date start = startDate == null ? RLM_HVAC_CommercialPricing.defaultStart(Date.today()) : startDate;
-        plan.startDate = String.valueOf(start);
-        plan.endDate = String.valueOf(RLM_HVAC_CommercialPricing.endFor(start));
-        Contact signer = signerFor(accountId);
-        plan.contactName = signer == null ? null : signer.Name;
-        for (Quote q : [
-            SELECT Id, Name FROM Quote
-            WHERE QuoteAccountId = :accountId AND RLM_Line_of_Business__c = :RLM_HVAC_CommercialPricing.LOB
-                AND Status NOT IN ('Accepted', 'Rejected', 'Denied')
-            ORDER BY CreatedDate DESC LIMIT 1
-        ]) {
-            plan.openQuoteId = q.Id;
-            plan.openQuoteName = q.Name;
+        if (testPrices != null) {
+            for (String sku : testPrices.keySet()) {
+                prices.put(sku, testPrices.get(sku));
+                names.put(sku, sku);
+            }
         }
-        return plan;
+        return buildPlan(sites, units, prices, names, filterProgram != false, discountPercent);
     }
 
     /** Pure contract math: sites and their units in, priced lines per site out. */

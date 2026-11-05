@@ -1,0 +1,49 @@
+<template>
+    <template lwc:if={show}>
+        <lightning-card title="Invoice by site" icon-name="standard:location">
+            <span slot="actions" class="header-total">{header}</span>
+            <div class="body">
+                <p class="terms">{terms}</p>
+                <ul class="sites">
+                    <template for:each={sites} for:item="site">
+                        <li key={site.key} class="site">
+                            <button type="button" class="row" data-key={site.key} aria-expanded={site.ariaExpanded}
+                                onclick={toggle}>
+                                <lightning-icon icon-name={site.icon} size="x-small" class="chevron"></lightning-icon>
+                                <span class="name">
+                                    {site.name}
+                                    <span class="meta">{site.meta}</span>
+                                    <span class="meta">{site.chargeLabel} + {site.taxLabel} tax</span>
+                                </span>
+                                <span class="amount strong">{site.totalLabel}</span>
+                            </button>
+                            <template lwc:if={site.open}>
+                                <ul class="lines">
+                                    <template for:each={site.lines} for:item="l">
+                                        <li key={l.key} class="line">
+                                            <span class="line-name">
+                                                {l.name}
+                                                <span class="meta">Qty {l.quantity} · {l.period}</span>
+                                            </span>
+                                            <span class="amount">{l.chargeLabel}</span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+                <div class="row foot">
+                    <span class="name">
+                        Total
+                        <span class="meta">{chargeLabel} + {taxLabel} tax</span>
+                    </span>
+                    <span class="amount strong">{totalLabel}</span>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+    <template lwc:elseif={error}>
+        <p class="error" role="alert">{error}</p>
+    </template>
+</template>

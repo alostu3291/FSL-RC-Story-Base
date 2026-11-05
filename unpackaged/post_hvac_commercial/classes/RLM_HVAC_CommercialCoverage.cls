@@ -10,6 +10,7 @@
  *    sets the 4-hour or next-business-day priority;
  *  - one Maintenance Plan at the site's Location with a quarterly rule per rooftop unit, so each
  *    generated visit is one Work Order for the site with a line per unit.
+ * A renewal extends the contract assets' end dates, which extends the entitlements and plans.
  */
 public with sharing class RLM_HVAC_CommercialCoverage {
     public static final String PLAN_TITLE = 'Brightline commercial maintenance';
@@ -45,6 +46,32 @@ public with sharing class RLM_HVAC_CommercialCoverage {
         if (!assetIds.isEmpty() && Limits.getQueueableJobs() < Limits.getLimitQueueableJobs()
                 && !(Test.isRunningTest() && System.isQueueable())) {
             System.enqueueJob(new SiteJob(assetIds, 1), Test.isRunningTest() ? 0 : DELAY_MINUTES);
+        }
+    }
+
+    /** A renewal moved contract assets' end dates: extend their sites' entitlements and plans. */
+    public static void assetsUpdated(List<Asset> assets, Map<Id, Asset> oldMap) {
+        Set<Id> siteIds = new Set<Id>();
+        for (Asset a : assets) {
+            if (a.RLM_HVAC_Site__c != null && a.LifecycleEndDate != oldMap.get(a.Id).LifecycleEndDate) {
+                siteIds.add(a.RLM_HVAC_Site__c);
+            }
+        }
+        if (!siteIds.isEmpty() && Limits.getQueueableJobs() < Limits.getLimitQueueableJobs()
+                && !(Test.isRunningTest() && System.isQueueable())) {
+            System.enqueueJob(new RefreshJob(siteIds), Test.isRunningTest() ? 0 : DELAY_MINUTES);
+        }
+    }
+
+    public class RefreshJob implements Queueable {
+        private final Set<Id> siteIds;
+
+        public RefreshJob(Set<Id> siteIds) {
+            this.siteIds = siteIds;
+        }
+
+        public void execute(QueueableContext context) {
+            RLM_HVAC_Coverage.generate(activate(siteIds));
         }
     }
 
@@ -175,14 +202,22 @@ public with sharing class RLM_HVAC_CommercialCoverage {
                 responseIds.add(sc.response.Id);
             }
         }
-        Set<Id> entitled = new Set<Id>();
-        for (Entitlement e : [SELECT AssetId FROM Entitlement WHERE AssetId IN :responseIds]) {
-            entitled.add(e.AssetId);
+        Map<Id, Entitlement> entitled = new Map<Id, Entitlement>();
+        for (Entitlement e : [SELECT Id, AssetId, EndDate FROM Entitlement WHERE AssetId IN :responseIds]) {
+            entitled.put(e.AssetId, e);
         }
         Id process = responseProcessId();
         List<Entitlement> created = new List<Entitlement>();
+        List<Entitlement> extended = new List<Entitlement>();
         for (SiteCoverage sc : sites) {
-            if (sc.response == null || entitled.contains(sc.response.Id)) {
+            if (sc.response == null) {
+                continue;
+            }
+            Entitlement existing = entitled.get(sc.response.Id);
+            if (existing != null) {
+                if (sc.endDate != null && existing.EndDate != null && existing.EndDate < sc.endDate) {
+                    extended.add(new Entitlement(Id = existing.Id, EndDate = sc.endDate));
+                }
                 continue;
             }
             created.add(new Entitlement(
@@ -196,6 +231,7 @@ public with sharing class RLM_HVAC_CommercialCoverage {
             ));
         }
         insert created;
+        update extended;
     }
 
     private static Set<Id> syncPlans(List<SiteCoverage> sites) {
@@ -206,13 +242,18 @@ public with sharing class RLM_HVAC_CommercialCoverage {
             siteIds.add(sc.site.Id);
         }
         for (MaintenancePlan mp : [
-            SELECT Id, AccountId FROM MaintenancePlan WHERE AccountId IN :siteIds AND MaintenancePlanTitle = :PLAN_TITLE
+            SELECT Id, AccountId, EndDate FROM MaintenancePlan WHERE AccountId IN :siteIds AND MaintenancePlanTitle = :PLAN_TITLE
         ]) {
             planBySite.put(mp.AccountId, mp);
         }
         List<MaintenancePlan> newPlans = new List<MaintenancePlan>();
+        List<MaintenancePlan> extendedPlans = new List<MaintenancePlan>();
         for (SiteCoverage sc : sites) {
-            if (planBySite.containsKey(sc.site.Id) || sc.units.isEmpty()) {
+            MaintenancePlan existing = planBySite.get(sc.site.Id);
+            if (existing != null && sc.endDate != null && existing.EndDate != null && existing.EndDate < sc.endDate) {
+                extendedPlans.add(new MaintenancePlan(Id = existing.Id, EndDate = sc.endDate));
+            }
+            if (existing != null || sc.units.isEmpty()) {
                 continue;
             }
             MaintenancePlan mp = new MaintenancePlan(
@@ -235,6 +276,7 @@ public with sharing class RLM_HVAC_CommercialCoverage {
             planBySite.put(sc.site.Id, mp);
         }
         insert newPlans;
+        update extendedPlans;
 
         Set<Id> planIds = new Map<Id, MaintenancePlan>(planBySite.values()).keySet();
         Set<Id> maintained = new Set<Id>();

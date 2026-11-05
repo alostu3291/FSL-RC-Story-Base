@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Brightline Commercial HVAC demo: site type, site code and response tier on Account, rooftop unit details on Asset, the site on quote lines, order products and assets, the contract PO number, and the contract quote, order and coverage classes.</description>
+    <description>Brightline Commercial HVAC: site and rooftop unit fields, the site on quote lines, order products and assets, the PO number on quotes and invoices, and the contract quote, order, coverage, invoice, add-a-site and renewal classes.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>RLM Brightline HVAC Commercial</label>
     <classAccesses>
@@ -12,11 +12,23 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>RLM_HVAC_ContractAmend</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_HVAC_ContractInvoice</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>RLM_HVAC_ContractOrder</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
         <apexClass>RLM_HVAC_ContractQuote</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_HVAC_ContractRenew</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <fieldPermissions>
@@ -72,6 +84,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Asset.RLM_HVAC_Unit_Tag__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Invoice.RLM_HVAC_PO_Number__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

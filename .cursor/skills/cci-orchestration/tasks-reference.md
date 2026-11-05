@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**260 tasks** across **9 groups**.
+**261 tasks** across **9 groups**.
 
 ---
 
@@ -657,7 +657,7 @@
 
 ## Revenue Lifecycle Management
 
-*176 task(s)*
+*177 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1449,7 +1449,7 @@
 
 ### `deploy_post_hvac_commercial`
 
-**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase), the PO Number on Quote, contract booking (RLM_HVAC_ContractOrder activates the order with the PO, accounts payable as bill-to and the facility director as ship-to, after any required approval), site coverage (RLM_HVAC_CommercialCoverage, from RLM_HVAC_CommercialAssetTrigger, stamps each contract asset's site from its order product, then gives each site a response Entitlement on the Brightline Comfort Response process and a Maintenance Plan at its Location with a quarterly rule per rooftop unit; RLM_HVAC_CommercialWorkOrderTrigger fills the generated visits' address, Location, territory and contact) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
+**Description:** Deploy Brightline Commercial metadata (Site Type, Site Code and Response Tier on Account; Unit Tag, Tonnage, Tonnage Band, Install Year, Refrigerant Type and Charge, and Leak Rate Tracked on Asset for rooftop units; a Site lookup on Quote Line Item, Order Product and Asset), the multi-site contract quote (RLM_HVAC_ContractQuote builds one 12-month, Net 30 quote with a line group per site, maintenance lines by tonnage band, an optional filter program and the site's response coverage; RLM_HVAC_CommercialPricing holds the bands, the 15% approval threshold and the 3% renewal increase), the PO Number on Quote, contract booking (RLM_HVAC_ContractOrder activates the order with the PO, accounts payable as bill-to and the facility director as ship-to, after any required approval), site coverage (RLM_HVAC_CommercialCoverage, from RLM_HVAC_CommercialAssetTrigger, stamps each contract asset's site from its order product, then gives each site a response Entitlement on the Brightline Comfort Response process and a Maintenance Plan at its Location with a quarterly rule per rooftop unit; RLM_HVAC_CommercialWorkOrderTrigger fills the generated visits' address, Location, territory and contact), consolidated billing (RLM_HVAC_ContractInvoice bills the contract and its amendments as one invoice to the property group, RLM_HVAC_CommercialInvoiceTrigger stamps the PO Number on Invoice, and the rlmHvacInvoiceSites card shows the invoice by site), the Add Site action (RLM_HVAC_ContractAmend adds an uncovered site mid-term on an amendment order at the contract discount, co-terminated with the contract), the Renew Contract action (RLM_HVAC_ContractRenew creates the 12-month renewal quote with a line group per site at this year's price plus 3%; booking it extends each site's entitlement and maintenance plan) and the RLM_Brightline_HVAC_Commercial permission set. Requires deploy_post_hvac.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1457,7 +1457,7 @@
 
 - `path`: `unpackaged/post_hvac_commercial`
 - `test_level`: `RunSpecifiedTests`
-- `specified_tests`: `RLM_HVAC_ContractQuoteTest,RLM_HVAC_CommercialCoverageTest`
+- `specified_tests`: `RLM_HVAC_ContractQuoteTest,RLM_HVAC_CommercialCoverageTest,RLM_HVAC_ContractChangeTest`
 
 ---
 
@@ -2666,6 +2666,18 @@
 **Description:** Seed an existing Brightline customer by running the real sale end to end (account_name, street, plan Basic/Plus/Premier, system_type, systems, install_year, iaq, water_heater, repair) - system check with findings, quote, proposal PDF, Sign & Pay, activated order, Initial Tune-up booked and completed with its checklist and approved repairs - then waits for the agreement entitlements, maintenance plan and tune-up invoice and reports them. Resumes where a previous run stopped; a customer who already has an agreement is only reported. Use before seed_hvac_service_call in an org with no agreement customers.
 
 **Class:** `tasks.rlm_hvac_seed_agreement.SeedHvacAgreementCustomer`
+
+---
+
+### `seed_hvac_commercial_new_site`
+
+**Description:** Idempotently seed Westfield Commons Office (LPG-WFC), a seventh Lakeshore site with a Location and six rooftop units, for the add-a-site story. Run it after the contract is booked, because a site seeded earlier is quoted with the others; it is not part of prepare_hvac_commercial.
+
+**Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
+
+**Options:**
+
+- `path`: `scripts/apex/seedHvacCommercialNewSite.apex`
 
 ---
 

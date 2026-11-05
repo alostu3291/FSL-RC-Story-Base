@@ -1,0 +1,96 @@
+.body {
+    padding: 0 1rem 0.5rem;
+}
+
+.header-total {
+    font-weight: 600;
+    color: #0b3a5c;
+}
+
+.terms {
+    margin-bottom: 0.5rem;
+    color: #3e4c59;
+}
+
+.sites {
+    border-top: 1px solid #e5e9ed;
+}
+
+.site {
+    border-bottom: 1px solid #e5e9ed;
+}
+
+.row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem 0.25rem;
+    border: 0;
+    background: none;
+    text-align: left;
+}
+
+button.row {
+    cursor: pointer;
+}
+
+button.row:hover {
+    background: #f6f8fa;
+}
+
+.chevron {
+    margin-top: 0.125rem;
+}
+
+.name {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: #16222e;
+}
+
+.meta {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #5c6b7a;
+}
+
+.amount {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.strong {
+    font-weight: 600;
+    color: #16222e;
+}
+
+.foot {
+    border-top: 2px solid #c9d1d9;
+    padding-left: 1.75rem;
+}
+
+.lines {
+    margin: -0.25rem 0 0.5rem 1.75rem;
+    font-size: 0.8125rem;
+}
+
+.line {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.25rem 0.25rem 0.25rem 0;
+    border-top: 1px solid #eef1f4;
+}
+
+.line-name {
+    min-width: 0;
+    color: #16222e;
+}
+
+.error {
+    color: #b3261e;
+}

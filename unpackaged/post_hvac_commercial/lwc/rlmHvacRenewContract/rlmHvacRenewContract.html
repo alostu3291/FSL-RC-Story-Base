@@ -1,0 +1,85 @@
+<template>
+    <lightning-quick-action-panel header="Renew contract">
+        <template lwc:if={state}>
+            <p class="eyebrow">{state.groupName}</p>
+            <template lwc:if={noContract}>
+                <p class="notice warn">There is no active contract to renew.</p>
+            </template>
+            <template lwc:else>
+                <template lwc:if={created}>
+                    <p class="notice ok">
+                        {state.renewalQuoteName} is ready, with a line group per site. Send it for signature, then book it
+                        with next year's PO.
+                    </p>
+                </template>
+                <template lwc:elseif={hasQuote}>
+                    <p class="notice">Renewal quote {state.renewalQuoteName} is already open.</p>
+                </template>
+                <template lwc:else>
+                    <p class="intro">{introText}</p>
+                </template>
+                <table class="sites">
+                    <thead>
+                        <tr>
+                            <th scope="col">Site</th>
+                            <th scope="col" class="num">This year</th>
+                            <th scope="col" class="num">Renewal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={sites} for:item="s">
+                            <tr key={s.key}>
+                                <td>{s.name}</td>
+                                <td class="num">
+                                    <lightning-formatted-number value={s.currentMonthly} format-style="currency"
+                                        currency-code="USD"></lightning-formatted-number>
+                                </td>
+                                <td class="num">
+                                    <lightning-formatted-number value={s.renewalMonthly} format-style="currency"
+                                        currency-code="USD"></lightning-formatted-number>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th scope="row">Monthly</th>
+                            <td class="num">
+                                <lightning-formatted-number value={state.currentMonthly} format-style="currency"
+                                    currency-code="USD"></lightning-formatted-number>
+                            </td>
+                            <td class="num">
+                                <lightning-formatted-number value={state.renewalMonthly} format-style="currency"
+                                    currency-code="USD"></lightning-formatted-number>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <p class="term">
+                    <span>{increaseText}</span>
+                    <span class="term-value">
+                        <lightning-formatted-number value={state.renewalAnnual} format-style="currency"
+                            currency-code="USD"></lightning-formatted-number>
+                    </span>
+                </p>
+            </template>
+        </template>
+        <template lwc:if={error}>
+            <p class="error" role="alert">{error}</p>
+        </template>
+        <template lwc:if={busy}>
+            <lightning-spinner alternative-text="Creating the renewal quote" size="small"></lightning-spinner>
+        </template>
+
+        <div slot="footer">
+            <lightning-button label={closeLabel} onclick={close}></lightning-button>
+            <template lwc:if={canRenew}>
+                <lightning-button variant="brand" class="gap" label="Create renewal quote" disabled={busy}
+                    onclick={createRenewal}></lightning-button>
+            </template>
+            <template lwc:if={hasQuote}>
+                <lightning-button variant="brand" class="gap" label="Open renewal quote" onclick={openQuote}></lightning-button>
+            </template>
+        </div>
+    </lightning-quick-action-panel>
+</template>

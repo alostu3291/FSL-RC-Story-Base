@@ -1,0 +1,18 @@
+feature: hvac_commercial
+feature_flag: hvac_commercial
+# Invoice by site (PO, terms and a subtotal per site) at the top of the Invoice sidebar. It renders
+# only on Brightline Commercial contract invoices.
+patches:
+  - type: insert_after_xml
+    anchor: |-
+      <name>sidebartabs</name>
+              <type>Facet</type>
+          </flexiPageRegions>
+          <flexiPageRegions>
+    xml: |2
+              <itemInstances>
+                  <componentInstance>
+                      <componentName>rlmHvacInvoiceSites</componentName>
+                      <identifier>c_rlmHvacInvoiceSites</identifier>
+                  </componentInstance>
+              </itemInstances>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionSubtype>ScreenAction</actionSubtype>
+    <description>Add a site to the property group's running Brightline Commercial contract: its rooftop units priced at the contract discount, co-terminated with the contract and billed on the group's consolidated invoice.</description>
+    <label>Add Site</label>
+    <lightningWebComponent>rlmHvacAddSite</lightningWebComponent>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>LightningWebComponent</type>
+</QuickAction>
