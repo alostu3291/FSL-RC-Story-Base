@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_HVAC_Installment_Amount__c</fullName>
+    <description>Brightline Commercial contract: the term's recurring total split into equal monthly invoices.</description>
+    <formula>IF(RLM_TermMonths__c &gt; 0, RLM_HVAC_Monthly_Total__c / RLM_TermMonths__c, 0)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Contract Installment</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <type>Currency</type>
+</CustomField>

@@ -198,6 +198,21 @@ the templates and re-upload their binaries:
 | `RLM_HVAC_Replacement_Proposal` | Replacement quotes (Replacement Options) | `RLMHVACReplacementProposalExtract` / `Transform`: findings, why we recommend replacing it, your new system, install-day next steps and warranty |
 | `RLM_HVAC_Invoice` | Invoice documents | Platform invoice mappings with Brightline branding |
 
+With `hvac_commercial: true` as well, `prepare_hvac_commercial` steps 7–9 deploy
+`unpackaged/post_hvac_commercial_docgen`. The Book Contract and Book Project actions and the
+Invoice by Site card get a button that creates the PDF and attaches it to the record
+(`RLM_HVAC_CommercialDocuments`):
+
+| Template | Used for | Data |
+|----------|----------|------|
+| `RLM_HVAC_Contract_Proposal` | Multi-site contract quotes | `RLMHVACContractProposalExtract` / `Transform`: a row per site (units, tons, response, price per year), the term, monthly invoice and contract total, then each site's services and the units they cover |
+| `RLM_HVAC_Project_Proposal` | Capital project quotes | `RLMHVACProjectProposalExtract` / `Transform`: scope, unit replacements and crane lift, and the 40/40/20 milestone schedule (Quote `RLM_HVAC_Deposit_Amount__c`, `Install_Amount__c`, `Commissioning_Amount__c`) |
+| `RLM_HVAC_Commercial_Invoice` | Contract and project invoices | `RLMHVACCommercialInvoiceExtract` / `Transform`: the PO number, due date and a subtotal per site from `RLM_HVAC_Invoice_Site__c`, which `RLM_HVAC_ContractInvoice.stampSites` rebuilds when the invoice posts and again before each PDF |
+
+Rebuild them with `scripts/docgen/build_hvac_commercial_docs.py` and
+`build_hvac_commercial_odts.py`; the second script also writes the `.dt-meta.xml` token lists.
+After a redeploy, DocGen can keep rendering the previous template version for a minute or two.
+
 Build the proposals with `scripts/docgen/build_hvac_proposal.py` (add `replacement` for the
 replacement proposal) and `build_hvac_proposal_odts.py`, and the invoice with
 `build_hvac_invoice.py`; don't hand-edit the `.dt` or `.rpt-meta.xml` files. Redeploying a

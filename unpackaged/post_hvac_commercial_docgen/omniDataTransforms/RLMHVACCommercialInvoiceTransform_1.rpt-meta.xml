@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OmniDataTransform xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>false</active>
+    <assignmentRulesUsed>false</assignmentRulesUsed>
+    <deletedOnSuccess>false</deletedOnSuccess>
+    <errorIgnored>false</errorIgnored>
+    <expectedOutputJson>{
+  "DocumentNumber": "DOC-000000007",
+  "InvoiceDate": "11/05/2026",
+  "DueDate": "12/05/2026",
+  "PoNumber": "LPG-PO-2026-118",
+  "InvoiceCharge": "$4,212.00",
+  "InvoiceTax": "$339.13",
+  "InvoiceTotal": "$4,551.13",
+  "Balance": "$4,551.13",
+  "AccountName": "Lakeshore Property Group",
+  "BillingStreet": "1 Lakeshore Plaza",
+  "BillingCity": "Naperville",
+  "BillingState": "IL",
+  "BillingPostalCode": "60563",
+  "BillTo": "Accounts Payable",
+  "BillToEmail": "ap@example.com",
+  "Site": [
+    {
+      "Name": "Ember &amp; Oak Bistro",
+      "Coverage": "Restaurant \u00b7 4 hours response",
+      "Period": "Dec 1, 2026 \u2013 Dec 31, 2026",
+      "Services": "Filter Program (4); Planned Maintenance, 6 to 12 tons (3)",
+      "Charge": "$402.05",
+      "Tax": "$32.37",
+      "Total": "$434.42"
+    }
+  ]
+}</expectedOutputJson>
+    <fieldLevelSecurityEnabled>false</fieldLevelSecurityEnabled>
+    <inputType>JSON</inputType>
+    <isManagedUsingStdDesigner>false</isManagedUsingStdDesigner>
+    <name>RLMHVACCommercialInvoiceTransform</name>
+    <nullInputsIncludedInOutput>false</nullInputsIncludedInOutput>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>a1787d10-1153-53a4-9ea7-88e0243ca20c</globalKey>
+        <inputFieldName>DocumentNumber</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>DocumentNumber</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>6db53321-b622-56a3-985e-7d43a0599d48</globalKey>
+        <inputFieldName>InvoiceDate</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>InvoiceDate</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>dafce543-29dc-5713-bf0e-26fd3cb169f9</globalKey>
+        <inputFieldName>DueDate</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>DueDate</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>4fba938c-fb40-5af7-bb33-6b7bf2befa7d</globalKey>
+        <inputFieldName>PoNumber</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>PoNumber</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>2b80cb03-c6b9-55fe-91e6-56aa6918bd72</globalKey>
+        <inputFieldName>InvoiceCharge</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>InvoiceCharge</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>5b057d50-5ffb-5bd5-9d0e-251de86a6d88</globalKey>
+        <inputFieldName>InvoiceTax</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>InvoiceTax</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>44f46291-6c0e-5387-9a28-408d793467a7</globalKey>
+        <inputFieldName>InvoiceTotal</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>InvoiceTotal</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>9fcb46ad-6c11-53a5-83d3-43c62b0f0298</globalKey>
+        <inputFieldName>Balance</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Balance</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>00efd487-48f1-58f0-9336-a4a7bd02fc3a</globalKey>
+        <inputFieldName>AccountName</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>AccountName</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>0da03bb5-47a9-5f25-a75f-879f89e3ee0d</globalKey>
+        <inputFieldName>BillingStreet</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingStreet</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>6ce287c5-c451-5df7-b828-45766a2a1b6b</globalKey>
+        <inputFieldName>BillingCity</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingCity</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>8006f9e8-0bc1-5e4f-a42c-c60c225fed05</globalKey>
+        <inputFieldName>BillingState</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingState</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>418d97c0-cc3a-528d-9e39-9564a187e77c</globalKey>
+        <inputFieldName>BillingPostalCode</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillingPostalCode</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>a34c523e-4005-589c-9d4b-56038535ddbd</globalKey>
+        <inputFieldName>BillTo</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillTo</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>e41a23f0-fbae-5aec-b665-f481c5c8237a</globalKey>
+        <inputFieldName>BillToEmail</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>BillToEmail</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>7a6ee768-3d01-5173-8527-765c3d6d1e4d</globalKey>
+        <inputFieldName>Site:Name</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Name</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>03c0b9b2-8688-5be9-9c48-da225462dbe8</globalKey>
+        <inputFieldName>Site:Coverage</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Coverage</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>69a567a6-4a99-512c-baa8-62d589c300d3</globalKey>
+        <inputFieldName>Site:Period</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Period</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>e459f658-650b-5e23-a05d-ddc4e56d3fbc</globalKey>
+        <inputFieldName>Site:Services</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Services</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>cbee4491-3ae6-5d23-a3d2-e7a577787757</globalKey>
+        <inputFieldName>Site:Charge</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Charge</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>59435992-e207-583e-8f54-a90cb685848a</globalKey>
+        <inputFieldName>Site:Tax</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Tax</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <omniDataTransformItem>
+        <disabled>false</disabled>
+        <filterGroup>0.0</filterGroup>
+        <globalKey>59b97fc2-03ed-583b-9171-aacf32eb707b</globalKey>
+        <inputFieldName>Site:Total</inputFieldName>
+        <inputObjectQuerySequence>0.0</inputObjectQuerySequence>
+        <linkedObjectSequence>0.0</linkedObjectSequence>
+        <name>RLMHVACCommercialInvoiceTransform</name>
+        <outputCreationSequence>1.0</outputCreationSequence>
+        <outputFieldName>Site:Total</outputFieldName>
+        <outputObjectName>json</outputObjectName>
+        <requiredForUpsert>false</requiredForUpsert>
+        <transformValuesMappings>{ }</transformValuesMappings>
+        <upsertKey>false</upsertKey>
+    </omniDataTransformItem>
+    <outputType>JSON</outputType>
+    <previewJsonData>{
+  "DocumentNumber": "DOC-000000007",
+  "InvoiceDate": "11/05/2026",
+  "DueDate": "12/05/2026",
+  "PoNumber": "LPG-PO-2026-118",
+  "InvoiceCharge": "$4,212.00",
+  "InvoiceTax": "$339.13",
+  "InvoiceTotal": "$4,551.13",
+  "Balance": "$4,551.13",
+  "AccountName": "Lakeshore Property Group",
+  "BillingStreet": "1 Lakeshore Plaza",
+  "BillingCity": "Naperville",
+  "BillingState": "IL",
+  "BillingPostalCode": "60563",
+  "BillTo": "Accounts Payable",
+  "BillToEmail": "ap@example.com",
+  "Site": [
+    {
+      "Name": "Ember &amp; Oak Bistro",
+      "Coverage": "Restaurant \u00b7 4 hours response",
+      "Period": "Dec 1, 2026 \u2013 Dec 31, 2026",
+      "Services": "Filter Program (4); Planned Maintenance, 6 to 12 tons (3)",
+      "Charge": "$402.05",
+      "Tax": "$32.37",
+      "Total": "$434.42"
+    }
+  ]
+}</previewJsonData>
+    <processSuperBulk>false</processSuperBulk>
+    <responseCacheTtlMinutes>0.0</responseCacheTtlMinutes>
+    <rollbackOnError>false</rollbackOnError>
+    <sourceObjectDefault>false</sourceObjectDefault>
+    <synchronousProcessThreshold>0.0</synchronousProcessThreshold>
+    <targetOutputFileName>Brightline_Commercial_Invoice(Version 1)</targetOutputFileName>
+    <type>Transform</type>
+    <uniqueName>RLMHVACCommercialInvoiceTransform_1</uniqueName>
+    <versionNumber>1.0</versionNumber>
+    <xmlDeclarationRemoved>false</xmlDeclarationRemoved>
+</OmniDataTransform>

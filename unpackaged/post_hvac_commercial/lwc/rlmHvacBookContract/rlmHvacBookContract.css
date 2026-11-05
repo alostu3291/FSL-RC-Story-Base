@@ -71,3 +71,8 @@
 .gap {
     margin-left: 0.5rem;
 }
+
+.document {
+    display: block;
+    margin: 0.75rem 0;
+}

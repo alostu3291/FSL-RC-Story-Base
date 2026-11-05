@@ -2,6 +2,7 @@
     <lightning-quick-action-panel header="Book contract">
         <template lwc:if={status}>
             <p class="eyebrow">{status.quoteName}</p>
+            <c-rlm-hvac-document class="document" record-id={recordId}></c-rlm-hvac-document>
             <template lwc:if={booked}>
                 <ul class="steps">
                     <template for:each={steps} for:item="step">

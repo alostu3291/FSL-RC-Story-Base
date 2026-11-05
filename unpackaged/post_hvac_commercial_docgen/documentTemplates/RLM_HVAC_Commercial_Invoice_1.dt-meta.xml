@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DocumentTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <documentGenerationMechanism>ServerSide</documentGenerationMechanism>
+    <extractOmniDataTransformName>RLMHVACCommercialInvoiceExtract</extractOmniDataTransformName>
+    <fileExtension>docx</fileExtension>
+    <hasBatchableSection>false</hasBatchableSection>
+    <isActive>true</isActive>
+    <isSectionProcessed>false</isSectionProcessed>
+    <mapperOmniDataTransformName>RLMHVACCommercialInvoiceTransform</mapperOmniDataTransformName>
+    <name>RLM_HVAC_Commercial_Invoice</name>
+    <shouldDisplayUnmappedToken>false</shouldDisplayUnmappedToken>
+    <shouldExtractEmbeddedTmplToken>false</shouldExtractEmbeddedTmplToken>
+    <status>Active</status>
+    <tokenList>DocumentNumber,InvoiceDate,DueDate,PoNumber,InvoiceCharge,InvoiceTax,InvoiceTotal,Balance,AccountName,BillingStreet,BillingCity,BillingState,BillingPostalCode,BillTo,BillToEmail,Site:Name,Site:Coverage,Site:Period,Site:Services,Site:Charge,Site:Tax,Site:Total</tokenList>
+    <tokenMappingMethodType>OmniDataTransform</tokenMappingMethodType>
+    <tokenMappingType>JSON</tokenMappingType>
+    <type>MicrosoftWord</type>
+    <uniqueName>RLM_HVAC_Commercial_Invoice_1</uniqueName>
+    <usageType>Revenue_Lifecycle_Management</usageType>
+    <versionNumber>1</versionNumber>
+</DocumentTemplate>

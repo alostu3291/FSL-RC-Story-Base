@@ -94,3 +94,8 @@ button.row:hover {
 .error {
     color: #b3261e;
 }
+
+.document {
+    display: block;
+    margin: 0.75rem 0;
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DocumentTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <documentGenerationMechanism>ServerSide</documentGenerationMechanism>
+    <extractOmniDataTransformName>RLMHVACContractProposalExtract</extractOmniDataTransformName>
+    <fileExtension>docx</fileExtension>
+    <hasBatchableSection>false</hasBatchableSection>
+    <isActive>true</isActive>
+    <isSectionProcessed>false</isSectionProcessed>
+    <mapperOmniDataTransformName>RLMHVACContractProposalTransform</mapperOmniDataTransformName>
+    <name>RLM_HVAC_Contract_Proposal</name>
+    <shouldDisplayUnmappedToken>false</shouldDisplayUnmappedToken>
+    <shouldExtractEmbeddedTmplToken>false</shouldExtractEmbeddedTmplToken>
+    <status>Active</status>
+    <tokenList>QuoteNumber,CreatedDate,ExpirationDate,AccountName,BillingStreet,BillingCity,BillingState,BillingPostalCode,ContactName,ContactEmail,ContactPhone,SalesRep,SalesRepEmail,TermMonths,ContractTotal,Installment,Site:Name,Site:Coverage,Site:Annual,Site:Line:Name,Site:Line:Units,Site:Line:Quantity,Site:Line:Annual</tokenList>
+    <tokenMappingMethodType>OmniDataTransform</tokenMappingMethodType>
+    <tokenMappingType>JSON</tokenMappingType>
+    <type>MicrosoftWord</type>
+    <uniqueName>RLM_HVAC_Contract_Proposal_1</uniqueName>
+    <usageType>Revenue_Lifecycle_Management</usageType>
+    <versionNumber>1</versionNumber>
+</DocumentTemplate>

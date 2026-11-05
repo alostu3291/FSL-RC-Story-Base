@@ -6,7 +6,8 @@
  * the order's PO number:
  *  - new invoices get the PO number (RLM_HVAC_CommercialInvoiceTrigger queues the stamp, because the lines
  *    are written after the invoice);
- *  - siteSummary groups the lines by site with subtotals, for the invoice page and the billing agent.
+ *  - siteSummary groups the lines by site with subtotals, for the invoice page and the billing agent;
+ *  - stampSites saves those subtotals as RLM_HVAC_Invoice_Site__c rows for the consolidated invoice document.
  */
 public with sharing class RLM_HVAC_ContractInvoice {
 
@@ -96,6 +97,7 @@ public with sharing class RLM_HVAC_ContractInvoice {
 
         public void execute(QueueableContext context) {
             stampPurchaseOrders(invoiceIds);
+            stampSites(invoiceIds);
         }
     }
 
@@ -140,28 +142,42 @@ public with sharing class RLM_HVAC_ContractInvoice {
     }
 
     public static Summary summaryFor(Id invoiceId) {
-        Invoice inv = [
+        Summary s = summariesFor(new Set<Id>{ invoiceId }).get(invoiceId);
+        if (s == null) {
+            throw new QueryException('Invoice ' + invoiceId + ' was not found.');
+        }
+        return s;
+    }
+
+    public static Map<Id, Summary> summariesFor(Set<Id> invoiceIds) {
+        Map<Id, Summary> summaries = new Map<Id, Summary>();
+        for (Invoice inv : [
             SELECT Id, DocumentNumber, BillingAccount.Name, InvoiceDate, DueDate, TotalAmount, TotalTaxAmount,
                 TotalAmountWithTax, PaymentTerm.Name, BillToContact.Name, RLM_HVAC_PO_Number__c
-            FROM Invoice WHERE Id = :invoiceId
-        ];
-        Summary s = new Summary();
-        s.invoiceId = inv.Id;
-        s.documentNumber = inv.DocumentNumber;
-        s.accountName = inv.BillingAccount?.Name;
-        s.poNumber = inv.RLM_HVAC_PO_Number__c;
-        s.paymentTerm = inv.PaymentTerm?.Name;
-        s.billTo = inv.BillToContact?.Name;
-        s.invoiceDate = inv.InvoiceDate;
-        s.dueDate = inv.DueDate;
-        s.charge = inv.TotalAmount ?? 0;
-        s.tax = inv.TotalTaxAmount ?? 0;
-        s.total = inv.TotalAmountWithTax ?? s.charge + s.tax;
+            FROM Invoice WHERE Id IN :invoiceIds
+        ]) {
+            Summary s = new Summary();
+            s.invoiceId = inv.Id;
+            s.documentNumber = inv.DocumentNumber;
+            s.accountName = inv.BillingAccount?.Name;
+            s.poNumber = inv.RLM_HVAC_PO_Number__c;
+            s.paymentTerm = inv.PaymentTerm?.Name;
+            s.billTo = inv.BillToContact?.Name;
+            s.invoiceDate = inv.InvoiceDate;
+            s.dueDate = inv.DueDate;
+            s.charge = inv.TotalAmount ?? 0;
+            s.tax = inv.TotalTaxAmount ?? 0;
+            s.total = inv.TotalAmountWithTax ?? s.charge + s.tax;
+            summaries.put(inv.Id, s);
+        }
+        if (summaries.isEmpty()) {
+            return summaries;
+        }
 
         List<InvoiceLine> lines = [
-            SELECT Name, Quantity, ChargeAmount, TaxAmount, InvoiceLineStartDate, InvoiceLineEndDate,
+            SELECT InvoiceId, Name, Quantity, ChargeAmount, TaxAmount, InvoiceLineStartDate, InvoiceLineEndDate,
                 BillingSchedule.ReferenceEntityItemId, Product2.StockKeepingUnit
-            FROM InvoiceLine WHERE InvoiceId = :invoiceId AND Type = 'Charge'
+            FROM InvoiceLine WHERE InvoiceId IN :summaries.keySet() AND Type = 'Charge'
             ORDER BY Name
         ];
         Set<Id> itemIds = new Set<Id>();
@@ -175,9 +191,16 @@ public with sharing class RLM_HVAC_ContractInvoice {
                 RLM_HVAC_Site__r.RLM_HVAC_Response_Tier__c, RLM_HVAC_Site__r.RLM_HVAC_Site_Code__c
             FROM OrderItem WHERE Id IN :itemIds
         ]);
-        Map<String, Site> bySite = new Map<String, Site>();
-        Map<String, String> sortKey = new Map<String, String>();
+        Map<Id, Map<String, Site>> sitesByInvoice = new Map<Id, Map<String, Site>>();
+        Map<Id, Map<String, String>> sortByInvoice = new Map<Id, Map<String, String>>();
         for (InvoiceLine line : lines) {
+            Summary s = summaries.get(line.InvoiceId);
+            if (!sitesByInvoice.containsKey(line.InvoiceId)) {
+                sitesByInvoice.put(line.InvoiceId, new Map<String, Site>());
+                sortByInvoice.put(line.InvoiceId, new Map<String, String>());
+            }
+            Map<String, Site> bySite = sitesByInvoice.get(line.InvoiceId);
+            Map<String, String> sortKey = sortByInvoice.get(line.InvoiceId);
             OrderItem item = items.get(line.BillingSchedule?.ReferenceEntityItemId);
             String key = item?.RLM_HVAC_Site__c == null ? 'none' : String.valueOf(item.RLM_HVAC_Site__c);
             Site site = bySite.get(key);
@@ -210,15 +233,77 @@ public with sharing class RLM_HVAC_ContractInvoice {
             site.tax += l.tax;
             site.total = site.charge + site.tax;
         }
-        Map<String, String> keyBySort = new Map<String, String>();
-        for (String key : sortKey.keySet()) {
-            keyBySort.put(sortKey.get(key) + key, key);
+        for (Id invoiceId : sitesByInvoice.keySet()) {
+            Map<String, Site> bySite = sitesByInvoice.get(invoiceId);
+            Map<String, String> sortKey = sortByInvoice.get(invoiceId);
+            Map<String, String> keyBySort = new Map<String, String>();
+            for (String key : sortKey.keySet()) {
+                keyBySort.put(sortKey.get(key) + key, key);
+            }
+            List<String> order = new List<String>(keyBySort.keySet());
+            order.sort();
+            for (String k : order) {
+                summaries.get(invoiceId).sites.add(bySite.get(keyBySort.get(k)));
+            }
         }
-        List<String> order = new List<String>(keyBySort.keySet());
-        order.sort();
-        for (String k : order) {
-            s.sites.add(bySite.get(keyBySort.get(k)));
+        return summaries;
+    }
+
+    /**
+     * Rebuilds the invoice's site subtotal records (RLM_HVAC_Invoice_Site__c), which the consolidated
+     * invoice document and the billing agent read. Invoices without contract sites get none.
+     */
+    public static void stampSites(Set<Id> invoiceIds) {
+        delete [SELECT Id FROM RLM_HVAC_Invoice_Site__c WHERE RLM_HVAC_Invoice__c IN :invoiceIds];
+        List<RLM_HVAC_Invoice_Site__c> rows = new List<RLM_HVAC_Invoice_Site__c>();
+        for (Summary s : summariesFor(invoiceIds).values()) {
+            if (!s.isContract) {
+                continue;
+            }
+            Integer position = 0;
+            for (Site site : s.sites) {
+                rows.add(siteRow(s.invoiceId, site, ++position));
+            }
         }
-        return s;
+        insert rows;
+    }
+
+    private static RLM_HVAC_Invoice_Site__c siteRow(Id invoiceId, Site site, Integer position) {
+        List<String> services = new List<String>();
+        Date first;
+        Date last;
+        for (Line l : site.lines) {
+            Decimal qty = l.quantity ?? 1;
+            services.add(qty == 1 ? l.name : l.name + ' (' + qty.stripTrailingZeros().toPlainString() + ')');
+            if (l.startDate != null && (first == null || l.startDate < first)) {
+                first = l.startDate;
+            }
+            if (l.endDate != null && (last == null || l.endDate > last)) {
+                last = l.endDate;
+            }
+        }
+        List<String> coverage = new List<String>();
+        if (String.isNotBlank(site.siteType)) {
+            coverage.add(site.siteType);
+        }
+        if (String.isNotBlank(site.responseTier)) {
+            coverage.add(site.responseTier + ' response');
+        }
+        return new RLM_HVAC_Invoice_Site__c(
+            Name = site.name.abbreviate(80),
+            RLM_HVAC_Invoice__c = invoiceId,
+            RLM_HVAC_Site__c = site.accountId,
+            RLM_HVAC_Sort_Order__c = position,
+            RLM_HVAC_Coverage__c = String.join(coverage, ' · ').abbreviate(255),
+            RLM_HVAC_Services__c = String.join(services, '; ').abbreviate(2000),
+            RLM_HVAC_Period__c = first == null ? null : (periodLabel(first) + ' – ' + periodLabel(last ?? first)),
+            RLM_HVAC_Charge__c = site.charge,
+            RLM_HVAC_Tax__c = site.tax,
+            RLM_HVAC_Total__c = site.total
+        );
+    }
+
+    private static String periodLabel(Date d) {
+        return Datetime.newInstanceGmt(d, Time.newInstance(0, 0, 0, 0)).formatGmt('MMM d, yyyy');
     }
 }

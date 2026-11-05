@@ -7,6 +7,7 @@
             </template>
             <template lwc:elseif={booked}>
                 <p class="order">{orderText}</p>
+                <c-rlm-hvac-document class="document" record-id={recordId}></c-rlm-hvac-document>
                 <p class="section">Billing</p>
                 <ul class="rows">
                     <template for:each={milestones} for:item="m">
@@ -45,6 +46,7 @@
             </template>
             <template lwc:else>
                 <p class="intro">{introText}</p>
+                <c-rlm-hvac-document class="document" record-id={recordId}></c-rlm-hvac-document>
                 <ul class="rows">
                     <template for:each={milestones} for:item="m">
                         <li key={m.key} class="row">

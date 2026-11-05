@@ -1,0 +1,36 @@
+<template>
+    <template lwc:if={doc}>
+        <div class="doc">
+            <lightning-icon icon-name="doctype:pdf" size="small" class="icon"></lightning-icon>
+            <span class="text">
+                <template lwc:if={ready}>
+                    <span class="title">{doc.title}</span>
+                </template>
+                <template lwc:elseif={generating}>
+                    <span class="title">{progressText}</span>
+                </template>
+                <template lwc:elseif={failed}>
+                    <span class="title">The {kind} could not be created.</span>
+                    <span class="detail">{doc.message}</span>
+                </template>
+                <template lwc:else>
+                    <span class="title">No {kind} yet</span>
+                </template>
+            </span>
+            <span class="buttons">
+                <template lwc:if={generating}>
+                    <lightning-spinner alternative-text="Creating" size="x-small" class="spin"></lightning-spinner>
+                </template>
+                <template lwc:else>
+                    <template lwc:if={ready}>
+                        <lightning-button label={openLabel} variant="brand-outline" onclick={open}></lightning-button>
+                    </template>
+                    <lightning-button label={createLabel} class="gap" disabled={busy} onclick={generate}></lightning-button>
+                </template>
+            </span>
+        </div>
+    </template>
+    <template lwc:if={error}>
+        <p class="error" role="alert">{error}</p>
+    </template>
+</template>

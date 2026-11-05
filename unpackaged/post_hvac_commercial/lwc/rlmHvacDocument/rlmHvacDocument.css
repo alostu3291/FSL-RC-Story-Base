@@ -1,0 +1,47 @@
+:host {
+    display: block;
+}
+
+.doc {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e9ed;
+    border-radius: 0.25rem;
+    background: #f7f9fb;
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.title {
+    color: #1e2a35;
+    font-weight: 600;
+}
+
+.detail {
+    color: #5c6b7a;
+    font-size: 0.75rem;
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-width: 2rem;
+    min-height: 2rem;
+}
+
+.gap {
+    margin-left: 0.5rem;
+}
+
+.error {
+    margin-top: 0.5rem;
+    color: #ba0517;
+}

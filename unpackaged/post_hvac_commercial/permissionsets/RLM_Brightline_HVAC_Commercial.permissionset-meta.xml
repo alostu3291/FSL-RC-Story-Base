@@ -9,11 +9,24 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
+        <object>RLM_HVAC_Invoice_Site__c</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
         <object>RLM_HVAC_Refrigerant_Log__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
     <classAccesses>
         <apexClass>RLM_HVAC_CapitalProject</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_HVAC_CommercialDocuments</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -186,6 +199,71 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>RLM_HVAC_Refrigerant_Log__c.RLM_HVAC_Work_Order__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Charge__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Coverage__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Invoice__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Period__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Services__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Site__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Sort_Order__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Tax__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>RLM_HVAC_Invoice_Site__c.RLM_HVAC_Total__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Quote.RLM_HVAC_Commissioning_Amount__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Quote.RLM_HVAC_Deposit_Amount__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Quote.RLM_HVAC_Install_Amount__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Quote.RLM_HVAC_Installment_Amount__c</field>
         <readable>true</readable>
     </fieldPermissions>
 </PermissionSet>
