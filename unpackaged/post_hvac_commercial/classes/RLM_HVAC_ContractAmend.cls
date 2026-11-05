@@ -112,10 +112,12 @@ public with sharing class RLM_HVAC_ContractAmend {
         s.effectiveDate = defaultEffectiveDate(Date.today(), s.contractStart);
 
         // The PO is this term's (a renewal's, once renewed); the discount is the one the contract was sold at,
-        // because renewal quotes carry it in their prices rather than as a line discount.
+        // because renewal quotes carry it in their prices rather than as a line discount. Capital project
+        // quotes have their own PO and aren't part of the contract.
         for (Quote q : [
             SELECT RLM_HVAC_PO_Number__c FROM Quote
             WHERE QuoteAccountId = :grp.Id AND RLM_Line_of_Business__c = :RLM_HVAC_CommercialPricing.LOB AND Status = 'Accepted'
+                AND Id NOT IN (SELECT QuoteId FROM QuoteLineItem WHERE Product2.StockKeepingUnit = :RLM_HVAC_CapitalProject.REPLACEMENT_SKU)
             ORDER BY CreatedDate DESC LIMIT 1
         ]) {
             s.poNumber = q.RLM_HVAC_PO_Number__c;
@@ -125,6 +127,7 @@ public with sharing class RLM_HVAC_ContractAmend {
             FROM Quote
             WHERE QuoteAccountId = :grp.Id AND RLM_Line_of_Business__c = :RLM_HVAC_CommercialPricing.LOB AND Status = 'Accepted'
                 AND Id IN (SELECT QuoteId FROM QuoteLineItem WHERE Discount > 0)
+                AND Id NOT IN (SELECT QuoteId FROM QuoteLineItem WHERE Product2.StockKeepingUnit = :RLM_HVAC_CapitalProject.REPLACEMENT_SKU)
             ORDER BY CreatedDate DESC LIMIT 1
         ]) {
             s.discountPercent = q.QuoteLineItems[0].Discount;

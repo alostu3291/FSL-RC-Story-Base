@@ -56,7 +56,8 @@ full workflow, checks and report template.
 `prepare_hvac` step 11.5 books Priya Raman's System Check. A prospect who signed is used up;
 pick a new name and street for the next run.
 
-**Commercial (Lakeshore Property Group).** Once the contract is booked, `cci flow run
+**Commercial (Lakeshore Property Group).** The commercial story, scenes and run of show are in
+[`hvac-commercial-demo.md`](hvac-commercial-demo.md). Once the contract is booked, `cci flow run
 reset_hvac_commercial_demo` puts the commercial stories back in their starting state. The flow
 leaves orders, invoices and the contract alone. Each step is also a task you can run on its own:
 

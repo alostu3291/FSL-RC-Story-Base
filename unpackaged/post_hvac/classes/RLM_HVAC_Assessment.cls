@@ -231,7 +231,9 @@ public with sharing class RLM_HVAC_Assessment {
         List<WorkOrder> orders = [
             SELECT WorkType.Name, RLM_HVAC_Service_Steps__c FROM WorkOrder WHERE Id = :workOrderId
         ];
-        if (orders.isEmpty()) {
+        // Commercial work types (rooftop unit maintenance, leak repair, capital project steps) have no
+        // residential tune-up checklist; their per-unit work is on the work order lines.
+        if (orders.isEmpty() || (orders[0].WorkType?.Name ?? '').startsWith('Commercial ')) {
             return null;
         }
         Id assessmentId = assessmentFor(workOrderId);
