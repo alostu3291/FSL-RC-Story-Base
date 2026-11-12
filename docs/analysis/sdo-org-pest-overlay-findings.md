@@ -80,7 +80,7 @@ Layouts the admin profile uses, and what was added to each:
 
 | Object | Assigned layout | Added |
 |--------|-----------------|-------|
-| Work Order | `SDO SFS Work Order Layout` | Inspect & Quote and Treatment actions, plus a "Rentokil Pest" section (`RLM_RTK_Inspection__c`, `RLM_RTK_Reported_Pest__c`, `RLM_Service_Coverage__c`, `RLM_Order__c`, `RLM_Billable_Order__c`) |
+| Work Order | `SDO SFS Work Order Layout` | Inspect & Quote and Treatment actions, plus a "Verdant Pest" section (`RLM_RTK_Inspection__c`, `RLM_RTK_Reported_Pest__c`, `RLM_Service_Coverage__c`, `RLM_Order__c`, `RLM_Billable_Order__c`) |
 | Service Appointment | `SDO - SFS Service Appointment Feed Based` | Inspect & Quote |
 | Quote | `RC Quote Layout` | Sign & Pay |
 | Account | `Account Layout`, `SDO - Account`, `SDO - Partner Account`, `SDO - Account Community` (one per record type) | Inspect & Quote; Work Orders and Service Appointments related lists |
@@ -101,7 +101,7 @@ It patches whatever the org actually uses, in place:
   System Administrator; add technician profiles with `-o profiles "System
   Administrator,Field Technician"`). Into each one it copies the `*.RLM_RTK_*`
   actions from the matching `templates/layouts/pest` layout, plus any pest
-  `RLM_*` fields the layout lacks, in a "Rentokil Pest" section. It also
+  `RLM_*` fields the layout lacks, in a "Verdant Pest" section. It also
   copies related lists, with their columns, from a repo template:
   Work Orders and Service Appointments from the pest Account layout, and
   Maintenance Plans and Entitlements from `templates/layouts/fsl/Asset-RLM

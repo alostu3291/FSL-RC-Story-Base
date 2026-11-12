@@ -62,7 +62,7 @@ LAYOUT_AFTER_RELATED_LISTS = [
     "showSolutionSection", "showSubmitAndAttachButton", "summaryLayout",
 ]
 PEST_ACTION_MARKER = ".RLM_RTK_"
-PEST_SECTION_LABEL = "Rentokil Pest"
+PEST_SECTION_LABEL = "Verdant Pest"
 
 # Column names are validated per related list at deploy time and differ between lists
 # (WorkOrders wants Name, Entitlements wants the legacy ENTITLEMENT.* aliases).
