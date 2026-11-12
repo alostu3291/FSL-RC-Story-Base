@@ -6,6 +6,7 @@ priced Quote on a tablet, and Revenue Cloud plus Field Service run the lifecycle
 
 The storyboard deck is [`pest-control-demo-deck.pptx`](pest-control-demo-deck.pptx). Each scene is
 marked Live, Partly live or Vision, and the run-of-show slide lists the status of every scene. AI moments are marked ✧ Einstein, and the "Einstein at every step" slide summarizes them.
+[`rentokil-pest-control-demo-deck.pptx`](rentokil-pest-control-demo-deck.pptx) is the backup deck from before the rebrand: the same story, with Rentokil text and screenshots.
 Older story assets (screenshots, earlier deck drafts) are on the `pest-control` branch of
 [FSL-RC-Story-Base](https://github.com/alostu3291/FSL-RC-Story-Base).
 
