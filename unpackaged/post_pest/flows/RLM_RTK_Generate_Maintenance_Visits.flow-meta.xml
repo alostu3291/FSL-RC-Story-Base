@@ -14,7 +14,7 @@
                 <elementReference>recordId</elementReference>
             </value>
         </inputParameters>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
+        <storeOutputAutomatically>false</storeOutputAutomatically>
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <description>Generates the recurring visit Work Orders for a Rentokil maintenance plan. Called by RLM_RTK_Coverage, because Apex can't invoke the standard Generate Work Orders action directly.</description>
