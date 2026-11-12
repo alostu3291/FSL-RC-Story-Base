@@ -208,6 +208,54 @@ private class RLM_RTK_PlanChangeTest {
     }
 
     @IsTest
+    static void aDatedChangeStartsOnItsDate() {
+        StubPlacer stub = new StubPlacer();
+        RLM_RTK_PlanChange.placer = stub;
+        Date startDate = Date.today().addDays(-5);
+
+        RLM_RTK_PlanChange.scheduleChange(workOrderId(), RLM_RTK_PlanChange.HOME_PROTECTION, 'Marcus Bell', startDate);
+
+        Assert.areEqual(startDate, stub.placed.startDate);
+        Assert.areEqual('UpgradeFrom', stub.placed.fromSubtype);
+    }
+
+    @IsTest
+    static void resumingAPausedPlanRestoresItsAsset() {
+        StubPlacer stub = new StubPlacer();
+        RLM_RTK_PlanChange.placer = stub;
+        Id mosquitoId = hold(RLM_RTK_PlanChange.MOSQUITO, Date.today().addDays(-30));
+        insert new AssetStatePeriod(AssetId = mosquitoId, StartDate = Date.today().addDays(20), Quantity = 0, Mrr = 0, Amount = 0);
+        Date resumeDate = Date.today().addDays(140);
+
+        RLM_RTK_PlanChange.resumePlan(workOrderId(), RLM_RTK_PlanChange.MOSQUITO, resumeDate, 'Marcus Bell');
+
+        Assert.areEqual(mosquitoId, stub.placed.assetId);
+        Assert.areEqual(1, stub.placed.quantityChange);
+        Assert.areEqual(resumeDate, stub.placed.startDate);
+        Assert.isNull(stub.placed.entry);
+        Order o = [SELECT Name FROM Order];
+        Assert.isTrue(o.Name.startsWith('Plan change: Resume'), o.Name);
+    }
+
+    @IsTest
+    static void onlyAPausedPlanCanResume() {
+        RLM_RTK_PlanChange.placer = new StubPlacer();
+        hold(RLM_RTK_PlanChange.MOSQUITO, Date.today().addDays(-30));
+        try {
+            RLM_RTK_PlanChange.resumePlan(workOrderId(), RLM_RTK_PlanChange.MOSQUITO, Date.today().addDays(140), 'Marcus Bell');
+            Assert.fail('Expected an error for a plan that is not paused');
+        } catch (RLM_RTK_PlanChange.PlanChangeException e) {
+            Assert.isTrue(e.getMessage().contains('paused'), e.getMessage());
+        }
+        try {
+            RLM_RTK_PlanChange.resumePlan(workOrderId(), RLM_RTK_PlanChange.ESSENTIAL, Date.today().addDays(140), 'Marcus Bell');
+            Assert.fail('Expected an error for a tier');
+        } catch (RLM_RTK_PlanChange.PlanChangeException e) {
+            Assert.isTrue(e.getMessage().contains('add-on'), e.getMessage());
+        }
+    }
+
+    @IsTest
     static void changesNeedACustomerNameAndNoPendingChange() {
         RLM_RTK_PlanChange.placer = new StubPlacer();
         try {

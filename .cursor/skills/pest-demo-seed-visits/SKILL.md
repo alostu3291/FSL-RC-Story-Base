@@ -1,9 +1,22 @@
 ---
 name: pest-demo-seed-visits
-description: Seeds fresh Verdant pest demo data for the two field flows - a new prospect's inspection (Inspect & Quote, Sign & Pay, treatment) and a Covered re-service for an existing customer (response guarantee countdown, Treatment, Change the plan) - and verifies each seed. Use when asked to seed, reset or prepare demo data, customers or visits for the pest or Field Service demo.
+description: Seeds Verdant pest demo data - the whole demo cast (one customer per scene, with billing history, plan changes and the demo day's visits) or single fresh visits for the two field flows (a new prospect's inspection, a Covered re-service) - and verifies each seed. Use when asked to seed, reset or prepare demo data, customers or visits for the pest or Field Service demo.
 ---
 
 # Pest Demo Seed Visits
+
+## Whole cast (all nine scenes)
+
+`cci task run seed_rtk_demo_cast --org <cci_alias>` seeds Nora Castillo (prospect, scenes 1-3),
+Aisha Brooks (ordered, first treatment booked, 4-5), Casey Morgan (Covered rodent re-service, 7-8),
+Sam Patel ($366 first bill, winter mosquito pause, Not Covered re-service, 6-9) and Dana Whitfield
+($20 prorated upgrade bill, 8). The cast is defined in `tasks/rlm_rtk_seed_cast.py` (`build_cast`);
+the table is in `docs/guides/pest-control-demo.md` (Demo cast). It takes about three minutes the first
+time and is idempotent. `-o customers "Aisha Brooks,Sam Patel"` seeds a subset, `-o days_ahead 2`
+moves the demo day. A cast member whose scene was run live is used up: rename the account
+"zz Archived - ..." and re-run. Report its output with the template below.
+
+## Single visits
 
 Two CCI tasks book visits dispatched to the running user, in the Bloomingdale IL territory,
 at an hour on the territory's clock (America/Chicago). Both are idempotent: re-running moves
@@ -100,6 +113,8 @@ Covered by <guarantee>; response milestone due <day time> Central. Change the pl
 
 ## Additional resources
 
-- Scripts: `scripts/apex/seedRtkProspectInspection.apex`, `scripts/apex/seedRtkReservice.apex`
-- Task class: `tasks/rlm_rtk_seed_visit.py` (fills `%%%OPTION%%%` tokens, reports results)
+- Scripts: `scripts/apex/seedRtkProspectInspection.apex`, `scripts/apex/seedRtkReservice.apex`;
+  cast stages `seedRtkCastQuote.apex`, `seedRtkCastOrder.apex`, `seedRtkCastTreatment.apex`, `seedRtkCastPlanChange.apex`
+- Task classes: `tasks/rlm_rtk_seed_visit.py` (fills `%%%OPTION%%%` tokens, reports results),
+  `tasks/rlm_rtk_seed_cast.py` (runs the cast stages and waits for each asynchronous step)
 - Flow walkthrough: `docs/guides/pest-control-demo.md`

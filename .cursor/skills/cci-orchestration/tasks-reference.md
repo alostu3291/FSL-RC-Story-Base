@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**232 tasks** across **9 groups**.
+**233 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*151 task(s)*
+*152 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -2411,6 +2411,14 @@
 **Description:** Restore the placeholder siteAdmin and siteGuestRecordDefaultOwner in Payments_Webhook.site-meta.xml after deploy_post_payments_site so the repo never stores the target org's real username. Run AFTER deploy_post_payments_site.
 
 **Class:** `tasks.rlm_community.RevertPaymentsSiteAfterDeploy`
+
+---
+
+### `seed_rtk_demo_cast`
+
+**Description:** Idempotently seed one Verdant pest customer per demo scene through the field flows' own Apex (inspection findings, a priced quote dated back for existing customers, Sign & Pay, order activation, the first treatment, coverage and dated plan changes), then book the demo day's visits for the running user and pre-generate their visit briefs. Nora Castillo is a prospect with an inspection (scenes 1-3); Aisha Brooks is ordered with her first treatment booked (4-5); Casey Morgan has a Covered rodent re-service and an unchanged plan to upgrade (7-8); Sam Patel has three plans, a $366 first bill, a winter mosquito pause and a Not Covered bed bug re-service (6-9); Dana Whitfield upgraded to Home Protection Plus today for the billing agent's prorated bill (8). Re-running skips finished stages; customers option seeds a subset, days_ahead sets the demo day.
+
+**Class:** `tasks.rlm_rtk_seed_cast.SeedRtkDemoCast`
 
 ---
 

@@ -121,63 +121,105 @@ public with sharing class RLM_RTK_PlanChange {
     @AuraEnabled
     public static State applyChange(Id recordId, String sku, String approvedBy) {
         try {
-            Context context = contextFor(recordId);
-            if (String.isBlank(approvedBy)) {
-                throw new PlanChangeException('Enter the name of the customer approving the change.');
-            }
-            Holdings holdings = holdingsFor(context.account.Id);
-            if (holdings.lockedReason != null) {
-                throw new PlanChangeException(holdings.lockedReason);
-            }
-            if (holdings.byAsset.isEmpty()) {
-                throw new PlanChangeException('This customer has no active plan to change.');
-            }
-            Map<String, PricebookEntry> entries = entriesBySku();
-            PricebookEntry entry = entries.get(sku);
-            if (entry == null) {
-                throw new PlanChangeException('Plan ' + sku + ' is not available.');
-            }
-            Decimal multiplier = zoneMultiplier(context);
-            Holding tier = holdings.tier();
-            Holding existing = holdings.forSku(sku);
-
-            Change change = new Change();
-            change.accountId = context.account.Id;
-            change.startDate = Date.today().addDays(1);
-            String summary;
-            if (existing != null && isTier(sku)) {
-                throw new PlanChangeException('The customer is already on ' + entry.Product2.Name + '.');
-            } else if (existing != null) {
-                change.assetId = existing.assetId;
-                change.quantityChange = -1;
-                summary = 'Remove ' + existing.name;
-            } else if (isTier(sku) && tier != null) {
-                Decimal price = tierPrice(entry, multiplier, tier, entries);
-                String direction = price >= tier.price ? 'Upgrade' : 'Downgrade';
-                change.assetId = tier.assetId;
-                change.quantityChange = -1;
-                change.fromSubtype = direction + 'From';
-                change.toSubtype = direction + 'To';
-                change.entry = entry;
-                change.unitPrice = price;
-                summary = direction + ' ' + tier.name + ' to ' + entry.Product2.Name;
-            } else {
-                Holding anchor = tier != null ? tier : holdings.byAsset.values()[0];
-                change.assetId = anchor.assetId;
-                change.quantityChange = 0;
-                change.entry = entry;
-                change.unitPrice = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
-                summary = 'Add ' + entry.Product2.Name;
-            }
-
-            Id orderId = placer.place(change);
-            activate(orderId, context, change.startDate, summary, approvedBy.trim());
-            return buildState(context);
+            return scheduleChange(recordId, sku, approvedBy, Date.today().addDays(1));
         } catch (Exception e) {
             throw auraError(e);
         }
     }
 
+    /**
+     * Changes to the chosen plan from startDate. A past date records a change the customer already made;
+     * it must still come after the start of the plan it amends, or assetization fails.
+     */
+    public static State scheduleChange(Id recordId, String sku, String approvedBy, Date startDate) {
+        Context context = contextFor(recordId);
+        if (String.isBlank(approvedBy)) {
+            throw new PlanChangeException('Enter the name of the customer approving the change.');
+        }
+        Holdings holdings = holdingsFor(context.account.Id);
+        if (holdings.lockedReason != null) {
+            throw new PlanChangeException(holdings.lockedReason);
+        }
+        if (holdings.byAsset.isEmpty()) {
+            throw new PlanChangeException('This customer has no active plan to change.');
+        }
+        Map<String, PricebookEntry> entries = entriesBySku();
+        PricebookEntry entry = entries.get(sku);
+        if (entry == null) {
+            throw new PlanChangeException('Plan ' + sku + ' is not available.');
+        }
+        Decimal multiplier = zoneMultiplier(context);
+        Holding tier = holdings.tier();
+        Holding existing = holdings.forSku(sku);
+
+        Change change = new Change();
+        change.accountId = context.account.Id;
+        change.startDate = startDate;
+        String summary;
+        if (existing != null && isTier(sku)) {
+            throw new PlanChangeException('The customer is already on ' + entry.Product2.Name + '.');
+        } else if (existing != null) {
+            change.assetId = existing.assetId;
+            change.quantityChange = -1;
+            summary = 'Remove ' + existing.name;
+        } else if (isTier(sku) && tier != null) {
+            Decimal price = tierPrice(entry, multiplier, tier, entries);
+            String direction = price >= tier.price ? 'Upgrade' : 'Downgrade';
+            change.assetId = tier.assetId;
+            change.quantityChange = -1;
+            change.fromSubtype = direction + 'From';
+            change.toSubtype = direction + 'To';
+            change.entry = entry;
+            change.unitPrice = price;
+            summary = direction + ' ' + tier.name + ' to ' + entry.Product2.Name;
+        } else {
+            Holding anchor = tier != null ? tier : holdings.byAsset.values()[0];
+            change.assetId = anchor.assetId;
+            change.quantityChange = 0;
+            change.entry = entry;
+            change.unitPrice = RLM_RTK_ZonePricing.apply(entry.UnitPrice, multiplier);
+            summary = 'Add ' + entry.Product2.Name;
+        }
+
+        Id orderId = placer.place(change);
+        activate(orderId, context, change.startDate, summary, approvedBy.trim());
+        return buildState(context);
+    }
+
+    /**
+     * Resumes a removed add-on plan from startDate by restoring its asset's quantity, so its guarantee
+     * picks up again after the gap. A seasonal pause is a removal (scheduleChange) followed by this.
+     */
+    public static State resumePlan(Id recordId, String sku, Date startDate, String approvedBy) {
+        Context context = contextFor(recordId);
+        if (String.isBlank(approvedBy)) {
+            throw new PlanChangeException('Enter the name of the customer approving the change.');
+        }
+        if (isTier(sku)) {
+            throw new PlanChangeException('Only add-on plans can be paused and resumed.');
+        }
+        AssetStatePeriod latest;
+        for (AssetStatePeriod period : [
+            SELECT AssetId, Asset.Product2.Name, StartDate, Quantity FROM AssetStatePeriod
+            WHERE Asset.AccountId = :context.account.Id AND Asset.Product2.StockKeepingUnit = :(sku + skuSuffix)
+            ORDER BY StartDate
+        ]) {
+            latest = period;
+        }
+        if (latest == null || (latest.Quantity != null && latest.Quantity > 0) || latest.StartDate.date() >= startDate) {
+            throw new PlanChangeException('The customer has no ' + sku + ' plan paused before ' + startDate.format() + '.');
+        }
+        Change change = new Change();
+        change.accountId = context.account.Id;
+        change.assetId = latest.AssetId;
+        change.quantityChange = 1;
+        change.startDate = startDate;
+        Id orderId = placer.place(change);
+        activate(orderId, context, startDate, 'Resume ' + latest.Asset.Product2.Name, approvedBy.trim());
+        return buildState(context);
+    }
+
+    /** Changes starting after tomorrow are left to the regular billing run instead of being billed in advance. */
     private static void activate(Id orderId, Context context, Date startDate, String summary, String approvedBy) {
         Account a = context.account;
         Order o = new Order(Id = orderId,
@@ -197,7 +239,7 @@ public with sharing class RLM_RTK_PlanChange {
             insert new AppUsageAssignment(RecordId = orderId, AppUsageType = 'RevenueLifecycleManagement');
         }
         update new Order(Id = orderId, Status = 'Activated');
-        if (!Test.isRunningTest()) {
+        if (!Test.isRunningTest() && startDate <= Date.today().addDays(1)) {
             RLM_FSL_InvoiceOrder.enqueue(new Set<Id>{ orderId }, startDate);
         }
     }

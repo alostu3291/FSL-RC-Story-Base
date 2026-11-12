@@ -18,6 +18,8 @@ public with sharing class RLM_RTK_FieldQuote {
         @InvocableVariable public Boolean includeTermite;
         @InvocableVariable public Id inspectionId;
         @InvocableVariable public String overrideReason;
+        /** When the plans start; defaults to today. A past date records a customer who signed up earlier. */
+        @InvocableVariable public Date startDate;
     }
 
     public class Response {
@@ -87,7 +89,7 @@ public with sharing class RLM_RTK_FieldQuote {
             insert opportunity;
             response.opportunityId = opportunity.Id;
 
-            String today = String.valueOf(Date.today());
+            String startDate = String.valueOf(request.startDate ?? Date.today());
             PricebookEntry planEntry = entries.get(request.planSku);
             RevSalesTrxn.RecordResource quoteRecord = new RevSalesTrxn.RecordResource(Quote.SObjectType, 'POST');
             quoteRecord.fieldValues = new Map<String, Object>{
@@ -135,7 +137,7 @@ public with sharing class RLM_RTK_FieldQuote {
                     'PricebookEntryId' => entry.Id,
                     'Quantity' => '1',
                     'UnitPrice' => String.valueOf(unitPrice),
-                    'StartDate' => today,
+                    'StartDate' => startDate,
                     'Description' => description.abbreviate(255)
                 };
                 if (entry.ProductSellingModel != null && entry.ProductSellingModel.SellingModelType == 'Evergreen') {
