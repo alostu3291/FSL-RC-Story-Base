@@ -238,9 +238,63 @@ public with sharing class RLM_RTK_PlanChange {
         if ([SELECT COUNT() FROM AppUsageAssignment WHERE RecordId = :orderId] == 0) {
             insert new AppUsageAssignment(RecordId = orderId, AppUsageType = 'RevenueLifecycleManagement');
         }
-        update new Order(Id = orderId, Status = 'Activated');
+        if (!activateNow(orderId, startDate)) {
+            System.enqueueJob(new ActivationJob(orderId, startDate, 1));
+        }
+    }
+
+    @TestVisible
+    private static final Integer ACTIVATION_ATTEMPTS = 5;
+    private static final Integer ACTIVATION_RETRY_MINUTES = 1;
+    @TestVisible
+    private static final String PENDING_TAX = 'pending Tax Calculation';
+    @TestVisible
+    private static Boolean taxPendingOverride = false;
+
+    /**
+     * Activates the order and bills a change that starts by tomorrow. Returns false while the order's
+     * tax is still being calculated, which some orgs do in the background after an amendment.
+     */
+    @TestVisible
+    private static Boolean activateNow(Id orderId, Date startDate) {
+        try {
+            if (taxPendingOverride) {
+                throw new DmlException('You can\'t activate Revenue Lifecycle Management Orders with a ' + PENDING_TAX + '.');
+            }
+            update new Order(Id = orderId, Status = 'Activated');
+        } catch (DmlException e) {
+            if (!e.getMessage().contains(PENDING_TAX)) {
+                throw e;
+            }
+            return false;
+        }
         if (!Test.isRunningTest() && startDate <= Date.today().addDays(1)) {
             RLM_FSL_InvoiceOrder.enqueue(new Set<Id>{ orderId }, startDate);
+        }
+        return true;
+    }
+
+    /** Activates a plan change once its tax is calculated, checking again each minute. */
+    public class ActivationJob implements Queueable {
+        private final Id orderId;
+        private final Date startDate;
+        private final Integer attempt;
+
+        public ActivationJob(Id orderId, Date startDate, Integer attempt) {
+            this.orderId = orderId;
+            this.startDate = startDate;
+            this.attempt = attempt;
+        }
+
+        public void execute(QueueableContext context) {
+            if (activateNow(orderId, startDate)) {
+                return;
+            }
+            if (attempt < ACTIVATION_ATTEMPTS && !Test.isRunningTest()) {
+                System.enqueueJob(new ActivationJob(orderId, startDate, attempt + 1), ACTIVATION_RETRY_MINUTES);
+            } else {
+                System.debug(LoggingLevel.ERROR, 'Plan change ' + orderId + ' still had pending tax after ' + attempt + ' attempts.');
+            }
         }
     }
 

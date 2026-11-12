@@ -238,6 +238,23 @@ private class RLM_RTK_PlanChangeTest {
     }
 
     @IsTest
+    static void aChangeWithPendingTaxActivatesOnceTaxIsDone() {
+        RLM_RTK_PlanChange.placer = new StubPlacer();
+        hold(RLM_RTK_PlanChange.MOSQUITO, Date.today());
+        RLM_RTK_PlanChange.taxPendingOverride = true;
+
+        Test.startTest();
+        RLM_RTK_PlanChange.applyChange(workOrderId(), RLM_RTK_PlanChange.MOSQUITO, 'Marcus Bell');
+        Order pending = [SELECT Name, Status FROM Order];
+        Assert.areEqual('Draft', pending.Status);
+        Assert.isTrue(pending.Name.startsWith('Plan change: Remove'), pending.Name);
+        RLM_RTK_PlanChange.taxPendingOverride = false;
+        Test.stopTest();
+
+        Assert.areEqual('Activated', [SELECT Status FROM Order].Status);
+    }
+
+    @IsTest
     static void onlyAPausedPlanCanResume() {
         RLM_RTK_PlanChange.placer = new StubPlacer();
         hold(RLM_RTK_PlanChange.MOSQUITO, Date.today().addDays(-30));
