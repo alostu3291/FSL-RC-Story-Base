@@ -251,9 +251,26 @@ the old tier. The same code credits correctly on orgs built by
   (the template loads `OrderItem.PricingSource`) doesn't apply, because the
   field is empty on plan-change lines in both orgs.
 
-The line already comes back from `initiateAmendment` at $0, so the next place
-to look is the pricing log for that call (`enableDebugPriceLogs` is on in the
-template). Until it's fixed, on a template org
+- Pricing itself is right. The line's price waterfall (`GET
+  connect/core-pricing/waterfall/{lineId}/{executionId}`, ids from
+  `OrderItem.PriceWaterfallIdentifier`) shows `RC_DefaultPricingProcedure`
+  computing −$59 and an order total of $20. Neither org saves repricing results
+  onto removal lines, though, so the saved amount is whatever
+  `initiateAmendment` creates the line with.
+- That's where the orgs differ. In a rolled-back probe, `initiateAmendment`
+  with `quantityChange` −1 creates the line at −$39 on a `prepare_rlm_org` org
+  and at $0 on the template, for the same product, price and asset data.
+- Also matching: the asset contexts, the procedure plans (each points at its
+  own default pricing procedure), the release (API 68.0), and the field access
+  the running user has, apart from Service Account fields. The asset's
+  `RenewalTerm` (12 on the template, 1 elsewhere) makes no difference.
+- The template user couldn't see `OrderItem.BillingTerm`, so amendment lines
+  were created without it. Assigning `RevLifecycleManagementPlaceOrderApi`
+  fixes that (the repo's `RLM_PSL` grants the field), but not the $0.
+
+Next: open a Salesforce case with the rolled-back probe, or trace
+`initiateAmendment` with an Apex debug log at FINEST. Until it's fixed, on a
+template org
 only demo plan changes that add a new add-on, or demo pause, resume and
 upgrade on a `prepare_rlm_org` org.
 
