@@ -1797,6 +1797,11 @@ tasks:
       path: scripts/apex/seedRtkReservice.apex
       hour: 8
 
+  seed_rtk_demo_cast:
+    group: Revenue Lifecycle Management
+    description: Idempotently seed one Verdant pest customer per demo scene through the field flows' own Apex (inspection findings, a priced quote dated back for existing customers, Sign & Pay, order activation, the first treatment, coverage and dated plan changes), then book the demo day's visits for the running user and pre-generate their visit briefs. Nora Castillo is a prospect with an inspection (scenes 1-3); Aisha Brooks is ordered with her first treatment booked (4-5); Casey Morgan has a Covered rodent re-service and an unchanged plan to upgrade (7-8); Sam Patel has three plans, a $366 first bill, a winter mosquito pause and a Not Covered bed bug re-service (6-9); Dana Whitfield upgraded to Home Protection Plus today for the billing agent's prorated bill (8). Re-running skips finished stages; customers option seeds a subset, days_ahead sets the demo day.
+    class_path: tasks.rlm_rtk_seed_cast.SeedRtkDemoCast
+
   setup_rtk_dro_steps:
     group: Revenue Lifecycle Management
     description: Idempotently create Verdant Initial Treatment DRO step definitions (AutoTask/ManualTask/Milestone) and dependencies. Use when SFDMU StepType values do not match the org picklist.

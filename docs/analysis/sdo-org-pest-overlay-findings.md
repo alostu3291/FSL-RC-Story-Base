@@ -30,6 +30,7 @@ code; see [Deploy order that worked](#deploy-order-that-worked).
 | Invoicing | Works after adding sequence policies and recovering the failed invoices |
 | FS mobile actions | Work after `patch_sdo_org_for_pest` patches the template's layouts |
 | Apex tests | All 79 pest tests pass. Before the fixes most Work Order tests failed (Gaps 6 and 7) |
+| Plan changes | Activate once tax is calculated. Removals and downgrades credit $0 (Gap 8, open) |
 
 ## What the template org already has
 
@@ -220,6 +221,37 @@ resource that is a member of a service territory.
   accept every intermediate step.
 
 Result: all 79 pest tests pass on fieldrev.
+
+### 8. Plan changes: pending tax and $0 removals
+
+Found on a second template org (`alostumbo@verdant.rcfs.demo`, November 2026)
+while seeding the demo cast with `seed_rtk_demo_cast`.
+
+**Pending tax (fixed).** The template calculates tax on an amendment in the
+background, so activating a plan change straight away fails with "You can't
+activate Revenue Lifecycle Management Orders with a pending Tax Calculation."
+`RLM_RTK_PlanChange` now leaves the order in Draft with its name and details,
+and a queueable retries activation (and billing) each minute, up to five times.
+
+**Removals credit $0 (open).** On the template, the line that
+`initiateAmendment` creates to remove or downgrade a plan comes back priced at
+$0 instead of minus the plan's price. So a paused add-on still bills after it
+resumes (Sam Patel: $138/mo instead of $69), and an upgrade keeps charging for
+the old tier. The same code credits correctly on orgs built by
+`prepare_rlm_org`. What was ruled out:
+
+- Assets and their action sources match (`PricingSource` = LastTransaction,
+  same prices), as do the pricing procedures' last-transaction steps.
+- `skipOrgSttPricing` (on in the template, off in the repo) makes no
+  difference.
+- Sending the current price as `UnitPrice` on the removal line through Place
+  Sales Transaction succeeds, but repricing clears it.
+
+The likely cause is the template's `RC_SalesTransactionContext` not mapping
+the asset's last price onto amendment lines, which the repo's
+`RLM_SalesTransactionContext` does. Until that's patched, on a template org
+only demo plan changes that add a new add-on, or demo pause, resume and
+upgrade on a `prepare_rlm_org` org.
 
 ## Template behaviour that looks like an error but isn't
 
