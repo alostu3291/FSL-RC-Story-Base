@@ -1,4 +1,4 @@
-// Idempotent Rentokil DRO step definitions. StepType picklist values in this org
+// Idempotent Verdant DRO step definitions. StepType picklist values in this org
 // are AutoTask / ManualTask / Milestone (not "Field Installation").
 Id userId = UserInfo.getUserId();
 Map<String, Id> groups = new Map<String, Id>();

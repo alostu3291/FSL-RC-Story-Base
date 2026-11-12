@@ -1,4 +1,4 @@
-# Rentokil Residential Pest Control Demo
+# Verdant Pest Care Residential Demo
 
 Secondary FSL + Revenue Cloud story: the sale happens **in the field**. A technician
 inspects Michael Reyes's home at 316 Ridgewood Dr, Bloomingdale, IL 60108, builds a
@@ -19,7 +19,7 @@ project:
     fsl: true
     pest: true
     einstein: true   # AI features (prompt templates); without it they fall back to the rules
-    agents: true     # Rentokil Pest Billing Agent
+    agents: true     # Verdant Pest Billing Agent
 ```
 
 Then:
@@ -103,10 +103,10 @@ Completing the **Initial Pest Treatment** work order starts Field Service covera
 | Seasonal Mosquito | Mosquitoes | Monthly, April through October only (`Mosquito Visit`) |
 | Termite | Termites | Yearly (`Termite Monitoring`) |
 
-- **One maintenance plan per customer** ("Rentokil recurring service"), with a maintenance asset and rule per plan. It generates one work order per visit date with a line per plan due that day (`WorkOrderLineItemPerAsset`) and one appointment per work order, for the next four months. `RLM_RTK_Generate_Maintenance_Visits` runs the standard Generate Work Orders action, which Apex can't call directly. Auto-generation is off, because the platform blocks manual generation on auto-generating plans; the nightly sync below generates instead, so the schedule always reaches four months ahead.
+- **One maintenance plan per customer** ("Verdant recurring service"), with a maintenance asset and rule per plan. It generates one work order per visit date with a line per plan due that day (`WorkOrderLineItemPerAsset`) and one appointment per work order, for the next four months. `RLM_RTK_Generate_Maintenance_Visits` runs the standard Generate Work Orders action, which Apex can't call directly. Auto-generation is off, because the platform blocks manual generation on auto-generating plans; the nightly sync below generates instead, so the schedule always reaches four months ahead.
 - **Generated visits** get the work type, territory, address and contact of the customer's latest visit, and their accepted inspection, so **Treatment** shows the original findings. The recurring work types don't auto-create appointments (`ShouldAutoCreateSvcAppt = false`); the plan creates the one appointment.
 - **Re-service:** create a **Pest Re-service** work order on the account and set **Reported Pest**. An active guarantee that lists the pest marks it **Covered**, links the entitlement and its asset, and it's free. Otherwise it's **Not Covered**, and completing it bills `RTK-RESERVICE` ($149) through `RLM_FSL_Bill_Uncovered_Repair`: a "Re-service Visit - WO …" order and a posted invoice. Coverage is rechecked when the pest changes and frozen once the work order is completed.
-- **Re-service response guarantee:** every guarantee runs the **Rentokil Re-service Guarantee** entitlement process (`deploy_post_pest_sla`), so a Covered re-service gets a **Re-service Response** milestone due 48 hours after the request, counting Monday to Saturday on the **Rentokil Service Days** business hours (Central): a Wednesday 2 PM request is due Friday 2 PM, and a Saturday 2 PM request is due Tuesday 2 PM. It's met when the technician arrives, meaning the appointment is checked in, started or completed (`RLM_RTK_ServiceAppointmentTrigger`). The work order shows **Milestone Status**, the **Milestones** countdown tracker in the record page sidebar under Service Appointments (pest patch on `RLM_Work_Order_Record_Page`), and a **Milestones** related list with the target, time remaining and whether it was missed. Not Covered re-services have no milestone.
+- **Re-service response guarantee:** every guarantee runs the **Verdant Re-service Guarantee** entitlement process (`deploy_post_pest_sla`), so a Covered re-service gets a **Re-service Response** milestone due 48 hours after the request, counting Monday to Saturday on the **Verdant Service Days** business hours (Central): a Wednesday 2 PM request is due Friday 2 PM, and a Saturday 2 PM request is due Tuesday 2 PM. It's met when the technician arrives, meaning the appointment is checked in, started or completed (`RLM_RTK_ServiceAppointmentTrigger`). The work order shows **Milestone Status**, the **Milestones** countdown tracker in the record page sidebar under Service Appointments (pest patch on `RLM_Work_Order_Record_Page`), and a **Milestones** related list with the target, time remaining and whether it was missed. Not Covered re-services have no milestone.
 - **Existing customers:** `prepare_pest` step 11 (`setup_rtk_grow`) backfills coverage for every customer with an active plan and generates their visits. It's safe to re-run.
 - **Coverage follows the plan.** Upgrades, downgrades, pauses, renewals and cancellations all land in the assets' state periods, so `RLM_RTK_Coverage.sync` rebuilds coverage from them:
   - **Guarantees:** one entitlement per active stretch of a plan asset. An upgrade ends the old tier's guarantee the day before the change and starts the new tier's; a pause ends the guarantee at the pause and adds "… guarantee from <date>" for the resume; a renewal or cancellation moves the end date. Re-service checks use the guarantee active that day.
@@ -114,7 +114,7 @@ Completing the **Initial Pest Treatment** work order starts Field Service covera
   - **Visit rules:** an ended plan's rule is removed, a paused plan's rule skips to the first visit after it resumes, and a new plan gets a rule (continuing after any visits it took over). The maintenance plan's work type follows the plan that leads the remaining visits.
 - **When it syncs:** `RLM_RTK_AssetTrigger` syncs a customer a minute after any plan asset changes, which is when assetization finishes (from **Change the plan** or the standard Amend, Renew and Cancel actions). The **RLM RTK Nightly Coverage Sync** scheduled flow syncs every customer at 3 AM org time, which also covers changes that take effect that day, and generates visits as the four-month window moves forward.
 
-## Rentokil documents
+## Verdant documents
 
 With `docgen: true`, `prepare_pest` steps 12–14 deploy `unpackaged/post_pest_docgen`:
 
@@ -128,6 +128,24 @@ The proposal also has a **Why We Recommend This Plan** box (`WhyThisPlan`, from 
 Invoices keep using the org default (`BillingSettings.defaultInvoiceDocTemplate`) until it points at `RLM_RTK_Invoice`.
 
 The proposal docx is generated by `scripts/docgen/build_rtk_pest_proposal.py` and its data mappings by `scripts/docgen/build_rtk_proposal_odts.py`; edit the scripts and rebuild rather than hand-editing the `.dt` or `.rpt-meta.xml` files. Inspection photos are not in the PDF (image tokens fail in this org); customers see them at Sign & Pay. Redeploying a template creates a new draft version, so run `activate_docgen_templates` afterwards.
+
+## Brand: Verdant Pest Care
+
+The demo company is **Verdant Pest Care** ("Protect the home. Respect the planet."), a fictional eco-conscious brand. Customer-facing text says Verdant; API names keep the `RLM_RTK_*` / `RTK-*` prefixes and the permission set stays `RLM_Rentokil_Pest`.
+
+| Color | Hex | Used for |
+|-------|-----|----------|
+| Forest | `#1F4D3A` | Primary: Lightning brand color, DocGen header bands and totals, mobile navbar |
+| Leaf | `#3FA34D` | Logo leaf, section rules, bullets, success. Too light for text on white (3.2:1) |
+| Deep leaf | `#2E7340` | Accent text and buttons in the pest components (5.8:1 on white) |
+| Sage | `#A8C69F` | Borders and soft fills |
+| Cream | `#F6F4EC` | Backgrounds |
+| Sun | `#F2B33D` | The sun dot in the mark; decorative only |
+
+- **Logos:** `scripts/brand/build_verdant_assets.py` writes the SVG sources and PNGs to `scripts/brand/verdant/` (color, reversed, mark), the DocGen logos to `scripts/docgen/assets/verdant_logo_{white,color}.png`, and the 600×120 Lightning header image to `unpackaged/post_pest_brand/contentassets/`.
+- **Lightning theme:** `prepare_pest` step 19 (`deploy_post_pest_brand`) deploys the `RLM_Verdant` theme and branding set. Themes can't be activated through the API: in Setup → **Themes and Branding**, open the menu on **Verdant Pest Care** and choose **Activate**.
+- **Field Service mobile app:** its colors live on the `FieldServiceMobileSettings` record, not the Lightning theme (see the `field-service-mobile-branding-configure` skill). Devices pick up the change after the metadata cache refreshes (up to 7 days, or force it from the app's Settings).
+- **Orgs deployed before the rebrand:** see "Rebrand an existing org" in the `pest-demo-org-deploy` skill.
 
 ## Einstein AI
 
@@ -144,7 +162,7 @@ Every AI feature suggests and the technician or customer decides. Prices always 
 | 5 | **Ask Einstein** in Find & Add and Change the plan: up to three extra picks with a reason, only from offered products, and only when the reason names a pest that product treats | `rlmRtkFindAndAdd`, `rlmRtkPlanChange` | `RLM_RTK_Product_Suggestions` | Nothing; the customer still approves |
 | 6 | Visit summary: what was treated, what was approved, plan changes, next visit; emailed to the contact on completion | Done screen of both actions (`rlmRtkVisitSummary`) | `RLM_RTK_Visit_Summary` | `WorkOrder.RLM_RTK_Visit_Summary__c` / `RLM_RTK_Summary_Sent_At__c` (sent once) |
 
-**Billing agent (Scenes 8–9).** With `agents: true`, `prepare_pest` steps 15–18 deploy `unpackaged/post_pest_agent`: the **Rentokil Pest Billing Agent** (Agentforce employee agent) with a Pest Bill Questions topic, and the `RLM_RTK_Pest_Billing_Agent` permission set. Its one action, `RLM_RTK_BillExplainer` (invocable Apex), finds the bill by amount ($366 matches $366.30; a total of open bills also matches), number or customer, and lists each line: plan charges and periods, the initial service milestone, visit add-ons with their work order, plan-change credits and proration, and tax. The agent only rephrases those facts. Ask it "Why is Sam Patel's bill $366?" or "Why did Dana get a $20 bill after changing plans?". The CLI's `sf agent preview` can't start employee agents, so test them in the Agentforce panel. The repo's `post_agents` billing agents need the `billing_agents` managed package and aren't used here.
+**Billing agent (Scenes 8–9).** With `agents: true`, `prepare_pest` steps 15–18 deploy `unpackaged/post_pest_agent`: the **Verdant Pest Billing Agent** (Agentforce employee agent) with a Pest Bill Questions topic, and the `RLM_RTK_Pest_Billing_Agent` permission set. Its one action, `RLM_RTK_BillExplainer` (invocable Apex), finds the bill by amount ($366 matches $366.30; a total of open bills also matches), number or customer, and lists each line: plan charges and periods, the initial service milestone, visit add-ons with their work order, plan-change credits and proration, and tax. The agent only rephrases those facts. Ask it "Why is Sam Patel's bill $366?" or "Why did Dana get a $20 bill after changing plans?". The CLI's `sf agent preview` can't start employee agents, so test them in the Agentforce panel. The repo's `post_agents` billing agents need the `billing_agents` managed package and aren't used here.
 
 ## Nine scenes
 
@@ -155,7 +173,7 @@ Every AI feature suggests and the technician or customer decides. Prices always 
 | 3 | Sign & pay | **Why this plan** on screen and in the PDF; **Create Proposal** → preview → **Sign & Pay** (mock card + signature tied to the PDF), or Quote highlight **Sign & Pay** after a proposal exists → Create Order |
 | 4 | Plan builds itself | Activate Order → assets per plan, DRO fulfillment plan creates the Initial Pest Treatment WO + Service Appointment; `RTK-INITIAL` billing schedule waits on the "Initial Treatment Complete" milestone, monthly plans are Ready for Invoicing |
 | 5 | First treatment | Complete WO → fulfillment step completed, milestone accomplished, order invoiced (`RLM_FSL_Complete_Fulfillment_Step`); **Ask Einstein** in Find & Add; **visit summary** emailed |
-| 6 | Recurring visits | Account → Maintenance Plans → "Rentokil recurring service": a rule per plan and the generated visits (Michael's Home Protection is monthly; mosquito resumes in April); routing = package vision |
+| 6 | Recurring visits | Account → Maintenance Plans → "Verdant recurring service": a rule per plan and the generated visits (Michael's Home Protection is monthly; mosquito resumes in April); routing = package vision |
 | 7 | Re-service | Pest Re-service WO with **Reported Pest**: Ants → Covered by the Home Protection guarantee, free, with a 48-hour **Re-service Response** milestone met when the technician starts the visit; Bed Bugs → Not Covered, completion bills `RTK-RESERVICE` via `RLM_FSL_BillRepair` |
 | 8 | Upsell & upgrade | Find & Add finding → **Change the plan** (Termite add or tier upgrade) on an amendment order, invoiced; a minute later the new plan's guarantee and visits replace the old tier's (same visit days); **Ask Einstein**; billing agent explains the prorated bill |
 | 9 | Pause / renew | Mosquito qty amendment Nov/Apr splits the mosquito guarantee around the pause; renew plan asset extends its guarantee; billing agent answers "why is my bill $366?" |

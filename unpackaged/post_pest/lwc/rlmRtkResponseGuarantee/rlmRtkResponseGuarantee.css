@@ -2,9 +2,9 @@
     margin-top: 0.75rem;
     padding: 0.75rem 0.85rem;
     border-radius: 0.8rem;
-    border: 1px solid #b9dcc8;
+    border: 1px solid #BCD4B3;
     background: #f1f8f4;
-    --accent: #1f7a4d;
+    --accent: #2E7340;
 }
 
 .card.soon {

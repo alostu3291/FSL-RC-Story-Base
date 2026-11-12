@@ -1,5 +1,5 @@
 /**
- * Field Service coverage for Rentokil plans.
+ * Field Service coverage for Verdant plans.
  *
  * When a customer's Initial Pest Treatment is completed, each active plan asset gets a guarantee
  * Entitlement listing the pests it covers, and the account gets one Maintenance Plan whose
@@ -17,18 +17,18 @@
  *
  * A Pest Re-service Work Order is Covered when an active entitlement on the account lists the
  * reported pest, otherwise Not Covered, which RLM_FSL_Bill_Uncovered_Repair bills as RTK-RESERVICE
- * when the visit is completed. Guarantees run the Rentokil Re-service Guarantee entitlement process,
+ * when the visit is completed. Guarantees run the Verdant Re-service Guarantee entitlement process,
  * so a Covered re-service gets a Re-service Response milestone (48 hours, Sundays excluded), which is
  * met when its appointment is checked in, started or completed (RLM_RTK_ServiceAppointmentTrigger).
  */
 public with sharing class RLM_RTK_Coverage {
-    public static final String PLAN_TITLE = 'Rentokil recurring service';
+    public static final String PLAN_TITLE = 'Verdant recurring service';
     public static final String INITIAL_TREATMENT = 'Initial Pest Treatment';
     public static final String RESERVICE = 'Pest Re-service';
     public static final String COVERED = 'Covered';
     public static final String NOT_COVERED = 'Not Covered';
     public static final String GENERATE_FLOW = 'RLM_RTK_Generate_Maintenance_Visits';
-    public static final String RESPONSE_PROCESS = 'Rentokil Re-service Guarantee';
+    public static final String RESPONSE_PROCESS = 'Verdant Re-service Guarantee';
     public static final String RESPONSE_MILESTONE = 'Re-service Response';
     private static final Set<String> ARRIVED = new Set<String>{ 'CheckedIn', 'InProgress', 'Completed' };
 
@@ -273,8 +273,8 @@ public with sharing class RLM_RTK_Coverage {
     /** Lets assetization finish its asset updates before the sync reads the state periods. */
     private static final Integer ASSET_SYNC_DELAY_MINUTES = 1;
 
-    @InvocableMethod(label='Sync Rentokil Coverage' category='Field Service'
-        description='Brings every Rentokil customer\'s guarantees and recurring visits in step with their plans, and generates upcoming visits.')
+    @InvocableMethod(label='Sync Verdant Coverage' category='Field Service'
+        description='Brings every Verdant customer\'s guarantees and recurring visits in step with their plans, and generates upcoming visits.')
     public static void syncAll() {
         Set<Id> accountIds = new Set<Id>();
         for (MaintenancePlan mp : [SELECT AccountId FROM MaintenancePlan WHERE MaintenancePlanTitle = :PLAN_TITLE AND AccountId != null]) {

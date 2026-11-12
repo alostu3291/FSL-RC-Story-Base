@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Pre-visit brief for the Rentokil technician: why the visit, plan and history, what to look for. Called from RLM_RTK_AI.getBrief.</description>
+    <description>Pre-visit brief for the Verdant technician: why the visit, plan and history, what to look for. Called from RLM_RTK_AI.getBrief.</description>
     <developerName>RLM_RTK_Visit_Brief</developerName>
     <masterLabel>RTK Visit Brief</masterLabel>
     <templateVersions>
-        <content>You are writing a pre-visit brief for a Rentokil pest control technician who is about to arrive at a customer's home.
+        <content>You are writing a pre-visit brief for a Verdant pest control technician who is about to arrive at a customer's home.
 Use only the facts below. Don't invent history, prices or dates, and skip anything marked none.
 
 Reply with only a JSON object, no other text:

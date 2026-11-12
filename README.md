@@ -508,7 +508,7 @@ The project uses custom flags in `cumulusci.yml` under `project.custom` to contr
 | `dro` | `true` | Use Dynamic Revenue Orchestration |
 | `fsl` | `false` | Field Service Core + DRO Field Installation (requires Field Service PSLs) |
 | `fsl_managed_package` | `false` | Also install the FSL managed package (`fsl_package_version_id`) |
-| `pest` | `false` | Rentokil residential pest catalog, location pricing, field quote (requires `fsl`) |
+| `pest` | `false` | Verdant residential pest catalog, location pricing, field quote (requires `fsl`) |
 | `einstein` | `true` | Use Einstein AI |
 | `agents` | `false` | Deploy Agentforce Agent configurations |
 | `prm` | `true` | Use Partner Relationship Management |
@@ -866,7 +866,7 @@ See [Data Management Tasks](#data-management-tasks) for per-task details and gro
 | `prepare_tso` | TSO-specific PSL/PSG/permissions/metadata | `tso` |
 | `prepare_dro` | Load DRO data (dynamic user resolution), PFDR update (260 bug fix) | `dro`, `qb`, `q3` |
 | `prepare_fsl` | Field Service PSLs/settings/metadata, FSL foundation data, DRO Field Installation steps (install/repair pricing and milestone billing run separately as `setup_fsl_revenue`, `prepare_rlm_org` step 13.5) | `fsl`, `fsl_managed_package`, `dro`, `qb` |
-| `prepare_pest` | Rentokil residential pest catalog, location zones, Inspect & Quote flow, Bloomingdale FSL + Initial Service DRO (`prepare_rlm_org` step 13.6) | `pest`, `fsl`, `billing`, `dro` |
+| `prepare_pest` | Verdant residential pest catalog, location zones, Inspect & Quote flow, Bloomingdale FSL + Initial Service DRO (`prepare_rlm_org` step 13.6) | `pest`, `fsl`, `billing`, `dro` |
 | `prepare_clm` | Load CLM data | `clm`, `clm_data` |
 | `prepare_docgen` | Create docgen library, enable Document Builder + Document Templates Export + Design Document Templates toggles, deploy metadata | `docgen` |
 | `prepare_billing` | Load billing data, activate flows/records, deploy ID-based settings via XPath transforms, trigger default template auto-creation (3-step cycle) | `billing`, `qb`, `q3`, `refresh` |
@@ -1042,7 +1042,7 @@ For details on exporting new models, importing into target orgs, polymorphic ID 
 | [Context Service Utility](docs/references/context-service-utility.md) | Context Service utility usage and plan examples |
 | [DocGen Setup](docs/guides/docgen-setup.md) | Document Generation architecture, deployment flow, Metadata API binary bug, seller token implementation |
 | [Field Service + Rev Cloud Demo](docs/guides/fsl-rev-cloud-demo.md) | `prepare_fsl` build and the nine-scene demo: quote → DRO install Work Order → milestone billing → maintenance, coverage-checked break/fix billing, field-flagged expansion |
-| [Pest Control Demo (Rentokil)](docs/guides/pest-control-demo.md) | `prepare_pest` secondary story: field tablet quote with location pricing → Initial Service DRO → monthly maintenance-plan visits, guarantee re-service, termite upsell, mosquito pause |
+| [Pest Control Demo (Verdant Pest Care)](docs/guides/pest-control-demo.md) | `prepare_pest` secondary story: field tablet quote with location pricing → Initial Service DRO → monthly maintenance-plan visits, guarantee re-service, termite upsell, mosquito pause |
 
 ### Analysis & Planning
 

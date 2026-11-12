@@ -1,4 +1,4 @@
-"""Generate the Rentokil pest proposal OmniDataTransforms (extract + pass-through transform).
+"""Generate the Verdant pest proposal OmniDataTransforms (extract + pass-through transform).
 
 Usage:
     python scripts/docgen/build_rtk_proposal_odts.py unpackaged/post_pest_docgen/omniDataTransforms
@@ -213,7 +213,7 @@ def build_transform():
         })
         items.append(item(TRANSFORM, f))
     return doc(TRANSFORM, "Transform", items, SAMPLE_OUTPUT, expected=SAMPLE_OUTPUT,
-               target="Rentokil_Pest_Proposal(Version 1)")
+               target="Verdant_Pest_Proposal(Version 1)")
 
 
 os.makedirs(OUT, exist_ok=True)

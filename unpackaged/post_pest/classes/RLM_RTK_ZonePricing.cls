@@ -1,5 +1,5 @@
 /**
- * Location-aware pricing for Rentokil residential quotes.
+ * Location-aware pricing for Verdant residential quotes.
  * Looks up RLM_RTK_Service_Zone__c by 5-digit ZIP, then 3-digit prefix.
  * Default multiplier is 1.0 (Chicago suburb / Bloomingdale) when no zone matches.
  */
@@ -74,8 +74,8 @@ public with sharing class RLM_RTK_ZonePricing {
         @InvocableVariable public String matchedPrefix;
     }
 
-    @InvocableMethod(label='Resolve RTK Service Zone' category='Rentokil'
-        description='Resolves the Rentokil service zone and price multiplier for a postal code.')
+    @InvocableMethod(label='Resolve RTK Service Zone' category='Verdant'
+        description='Resolves the Verdant service zone and price multiplier for a postal code.')
     public static List<ZoneResponse> resolveInvocable(List<ZoneRequest> requests) {
         List<ZoneResponse> results = new List<ZoneResponse>();
         for (ZoneRequest request : requests) {

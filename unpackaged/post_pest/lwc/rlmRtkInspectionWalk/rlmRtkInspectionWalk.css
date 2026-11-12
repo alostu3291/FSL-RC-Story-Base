@@ -1,12 +1,12 @@
 :host {
     --rtk-ink: #14241a;
     --rtk-muted: #5b6b62;
-    --rtk-line: #d7e2db;
-    --rtk-soft: #eef5f0;
+    --rtk-line: #D7E2D2;
+    --rtk-soft: #EEF3E8;
     --rtk-panel: #ffffff;
-    --rtk-accent: #1f7a4d;
-    --rtk-accent-deep: #145c38;
-    --rtk-accent-soft: #d8f0e3;
+    --rtk-accent: #2E7340;
+    --rtk-accent-deep: #1F4D3A;
+    --rtk-accent-soft: #E1EDDB;
     --rtk-warn: #c45c16;
     --rtk-warn-soft: #fde8d6;
     --rtk-hot: #b42318;
@@ -19,8 +19,8 @@
 
 .shell {
     background:
-        radial-gradient(120% 80% at 100% -10%, #dff3e8 0%, transparent 55%),
-        linear-gradient(180deg, #f7fbf8 0%, #ffffff 40%);
+        radial-gradient(120% 80% at 100% -10%, #E1EDDB 0%, transparent 55%),
+        linear-gradient(180deg, #F8F7F0 0%, #ffffff 40%);
     border: 1px solid var(--rtk-line);
     border-radius: calc(var(--rtk-radius) + 0.25rem);
     padding: 1.25rem 1.25rem 1rem;
@@ -152,8 +152,8 @@
 }
 
 .zone-card.clear {
-    border-color: #a9cbb8;
-    background: #f5fbf7;
+    border-color: #A8C69F;
+    background: #F6F4EC;
 }
 
 .zone-card.active {

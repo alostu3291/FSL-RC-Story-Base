@@ -40,7 +40,7 @@ p {
     margin-top: 0.5rem;
     font-size: 0.78rem;
     font-weight: 700;
-    color: #145c38;
+    color: #1F4D3A;
 }
 
 .muted {
@@ -52,7 +52,7 @@ p {
 .badge {
     padding: 0.05rem 0.5rem;
     border-radius: 1rem;
-    background: #eef5f0;
+    background: #EEF3E8;
     color: #5b6b62;
     font-size: 0.68rem;
     font-weight: 700;
@@ -68,7 +68,7 @@ p {
     border: none;
     background: none;
     padding: 0;
-    color: #145c38;
+    color: #1F4D3A;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;

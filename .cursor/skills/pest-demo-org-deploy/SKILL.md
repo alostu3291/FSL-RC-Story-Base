@@ -1,6 +1,6 @@
 ---
 name: pest-demo-org-deploy
-description: Deploys the Rentokil pest control / Field Service demo to an existing Salesforce org. Inventories what the org already has (check-only deploys per bundle plus data checks), pushes only what's missing or changed, runs the pest tests separately, and debugs known deploy failures. Use when deploying, updating or repairing the pest or FSL demo in an org, or when asked what an org is missing.
+description: Deploys the Verdant pest control / Field Service demo to an existing Salesforce org. Inventories what the org already has (check-only deploys per bundle plus data checks), pushes only what's missing or changed, runs the pest tests separately, and debugs known deploy failures. Use when deploying, updating or repairing the pest or FSL demo in an org, or when asked what an org is missing.
 ---
 
 # Pest Demo Org Deploy
@@ -94,9 +94,28 @@ Whole bundle missing or stale: use its CCI task, which carries the right options
 | post_pest_ai | `deploy_post_pest_ai`, `activate_pest_prompt_templates` |
 | post_pest_docgen | `deploy_post_pest_docgen`, `activate_docgen_templates`, `fix_pest_document_template_binaries` |
 | post_pest_agent | `deploy_agents_settings`, `deploy_post_pest_agent`, `assign_permission_sets -o api_names RLM_RTK_Pest_Billing_Agent`, `activate_pest_billing_agent` |
+| post_pest_brand | `deploy_post_pest_brand`, then activate the Verdant Pest Care theme in Setup → Themes and Branding (no API) |
 
 Order matters: `post_pest_sla` before `post_pest` (Apex references the process), `post_pest`
 before docgen (Quote roll-ups and inspection objects).
+
+An active agent rejects redeploys ("Cannot update record as Agent is Active"): run
+`sf agent deactivate --api-name RLM_RTK_Pest_Billing_Agent --target-org <username>`, deploy,
+then `activate_pest_billing_agent`.
+
+**Rebrand an existing org (Rentokil to Verdant).** Orgs deployed before the rebrand hold
+Rentokil-named records that a deploy doesn't rename. In order:
+1. Rename the business hours: `sf data update record -s BusinessHours -i <id> -v "Name='Verdant Service Days'"`.
+2. Deploy `post_pest_sla` with `sf project deploy start` (the CCI task skips only when the
+   Verdant process exists, so it deploys too). This creates **Verdant Re-service Guarantee**; the old process can't be renamed.
+3. Anonymous Apex: move `Entitlement.SlaProcessId` from the Rentokil process to the Verdant one,
+   and set `MaintenancePlanTitle = 'Verdant recurring service'` on plans titled `Rentokil recurring service`
+   (`RLM_RTK_Coverage` finds plans by that title).
+4. Deploy `post_pest`, `post_pest_ai` (+ activate), `post_pest_docgen` (+ activate + fix binaries),
+   `post_pest_agent` (deactivate first), `post_pest_brand`.
+5. Update the data SFDMU won't touch again: ProductCatalog `CAT-RTK-RES` name and description,
+   AttributeCategory `AC-RTK-PROPERTY` and PriceAdjustmentSchedule `RTK Attribute Based Adjustment` descriptions.
+6. Activate the theme in Setup. Optionally deactivate the old Rentokil theme and entitlement process.
 
 New org: set `fsl: true` and `pest: true` locally, run `cci flow run prepare_fsl` then
 `cci flow run prepare_pest --org <alias>`, then revert the flags.

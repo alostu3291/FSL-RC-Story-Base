@@ -1,5 +1,5 @@
 """
-Seed Rentokil pest demo visits: a new prospect's inspection or a Covered re-service.
+Seed Verdant pest demo visits: a new prospect's inspection or a Covered re-service.
 
 Runs an Apex script whose ``%%%NAME%%%`` tokens are filled from task options
 (``account_name`` fills ``%%%ACCOUNT_NAME%%%``). Values are escaped for Apex

@@ -25,7 +25,7 @@
 
 ### `delete_pest_data`
 
-**Description:** Delete Rentokil pest demo data in dependency order
+**Description:** Delete Verdant pest demo data in dependency order
 
 **Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
 
@@ -699,7 +699,7 @@
 
 ### `activate_pest_billing_agent`
 
-**Description:** Activate the Rentokil Pest Billing Agent after deploy_post_pest_agent.
+**Description:** Activate the Verdant Pest Billing Agent after deploy_post_pest_agent.
 
 **Class:** `tasks.rlm_prompt_templates.ActivateAgents`
 
@@ -1318,7 +1318,7 @@
 
 ### `deploy_post_pest`
 
-**Description:** Deploy Rentokil pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, the RLM_RTK_BillExplainer agent action, and Field Service coverage through RLM_RTK_Coverage and the RLM_RTK_WorkOrderTrigger, which on Initial Pest Treatment completion creates a guarantee Entitlement per plan asset (Covered Pests) and one Maintenance Plan with per-plan visit rules, generated through the RLM_RTK_Generate_Maintenance_Visits flow, and marks Pest Re-service Work Orders Covered or Not Covered from their Reported Pest, with Covered ones getting the 48-hour Re-service Response milestone from the guarantee's entitlement process that RLM_RTK_ServiceAppointmentTrigger completes when the technician arrives; RLM_RTK_AssetTrigger and the nightly RLM_RTK_Nightly_Coverage_Sync scheduled flow keep the guarantees and visits in step with upgrades, downgrades, pauses, renewals and cancellations, and extend the visit schedule). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest, RLM_RTK_BillExplainerTest and RLM_RTK_CoverageTest.
+**Description:** Deploy Verdant pest control metadata (service zones, line-of-business field, Monthly/One-Time Quote total roll-ups, inspection and finding objects, inspection-led Inspect and Quote flow, Field Service mobile Inspect and Quote and Treatment Checklist quick actions, Find & Add field add-ons and their billing flow, field plan changes (upgrade, downgrade, add or remove a plan on an amendment order), Inspection, FieldQuote, FieldVisit, FieldAddOn and PlanChange Apex, the RLM_RTK_AI visit brief / photo and notes findings / plan explanation / product suggestions / visit summary features with their rules fallback, the RLM_RTK_BillExplainer agent action, and Field Service coverage through RLM_RTK_Coverage and the RLM_RTK_WorkOrderTrigger, which on Initial Pest Treatment completion creates a guarantee Entitlement per plan asset (Covered Pests) and one Maintenance Plan with per-plan visit rules, generated through the RLM_RTK_Generate_Maintenance_Visits flow, and marks Pest Re-service Work Orders Covered or Not Covered from their Reported Pest, with Covered ones getting the 48-hour Re-service Response milestone from the guarantee's entitlement process that RLM_RTK_ServiceAppointmentTrigger completes when the technician arrives; RLM_RTK_AssetTrigger and the nightly RLM_RTK_Nightly_Coverage_Sync scheduled flow keep the guarantees and visits in step with upgrades, downgrades, pauses, renewals and cancellations, and extend the visit schedule). Runs RLM_RTK_FieldQuoteTest, RLM_RTK_InspectionTest, RLM_RTK_FieldVisitTest, RLM_RTK_FieldAddOnTest, RLM_RTK_PlanChangeTest, RLM_RTK_AITest, RLM_RTK_BillExplainerTest and RLM_RTK_CoverageTest.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1332,7 +1332,7 @@
 
 ### `deploy_post_pest_agent`
 
-**Description:** Deploy the Rentokil Pest Billing Agent (Agentforce employee agent with a Pest Bill Questions topic that calls RLM_RTK_BillExplainer, for questions like "why is my bill $366?") and its RLM_RTK_Pest_Billing_Agent permission set. Requires deploy_post_pest and the Agentforce settings from prepare_agents.
+**Description:** Deploy the Verdant Pest Billing Agent (Agentforce employee agent with a Pest Bill Questions topic that calls RLM_RTK_BillExplainer, for questions like "why is my bill $366?") and its RLM_RTK_Pest_Billing_Agent permission set. Requires deploy_post_pest and the Agentforce settings from prepare_agents.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1344,7 +1344,7 @@
 
 ### `deploy_post_pest_ai`
 
-**Description:** Deploy the Rentokil Einstein layer (EinsteinGpt settings, six RLM_RTK_* prompt templates and the RLM_RTK_EinsteinGenerator that RLM_RTK_AI finds at runtime). Without it the pest AI features fall back to the rules. Requires deploy_post_pest and Einstein generative AI (Prompt Builder) licenses. Runs RLM_RTK_EinsteinGeneratorTest.
+**Description:** Deploy the Verdant Einstein layer (EinsteinGpt settings, six RLM_RTK_* prompt templates and the RLM_RTK_EinsteinGenerator that RLM_RTK_AI finds at runtime). Without it the pest AI features fall back to the rules. Requires deploy_post_pest and Einstein generative AI (Prompt Builder) licenses. Runs RLM_RTK_EinsteinGeneratorTest.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1356,9 +1356,21 @@
 
 ---
 
+### `deploy_post_pest_brand`
+
+**Description:** Deploy the Verdant Pest Care Lightning theme (RLM_verdant_logo header image, RLM_Verdant branding set with Forest
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_pest_brand`
+
+---
+
 ### `deploy_post_pest_docgen`
 
-**Description:** Deploy Rentokil-branded DocGen templates (RLM_RTK_PestProposal for quotes, with inspection findings; RLM_RTK_Invoice for invoices) and the RLMRTKProposalExtract/Transform data mappings. Requires prepare_docgen plus the Quote total roll-ups and inspection objects from deploy_post_pest.
+**Description:** Deploy Verdant-branded DocGen templates (RLM_RTK_PestProposal for quotes, with inspection findings; RLM_RTK_Invoice for invoices) and the RLMRTKProposalExtract/Transform data mappings. Requires prepare_docgen plus the Quote total roll-ups and inspection objects from deploy_post_pest.
 
 **Class:** `cumulusci.tasks.salesforce.Deploy`
 
@@ -1370,14 +1382,14 @@
 
 ### `deploy_post_pest_sla`
 
-**Description:** Deploy the Rentokil re-service response SLA (enables Entitlements, adds the "Rentokil Service Days" business hours (Monday to Saturday, Central) alongside an unchanged 24/7 Default, the Re-service Response milestone and the Rentokil Re-service Guarantee Work Order entitlement process with a 48-hour milestone). Skipped when the entitlement process already exists, because the platform rejects redeploying a process in use. Must run before deploy_post_pest, whose RLM_RTK_CoverageTest expects the process.
+**Description:** Deploy the Verdant re-service response SLA (enables Entitlements, adds the "Verdant Service Days" business hours (Monday to Saturday, Central) alongside an unchanged 24/7 Default, the Re-service Response milestone and the Verdant Re-service Guarantee Work Order entitlement process with a 48-hour milestone). Skipped when the entitlement process already exists, because the platform rejects redeploying a process in use. Must run before deploy_post_pest, whose RLM_RTK_CoverageTest expects the process.
 
 **Class:** `tasks.rlm_deploy_unless_present.DeployUnlessPresent`
 
 **Options:**
 
 - `path`: `unpackaged/post_pest_sla`
-- `skip_if_soql`: `SELECT Id FROM SlaProcess WHERE Name = 'Rentokil Re-service Guarantee'`
+- `skip_if_soql`: `SELECT Id FROM SlaProcess WHERE Name = 'Verdant Re-service Guarantee'`
 
 ---
 
@@ -1717,7 +1729,7 @@
 
 ### `fix_pest_document_template_binaries`
 
-**Description:** Re-upload the Rentokil DocumentTemplate binaries after deploy_post_pest_docgen (works around the batch-deploy binary bug).
+**Description:** Re-upload the Verdant DocumentTemplate binaries after deploy_post_pest_docgen (works around the batch-deploy binary bug).
 
 **Class:** `tasks.rlm_docgen.FixDocumentTemplateBinaries`
 
@@ -1773,7 +1785,7 @@
 
 ### `insert_pest_dro_fsl_data`
 
-**Description:** Insert Rentokil DRO Initial Service overlay (RTK-DRO-FSL, step group, decomposition from Initial Service)
+**Description:** Insert Verdant DRO Initial Service overlay (RTK-DRO-FSL, step group, decomposition from Initial Service)
 
 **Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
 
@@ -1786,7 +1798,7 @@
 
 ### `insert_pest_fsl_data`
 
-**Description:** Insert Rentokil Field Service foundation (Bloomingdale OperatingHours, ServiceTerritory, WorkTypes including the Monthly, Quarterly, Mosquito and Termite Monitoring recurring visit types)
+**Description:** Insert Verdant Field Service foundation (Bloomingdale OperatingHours, ServiceTerritory, WorkTypes including the Monthly, Quarterly, Mosquito and Termite Monitoring recurring visit types)
 
 **Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
 
@@ -1798,7 +1810,7 @@
 
 ### `insert_pest_pcm_data`
 
-**Description:** Insert Rentokil residential pest product catalog (RTK- products, attributes, selling models)
+**Description:** Insert Verdant residential pest product catalog (RTK- products, attributes, selling models)
 
 **Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
 
@@ -1810,7 +1822,7 @@
 
 ### `insert_pest_pricing_data`
 
-**Description:** Insert Rentokil pest price book entries and attribute-based adjustments
+**Description:** Insert Verdant pest price book entries and attribute-based adjustments
 
 **Class:** `tasks.rlm_sfdmu.LoadSFDMUData`
 
@@ -2454,7 +2466,7 @@
 
 ### `setup_rtk_dro_steps`
 
-**Description:** Idempotently create Rentokil Initial Treatment DRO step definitions (AutoTask/ManualTask/Milestone) and dependencies. Use when SFDMU StepType values do not match the org picklist.
+**Description:** Idempotently create Verdant Initial Treatment DRO step definitions (AutoTask/ManualTask/Milestone) and dependencies. Use when SFDMU StepType values do not match the org picklist.
 
 **Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
 
@@ -2466,7 +2478,7 @@
 
 ### `setup_rtk_foundation`
 
-**Description:** Idempotently create Rentokil FSL junctions (skills, work type requirements, service resource for Bloomingdale)
+**Description:** Idempotently create Verdant FSL junctions (skills, work type requirements, service resource for Bloomingdale)
 
 **Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
 
@@ -2502,7 +2514,7 @@
 
 ### `setup_rtk_revenue`
 
-**Description:** Idempotently seed Rentokil service zones, price book entries, Initial Service milestone billing, guarantee entitlement template, and Maintenance Plan defaults. Runs after pest catalog load.
+**Description:** Idempotently seed Verdant service zones, price book entries, Initial Service milestone billing, guarantee entitlement template, and Maintenance Plan defaults. Runs after pest catalog load.
 
 **Class:** `cumulusci.tasks.apex.anon.AnonymousApexTask`
 

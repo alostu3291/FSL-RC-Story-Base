@@ -1,5 +1,5 @@
 /**
- * Field inspection for Rentokil residential pest. Stores findings (with photos as Files on each
+ * Field inspection for Verdant residential pest. Stores findings (with photos as Files on each
  * finding) and turns them into a recommended plan, add-ons, and severity for RLM_RTK_FieldQuote.
  */
 public with sharing class RLM_RTK_Inspection {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
-    <description>Rentokil demo Sign &amp; Pay on a Quote. Shows the inspection findings and photos behind the quote, then requires a proposal document from Create Proposal; stamps mock card + signature fields linked to that ContentDocument.</description>
+    <description>Verdant demo Sign &amp; Pay on a Quote. Shows the inspection findings and photos behind the quote, then requires a proposal document from Create Proposal; stamps mock card + signature fields linked to that ContentDocument.</description>
     <environments>Default</environments>
     <interviewLabel>Sign &amp; Pay {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Sign &amp; Pay</label>

@@ -2,6 +2,6 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>66.0</apiVersion>
     <isExposed>false</isExposed>
-    <masterLabel>Rentokil Find and Add</masterLabel>
+    <masterLabel>Verdant Find and Add</masterLabel>
     <description>Log a new finding during a visit and add customer-approved one-time services to the work order.</description>
 </LightningComponentBundle>

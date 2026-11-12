@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <description>Answers Rentokil pest customers' billing questions, such as "why is my bill $366?", from the posted invoice lines.</description>
+    <description>Answers Verdant pest customers' billing questions, such as "why is my bill $366?", from the posted invoice lines.</description>
     <localTopicLinks>
         <genAiPluginName>RLM_RTK_Pest_Bill_Questions</genAiPluginName>
     </localTopicLinks>
@@ -31,7 +31,7 @@
             <utterance>Why did Dana get a $20 bill after changing plans?</utterance>
         </aiPluginUtterances>
         <canEscalate>false</canEscalate>
-        <description>Explains what makes up a Rentokil residential pest customer's bill: monthly plans, the initial service, add-ons from a visit, plan-change credits and proration, and tax. Use it when someone asks why a bill is a certain amount, what a charge is for, or what they owe.</description>
+        <description>Explains what makes up a Verdant residential pest customer's bill: monthly plans, the initial service, add-ons from a visit, plan-change credits and proration, and tax. Use it when someone asks why a bill is a certain amount, what a charge is for, or what they owe.</description>
         <developerName>RLM_RTK_Pest_Bill_Questions</developerName>
         <genAiPluginInstructions>
             <description>Always call the Explain Pest Bill action before answering. Pass the amount the user mentioned as a number, the customer name if given, the invoice number if given, and currentRecordId as accountId whenever the user is on an Account or Invoice record. Don't ask for the customer's name when currentRecordId is available.</description>
@@ -80,8 +80,8 @@
         <localDeveloperName>Pest_Bill_Questions</localDeveloperName>
         <masterLabel>Pest Bill Questions</masterLabel>
         <pluginType>Topic</pluginType>
-        <scope>Explain Rentokil pest bills from the posted invoices. Don't change bills, prices, plans or payments.</scope>
+        <scope>Explain Verdant pest bills from the posted invoices. Don't change bills, prices, plans or payments.</scope>
     </localTopics>
-    <masterLabel>Rentokil Pest Billing Agent</masterLabel>
+    <masterLabel>Verdant Pest Billing Agent</masterLabel>
     <plannerType>AiCopilot__ReAct</plannerType>
 </GenAiPlannerBundle>

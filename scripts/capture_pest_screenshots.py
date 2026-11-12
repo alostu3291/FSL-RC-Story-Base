@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Capture Rentokil pest story screenshots (scenes 1-9) into a screenshots folder.
+"""Capture Verdant pest story screenshots (scenes 1-9) into a screenshots folder.
 
 Requires Playwright and an authenticated sf org. Env:
   FSL_ORG   sf CLI alias (default fsl-rc)
