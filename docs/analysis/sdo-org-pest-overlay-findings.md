@@ -235,7 +235,7 @@ and a queueable retries activation (and billing) each minute, up to five times.
 
 **Removals credit $0 (open).** On the template, the line that
 `initiateAmendment` creates to remove or downgrade a plan comes back priced at
-$0 instead of minus the plan's price. So a paused add-on still bills after it
+$0 instead of minus the plan's price. The cause isn't known yet. So a paused add-on still bills after it
 resumes (Sam Patel: $138/mo instead of $69), and an upgrade keeps charging for
 the old tier. The same code credits correctly on orgs built by
 `prepare_rlm_org`. What was ruled out:
@@ -246,10 +246,14 @@ the old tier. The same code credits correctly on orgs built by
   difference.
 - Sending the current price as `UnitPrice` on the removal line through Place
   Sales Transaction succeeds, but repricing clears it.
+- The template's `RC_SalesTransactionContext` has every asset mapping the
+  repo's `RLM_SalesTransactionContext` has. The one line-price difference
+  (the template loads `OrderItem.PricingSource`) doesn't apply, because the
+  field is empty on plan-change lines in both orgs.
 
-The likely cause is the template's `RC_SalesTransactionContext` not mapping
-the asset's last price onto amendment lines, which the repo's
-`RLM_SalesTransactionContext` does. Until that's patched, on a template org
+The line already comes back from `initiateAmendment` at $0, so the next place
+to look is the pricing log for that call (`enableDebugPriceLogs` is on in the
+template). Until it's fixed, on a template org
 only demo plan changes that add a new add-on, or demo pause, resume and
 upgrade on a `prepare_rlm_org` org.
 
