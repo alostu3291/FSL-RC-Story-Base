@@ -362,7 +362,7 @@ Deploy persona metadata (profiles, permission set groups, permission sets) from 
 
 ### `prepare_pest`
 
-Deploy Verdant residential pest control demo: catalog, location-aware pricing context, Inspect and Quote field flow, Bloomingdale FSL foundation, Initial Service DRO handoff, and Verdant-branded proposal and invoice DocGen templates (when docgen=true). With einstein=true, adds the Einstein prompt templates behind the pest AI features (visit brief, photo and notes findings, plan explanation, product suggestions, visit summary); with agents=true, adds the Verdant Pest Billing Agent. Requires fsl=true for Field Service metadata reused from prepare_fsl.
+Deploy Verdant residential pest control demo: catalog, location-aware pricing context, Inspect and Quote field flow, Bloomingdale FSL foundation, Initial Service DRO handoff, and Verdant-branded proposal and invoice DocGen templates (when docgen=true). With einstein=true, adds the Einstein prompt templates behind the pest AI features (visit brief, photo and notes findings, plan explanation, product suggestions, visit summary); with agents=true, adds the Verdant Pest Billing Agent; with pest_mcp=true and docgen=true, adds the Verdant Field Assistant REST facade for the LLM / MCP demo. Requires fsl=true for Field Service metadata reused from prepare_fsl.
 
 **Steps:**
 
@@ -393,6 +393,9 @@ Deploy Verdant residential pest control demo: catalog, location-aware pricing co
    - `api_names`: `['RLM_RTK_Pest_Billing_Agent']`
 18. **task** `activate_pest_billing_agent`  `when: project_config.project__custom__pest and project_config.project__custom__agents`
 19. **task** `deploy_post_pest_brand`  `when: project_config.project__custom__pest`
+20. **task** `deploy_post_pest_mcp`  `when: project_config.project__custom__pest and project_config.project__custom__pest_mcp and project_config.project__custom__docgen`
+21. **task** `assign_permission_sets`  `when: project_config.project__custom__pest and project_config.project__custom__pest_mcp and project_config.project__custom__docgen`
+   - `api_names`: `['RLM_RTK_Assistant']`
 
 ---
 

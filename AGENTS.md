@@ -177,6 +177,7 @@ that topic.
 | Debug a build/deploy failure | `.cursor/skills/troubleshooting/SKILL.md` |
 | Deploy or repair the pest / FSL demo in an existing org | `.cursor/skills/pest-demo-org-deploy/SKILL.md` |
 | Seed pest demo visits (prospect inspection, Covered re-service) | `.cursor/skills/pest-demo-seed-visits/SKILL.md` |
+| Run or extend the pest demo from an LLM (MCP server, Apex REST facade, reset) | `mcp/verdant-field-assistant/README.md` |
 | Build or debug LWC actions for the Field Service mobile app | `.cursor/skills/fsl-mobile-lwc/SKILL.md` |
 | Set up Field Service mobile login, settings and licensing | `docs/guides/fsl-mobile-setup.md` |
 | Revise a demo deck or replace its screenshots | `.cursor/skills/demo-deck-refresh/SKILL.md` |

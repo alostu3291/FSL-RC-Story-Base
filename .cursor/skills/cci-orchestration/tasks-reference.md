@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**233 tasks** across **9 groups**.
+**235 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*152 task(s)*
+*154 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1377,6 +1377,20 @@
 **Options:**
 
 - `path`: `unpackaged/post_pest_docgen`
+
+---
+
+### `deploy_post_pest_mcp`
+
+**Description:** Deploy the Verdant Field Assistant REST facade (POST /services/apexrest/verdant/assistant) that the mcp/verdant-field-assistant MCP server calls, so the pest storyline runs from an LLM with no Salesforce screens. RLM_RTK_AssistantApi dispatches each operation to the Apex the field flows use (FieldVisit, Inspection, FieldQuote, FieldAddOn, PlanChange, AI, BillExplainer, SignAndPay); RLM_RTK_Assistant adds caller intake (new customer plus a dispatched free inspection), re-service booking, the technician's schedule for a day and customer summaries; RLM_RTK_DemoReset archives assistant-created customers (Account.RLM_RTK_Demo_Run__c). Includes the RLM_RTK_Assistant permission set. Requires deploy_post_pest and deploy_post_docgen. Runs RLM_RTK_AssistantTest and RLM_RTK_AssistantApiTest.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_pest_mcp`
+- `test_level`: `RunSpecifiedTests`
+- `specified_tests`: `RLM_RTK_AssistantTest,RLM_RTK_AssistantApiTest`
 
 ---
 
@@ -2391,6 +2405,14 @@
 **Options:**
 
 - `developerNames`: `['Binding_Object_Rate_Adjustment_Resolution_Entries', 'Binding_Object_Rate_Card_Entry_Resolution_Entries_v2', 'Priceb...`
+
+---
+
+### `reset_verdant_llm_demo`
+
+**Description:** Reset the Verdant Field Assistant (LLM) demo for another run. Archives the accounts the assistant created for the scripted caller (customer, default Sarah Mitchell) by renaming them "zz Archived - ..." and canceling their open visits, then re-seeds the backup customers (customers, default Aisha Brooks, Casey Morgan, Sam Patel, Dana Whitfield) through seed_rtk_demo_cast. reseed false only archives. Requires deploy_post_pest_mcp.
+
+**Class:** `tasks.rlm_rtk_demo_reset.ResetVerdantLlmDemo`
 
 ---
 

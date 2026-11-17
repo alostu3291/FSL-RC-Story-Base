@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Verdant Field Assistant: the REST facade the MCP server calls, intake and demo reset Apex, and the demo run stamp on Account. Pair with RLM Verdant Pest.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>RLM Verdant Field Assistant</label>
+    <classAccesses>
+        <apexClass>RLM_RTK_Assistant</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_RTK_AssistantApi</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>RLM_RTK_DemoReset</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.RLM_RTK_Demo_Run__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+</PermissionSet>

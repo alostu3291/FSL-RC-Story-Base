@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "verdant-field-assistant": {
+      "command": "/opt/homebrew/bin/uv",
+      "args": [
+        "--directory",
+        "/ABSOLUTE/PATH/TO/FSL-RC-Story-Base-1/mcp/verdant-field-assistant",
+        "run",
+        "verdant-field-assistant"
+      ],
+      "env": {
+        "VERDANT_ORG": "verdant",
+        "VERDANT_ADMIN_TOOLS": "0",
+        "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}

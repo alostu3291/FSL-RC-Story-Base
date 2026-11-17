@@ -124,6 +124,7 @@ project:
 
     # ── Pest Control (Verdant residential demo) ───────────────────────────────
     pest: false               # Verdant residential pest catalog, location pricing, field quote (requires fsl)
+    pest_mcp: false           # Verdant Field Assistant REST facade for the LLM / MCP demo (requires pest, docgen)
 
     # ── Contracts & CLM ────────────────────────────────────────────────────────
     clm: true                 # Contract Lifecycle Management
@@ -1705,6 +1706,20 @@ tasks:
     options:
       path: unpackaged/post_pest_docgen
 
+  deploy_post_pest_mcp:
+    group: Revenue Lifecycle Management
+    description: Deploy the Verdant Field Assistant REST facade (POST /services/apexrest/verdant/assistant) that the mcp/verdant-field-assistant MCP server calls, so the pest storyline runs from an LLM with no Salesforce screens. RLM_RTK_AssistantApi dispatches each operation to the Apex the field flows use (FieldVisit, Inspection, FieldQuote, FieldAddOn, PlanChange, AI, BillExplainer, SignAndPay); RLM_RTK_Assistant adds caller intake (new customer plus a dispatched free inspection), re-service booking, the technician's schedule for a day and customer summaries; RLM_RTK_DemoReset archives assistant-created customers (Account.RLM_RTK_Demo_Run__c). Includes the RLM_RTK_Assistant permission set. Requires deploy_post_pest and deploy_post_docgen. Runs RLM_RTK_AssistantTest and RLM_RTK_AssistantApiTest.
+    class_path: cumulusci.tasks.salesforce.Deploy
+    options:
+      path: unpackaged/post_pest_mcp
+      test_level: RunSpecifiedTests
+      specified_tests: RLM_RTK_AssistantTest,RLM_RTK_AssistantApiTest
+
+  reset_verdant_llm_demo:
+    group: Revenue Lifecycle Management
+    description: Reset the Verdant Field Assistant (LLM) demo for another run. Archives the accounts the assistant created for the scripted caller (customer, default Sarah Mitchell) by renaming them "zz Archived - ..." and canceling their open visits, then re-seeds the backup customers (customers, default Aisha Brooks, Casey Morgan, Sam Patel, Dana Whitfield) through seed_rtk_demo_cast. reseed false only archives. Requires deploy_post_pest_mcp.
+    class_path: tasks.rlm_rtk_demo_reset.ResetVerdantLlmDemo
+
   deploy_post_pest_brand:
     group: Revenue Lifecycle Management
     description: Deploy the Verdant Pest Care Lightning theme (RLM_verdant_logo header image, RLM_Verdant branding set with Forest #1F4D3A as the brand color, and the RLM_Verdant theme). Activating a theme can't be done through the API, so activate it in Setup → Themes and Branding. Rebuild the logo with scripts/brand/build_verdant_assets.py.
@@ -3104,7 +3119,8 @@ flows:
       and Verdant-branded proposal and invoice DocGen templates (when docgen=true).
       With einstein=true, adds the Einstein prompt templates behind the pest AI features
       (visit brief, photo and notes findings, plan explanation, product suggestions,
-      visit summary); with agents=true, adds the Verdant Pest Billing Agent.
+      visit summary); with agents=true, adds the Verdant Pest Billing Agent; with
+      pest_mcp=true and docgen=true, adds the Verdant Field Assistant REST facade for the LLM / MCP demo.
       Requires fsl=true for Field Service metadata reused from prepare_fsl.
     steps:
       0.5:
@@ -3188,6 +3204,15 @@ flows:
       19:
         task: deploy_post_pest_brand
         when: project_config.project__custom__pest
+      20:
+        task: deploy_post_pest_mcp
+        when: project_config.project__custom__pest and project_config.project__custom__pest_mcp and project_config.project__custom__docgen
+      21:
+        task: assign_permission_sets
+        when: project_config.project__custom__pest and project_config.project__custom__pest_mcp and project_config.project__custom__docgen
+        options:
+          api_names:
+            - RLM_RTK_Assistant
 
   prepare_clm:
     group: Revenue Lifecycle Management

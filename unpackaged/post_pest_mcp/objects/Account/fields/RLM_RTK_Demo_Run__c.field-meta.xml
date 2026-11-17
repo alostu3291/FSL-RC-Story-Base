@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RLM_RTK_Demo_Run__c</fullName>
+    <description>When the Verdant Field Assistant created this customer from a call. reset_verdant_llm_demo archives these accounts so the scripted caller can be booked again.</description>
+    <label>RTK Demo Run</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

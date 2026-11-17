@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**41 feature flags**, **84 configuration values**, **33 YAML anchors** under `project.custom`.
+**42 feature flags**, **84 configuration values**, **33 YAML anchors** under `project.custom`.
 
 ---
 
@@ -28,7 +28,7 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `constraints` | `True` | 9 flow step(s) |
 | `constraints_data` | `True` | 5 flow step(s) |
 | `dev_ed` | `False` | 1 flow step(s) |
-| `docgen` | `True` | 13 flow step(s) |
+| `docgen` | `True` | 15 flow step(s) |
 | `dro` | `True` | 12 flow step(s) |
 | `einstein` | `True` | 5 flow step(s) |
 | `fsl` | `False` | 17 flow step(s) |
@@ -36,7 +36,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 | `guidedselling` | `False` | 2 flow step(s) |
 | `payments` | `True` | 6 flow step(s) |
 | `pde` | `False` | — |
-| `pest` | `False` | 25 flow step(s) |
+| `pest` | `False` | 27 flow step(s) |
+| `pest_mcp` | `False` | 2 flow step(s) |
 | `prm` | `True` | 9 flow step(s) |
 | `prm_exp_bundle` | `True` | 4 flow step(s) |
 | `procedure_plan_definition_version_active` | `False` | — |
@@ -177,6 +178,8 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 12 → `deploy_post_pest_docgen`
 - `prepare_pest` step 13 → `activate_docgen_templates`
 - `prepare_pest` step 14 → `fix_pest_document_template_binaries`
+- `prepare_pest` step 20 → `deploy_post_pest_mcp`
+- `prepare_pest` step 21 → `assign_permission_sets`
 - `prepare_docgen` step 1 → `create_docgen_library`
 - `prepare_docgen` step 2 → `enable_document_builder_toggle`
 - `prepare_docgen` step 3 → `deploy_docgen_seller_fields`
@@ -276,6 +279,13 @@ Boolean flags that gate task/flow execution via `when:` clauses.
 - `prepare_pest` step 17 → `assign_permission_sets`
 - `prepare_pest` step 18 → `activate_pest_billing_agent`
 - `prepare_pest` step 19 → `deploy_post_pest_brand`
+- `prepare_pest` step 20 → `deploy_post_pest_mcp`
+- `prepare_pest` step 21 → `assign_permission_sets`
+
+### `pest_mcp` (default: `False`)
+
+- `prepare_pest` step 20 → `deploy_post_pest_mcp`
+- `prepare_pest` step 21 → `assign_permission_sets`
 
 ### `prm` (default: `True`)
 
