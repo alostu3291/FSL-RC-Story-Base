@@ -88,7 +88,7 @@ Pick one of the times it offers (for example "The first one works."). Claude boo
 It's the treatment day now. What's my day?
 ```
 ```
-Starting Sarah's treatment.
+Starting Sarah's treatment. Show me the checklist.
 ```
 
 **8. Treat and find an add-on**
