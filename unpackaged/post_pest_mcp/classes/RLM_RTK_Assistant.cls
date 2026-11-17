@@ -219,7 +219,7 @@ public with sharing class RLM_RTK_Assistant {
 
     // ---------- reads ----------
 
-    /** The running technician's appointments on a day, on the territory's clock. */
+    /** The running technician's appointments on a day, on the territory's clock; archived demo runs are left out. */
     public static List<Visit> schedule(Date day) {
         TimeZone zone = zoneOf(territory());
         Datetime dayStart = zonedStart(day, 0, zone);
@@ -240,7 +240,7 @@ public with sharing class RLM_RTK_Assistant {
         Map<Id, WorkOrder> workOrders = new Map<Id, WorkOrder>([
             SELECT Id, WorkOrderNumber, WorkType.Name, Subject, Description, AccountId, Account.Name,
                 Street, City, State, PostalCode, RLM_Service_Coverage__c, RLM_RTK_Reported_Pest__c
-            FROM WorkOrder WHERE Id IN :workOrderIds
+            FROM WorkOrder WHERE Id IN :workOrderIds AND (NOT Account.Name LIKE 'zz Archived%')
         ]);
         List<Visit> visits = new List<Visit>();
         for (ServiceAppointment sa : appointments) {
