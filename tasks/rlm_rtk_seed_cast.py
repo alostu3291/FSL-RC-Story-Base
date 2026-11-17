@@ -249,14 +249,21 @@ class SeedRtkDemoCast(BaseSalesforceApiTask):
     def _plan_changes(self, c):
         name = self._q(c["name"])
         for change in c.get("changes", []):
-            if not self._count(f"SELECT COUNT() FROM Order WHERE Account.Name = '{name}' AND Name LIKE '{change['order']}'"):
+            existing = self._query(
+                f"SELECT EffectiveDate FROM Order WHERE Account.Name = '{name}' AND Name LIKE '{change['order']}' "
+                "ORDER BY CreatedDate DESC LIMIT 1"
+            )
+            if existing:
+                # Seeded on an earlier day: its periods start on that order's date, not today's.
+                start = existing[0]["EffectiveDate"]
+            else:
                 self.logger.info(f"{c['name']}: {change['action']} {change['sku']} from {change['start']}")
                 self._apex("seedRtkCastPlanChange.apex", {
                     "ACCOUNT_NAME": c["name"], "ACTION": change["action"], "SKU": change["sku"],
                     "START_DATE": change["start"].isoformat(),
                 })
+                start = change["start"].isoformat()
             # The next change reads the asset's state periods, which assetization writes after activation.
-            start = change["start"].isoformat()
             self._wait(
                 lambda: self._count(
                     f"SELECT COUNT() FROM AssetStatePeriod WHERE Asset.Account.Name = '{name}' "
