@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--VERDANT-->
+<style>
+  .finding { border-bottom: 1px solid var(--line); padding: 12px 16px; }
+  .finding:last-child { border-bottom: 0; }
+  .finding .top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .finding h2 { font-size: 14px; margin: 0; flex: 1; }
+  .note { margin: 6px 0 8px; font-size: 13px; }
+  .treated { font-size: 12px; color: var(--forest); margin-bottom: 8px; }
+  .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .col { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px; min-height: 92px; }
+  .col .label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .thumbs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .thumbs img { width: 84px; height: 64px; object-fit: cover; border-radius: 6px; cursor: zoom-in; }
+  .empty { font-size: 12px; color: var(--muted); }
+  .add { font-size: 11px; padding: 4px 8px; border-radius: 7px; }
+  .camera { position: fixed; inset: 0; background: rgba(10, 20, 15, .92); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 10; }
+  .camera.open { display: flex; }
+  .camera video { max-width: 92%; max-height: 70%; border-radius: 12px; }
+  .zoom { position: fixed; inset: 0; background: rgba(10, 20, 15, .9); display: none; align-items: center; justify-content: center; z-index: 10; cursor: zoom-out; }
+  .zoom.open { display: flex; }
+  .zoom img { max-width: 94%; max-height: 94%; border-radius: 8px; }
+  .reco { padding: 10px 16px; background: var(--mint); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head"><div class="logo">V</div><h1 id="title">Findings</h1><div class="sub" id="sub"></div></div>
+  <div id="body"><div class="loading">Loading the findings…</div></div>
+</div>
+<input type="file" id="file" accept="image/*" capture="environment" hidden>
+<div class="camera" id="camera">
+  <video id="video" autoplay playsinline></video>
+  <div class="row" style="flex:none;gap:10px"><button id="snap">Take photo</button><button class="ghost" id="cancel" style="color:#fff">Cancel</button></div>
+</div>
+<div class="zoom" id="zoom"><img id="zoomImg" alt=""></div>
+<script type="module">
+const V = window.Verdant;
+let visit;
+let card;
+let target; // { findingId, stage, label }
+
+function stageBadge(status) {
+  if (!status || status === "Open") return "";
+  const kind = status === "Treated" ? "" : "warn";
+  return `<span class="badge ${kind}">${V.esc(status)}</span>`;
+}
+
+function thumbs(list) {
+  return list.length ? `<div class="thumbs">${list.map((src) => `<img src="${src}" alt="">`).join("")}</div>` : '<div class="empty">No photo yet</div>';
+}
+
+function render() {
+  document.getElementById("title").textContent =
+    `${card.mode === "After" ? "Treatment" : "Inspection"} · ${card.accountName || ""}`;
+  document.getElementById("sub").textContent =
+    `${card.findings.length} finding${card.findings.length === 1 ? "" : "s"}${card.mode === "After" ? ` · ${card.treatedCount || 0} treated` : ""}`;
+  if (!card.findings.length) {
+    document.getElementById("body").innerHTML = '<div class="loading">No findings recorded yet.</div>';
+    return;
+  }
+  const reco = card.recommendation && card.mode !== "After"
+    ? `<div class="reco"><b>Recommended:</b> ${V.esc(card.recommendation)}</div>` : "";
+  document.getElementById("body").innerHTML = reco + card.findings.map((f) => `
+    <div class="finding">
+      <div class="top"><h2>${V.esc(f.zone)} · ${V.esc(f.pest)}</h2>
+        <span class="badge ${f.severity === "Heavy" ? "bad" : f.severity === "Moderate" ? "warn" : ""}">${V.esc(f.severity)}</span>
+        ${stageBadge(f.treatmentStatus)}</div>
+      <div class="note">${V.esc(f.customerNote || f.evidence || "")}</div>
+      ${f.treatmentNote ? `<div class="treated">✓ ${V.esc(f.treatmentNote)}</div>` : ""}
+      <div class="photos">
+        ${["Before", "After"].map((stage) => `<div class="col">
+          <div class="label">${stage}
+            <span>${navigator.mediaDevices?.getUserMedia ? `<button class="ghost add" data-cam="${f.id}" data-stage="${stage}">📷</button>` : ""}
+            <button class="ghost add" data-up="${f.id}" data-stage="${stage}">Upload</button></span></div>
+          ${thumbs(stage === "Before" ? f.before : f.after)}</div>`).join("")}
+      </div>
+    </div>`).join("");
+
+  document.querySelectorAll("[data-up]").forEach((b) => b.addEventListener("click", () => {
+    target = targetFor(b.dataset.up, b.dataset.stage);
+    document.getElementById("file").click();
+  }));
+  document.querySelectorAll("[data-cam]").forEach((b) => b.addEventListener("click", () => {
+    target = targetFor(b.dataset.cam, b.dataset.stage);
+    openCamera();
+  }));
+  document.querySelectorAll(".thumbs img").forEach((img) => img.addEventListener("click", () => {
+    document.getElementById("zoomImg").src = img.src;
+    document.getElementById("zoom").classList.add("open");
+  }));
+}
+
+function targetFor(findingId, stage) {
+  const f = card.findings.find((x) => x.id === findingId);
+  return { findingId, stage, label: `${f.zone} ${f.pest}`.toLowerCase() };
+}
+
+function resized(source, width, height) {
+  const scale = Math.min(1, 1600 / Math.max(width, height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round(height * scale);
+  canvas.getContext("2d").drawImage(source, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+}
+
+async function upload(base64) {
+  document.getElementById("sub").textContent = "Uploading photo…";
+  try {
+    await V.call("upload_finding_photo", {
+      finding_id: target.findingId, stage: target.stage, image_base64: base64,
+      file_name: `${target.label.replace(/[^a-z0-9]+/g, "-")}-${target.stage.toLowerCase()}.jpg`,
+    });
+    V.tellModel(`The technician added a ${target.stage} photo to the ${target.label} finding.`);
+    await load();
+  } catch (e) {
+    alert("Couldn't save the photo: " + e.message);
+    render();
+  }
+}
+
+document.getElementById("file").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    upload(resized(img, img.naturalWidth, img.naturalHeight));
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(file);
+});
+
+let stream;
+async function openCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    document.getElementById("video").srcObject = stream;
+    document.getElementById("camera").classList.add("open");
+  } catch (e) {
+    alert("The camera isn't available here, so pick a photo instead.");
+    document.getElementById("file").click();
+  }
+}
+function closeCamera() {
+  stream?.getTracks().forEach((t) => t.stop());
+  document.getElementById("camera").classList.remove("open");
+}
+document.getElementById("snap").addEventListener("click", () => {
+  const video = document.getElementById("video");
+  const base64 = resized(video, video.videoWidth, video.videoHeight);
+  closeCamera();
+  upload(base64);
+});
+document.getElementById("cancel").addEventListener("click", closeCamera);
+document.getElementById("zoom").addEventListener("click", () => document.getElementById("zoom").classList.remove("open"));
+
+async function load() {
+  try {
+    card = await V.call("findings_card", { visit });
+    render();
+  } catch (e) {
+    V.error(document.getElementById("body"), e);
+  }
+}
+
+V.app.ontoolinput = (params) => {
+  visit = params.arguments?.visit;
+};
+V.app.ontoolresult = () => {
+  if (visit) load();
+};
+await V.connect();
+</script>
+</body>
+</html>

@@ -79,6 +79,24 @@ refusal. Leave the org reset (not rehearsed) before the audience arrives. The ru
 Visit tools take a work order or service appointment Id. Every UTC timestamp in a result gets a
 `<field>Local` label in Central time (the Bloomingdale territory's clock).
 
+## Cards (MCP Apps)
+
+In hosts that support [MCP Apps](https://modelcontextprotocol.io/extensions/apps), some tools also
+show an interactive card in the chat. The pages live in `verdant_assistant/views/`, with the
+ext-apps SDK and Leaflet vendored under `views/vendor/` so nothing loads from a CDN.
+
+| Card | Shown by | What it does |
+|------|----------|--------------|
+| Day map | `get_my_schedule` | OpenStreetMap (CARTO tiles) with numbered stops, route and visit list; click a visit for its brief |
+| Quote | `get_quote`, `generate_proposal` | Lines, totals, "why this plan", the proposal PDF (preview, download) and Sign & Pay |
+| Findings | `get_inspection`, `get_treatment_checklist` | Each finding with Before and After photos; take one with the camera or upload |
+
+The cards call tools the model doesn't see: `quote_card`, `proposal_pdf`, `sign_and_pay`
+(records the acceptance and attaches the signature PNG to the quote; only the card's brand and
+last four leave the card form), `findings_card` and `upload_finding_photo`. Visits Salesforce
+hasn't geocoded yet are placed with OpenStreetMap Nominatim. The server logs whether the client
+negotiated Apps on each `get_my_schedule` (in Claude: `~/Library/Logs/Claude*/mcp-server-verdant-field-assistant.log`).
+
 ## Notes
 
 - **Changing days.** Dates are real. "It's Thursday now" means `get_my_schedule` for Thursday;

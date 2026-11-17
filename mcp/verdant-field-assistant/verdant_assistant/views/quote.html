@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!--VERDANT-->
+<style>
+  .totals { display: flex; gap: 12px; margin: 12px 0; }
+  .total { flex: 1; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .total b { display: block; font-size: 22px; color: var(--forest); }
+  .why { background: var(--mint); border-radius: 10px; padding: 10px 12px; margin: 10px 0; font-size: 13px; }
+  .attachment { display: flex; gap: 12px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 10px; margin: 12px 0; }
+  .attachment img { width: 64px; border: 1px solid var(--line); border-radius: 4px; cursor: zoom-in; }
+  .attachment .name { flex: 1; min-width: 0; }
+  .attachment .name b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pages { display: none; gap: 8px; overflow-x: auto; padding: 4px 0 10px; }
+  .pages.open { display: flex; }
+  .pages img { height: 380px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+  .sign { border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 12px; }
+  .sign h2, .signed h2 { font-size: 14px; margin: 0 0 4px; }
+  canvas { width: 100%; height: 130px; background: #fff; border: 1px solid var(--line); border-radius: 10px; touch-action: none; cursor: crosshair; display: block; }
+  .pad-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .pay { margin-top: 12px; width: 100%; padding: 12px; font-size: 15px; }
+  .signed { border-top: 1px dashed var(--line); margin-top: 14px; padding-top: 12px; display: flex; gap: 14px; align-items: center; }
+  .signed img { height: 64px; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+  .check { width: 30px; height: 30px; border-radius: 50%; background: var(--leaf); color: #fff; display: grid; place-items: center; font-weight: 700; flex: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head"><div class="logo">V</div><h1 id="title">Quote</h1><div class="sub" id="sub"></div></div>
+  <div class="body" id="body"><div class="loading">Loading the quote…</div></div>
+</div>
+<script type="module">
+const V = window.Verdant;
+let quoteId;
+let card;
+
+function brandOf(number) {
+  if (/^4/.test(number)) return "Visa";
+  if (/^(5[1-5]|2[2-7])/.test(number)) return "Mastercard";
+  if (/^3[47]/.test(number)) return "Amex";
+  if (/^6/.test(number)) return "Discover";
+  return "Card";
+}
+
+function render() {
+  const q = card.quote;
+  document.getElementById("title").textContent = `Quote ${q.quoteNumber} · ${q.accountName}`;
+  document.getElementById("sub").textContent = q.status || "";
+  const lines = (q.lines || []).map((l) => `<tr>
+      <td><b>${V.esc(l.product)}</b><div class="muted">${V.esc(l.billing)}</div></td>
+      <td class="amount">${V.money(l.totalPrice)}${l.billing === "One-time" ? "" : "/mo"}</td></tr>`).join("");
+  const p = card.proposal;
+  const attachment = p ? `
+    <div class="attachment">
+      ${p.pages?.length ? `<img src="${p.pages[0]}" alt="" id="thumb">` : ""}
+      <div class="name"><b>📄 ${V.esc(p.title)}.pdf</b><span class="muted">${p.pageCount} page${p.pageCount === 1 ? "" : "s"} · ${p.sizeKb} KB · saved on the quote in Salesforce</span></div>
+      <button class="ghost" id="preview">Preview</button>
+      <button class="ghost" id="download">Download</button>
+    </div>
+    <div class="pages" id="pages">${(p.pages || []).map((src) => `<img src="${src}" alt="">`).join("")}</div>`
+    : `<div class="muted" style="margin:12px 0">The proposal PDF isn't generated yet.</div>`;
+
+  let signing = "";
+  if (q.signedBy) {
+    signing = `<div class="signed"><div class="check">✓</div>
+      <div style="flex:1"><h2>Signed by ${V.esc(q.signedBy)}</h2>
+      <div class="muted">${V.esc(q.signedAtLocal || "")}${card.cardLast4 ? ` · ${V.esc(card.cardBrand)} •••• ${V.esc(card.cardLast4)}` : ""}</div></div>
+      ${card.signature ? `<img src="${card.signature}" alt="Signature">` : ""}</div>`;
+  } else if (p) {
+    signing = `<div class="sign">
+      <h2>Sign &amp; Pay</h2>
+      <div class="muted">${V.esc(q.accountName)} agrees to the plan above, billed monthly, and pays the one-time Initial Service today.</div>
+      <label>Customer name</label><input id="signer" value="${V.esc(card.contactName || q.accountName || "")}">
+      <label>Signature</label><canvas id="pad"></canvas>
+      <div class="pad-actions"><span class="muted">Sign with your finger, mouse or trackpad</span><button class="ghost" id="clear">Clear</button></div>
+      <label>Card number</label><input id="cardNumber" inputmode="numeric" placeholder="4242 4242 4242 4242" autocomplete="off">
+      <div class="row"><div><label>Expiry</label><input id="expiry" placeholder="MM/YY" autocomplete="off"></div>
+        <div><label>CVC</label><input id="cvc" placeholder="123" autocomplete="off"></div></div>
+      <div class="muted" style="margin-top:6px">Demo: only the card brand and last four digits are saved.</div>
+      <div id="signError"></div>
+      <button class="pay" id="pay">Sign &amp; Pay ${V.money(q.oneTimeTotal)} today</button>
+    </div>`;
+  }
+
+  document.getElementById("body").innerHTML = `
+    <table>${lines}</table>
+    <div class="totals">
+      <div class="total"><span class="muted">Monthly</span><b>${V.money(q.monthlyTotal)}/mo</b></div>
+      <div class="total"><span class="muted">Due today (Initial Service)</span><b>${V.money(q.oneTimeTotal)}</b></div>
+    </div>
+    ${q.planExplanation ? `<div class="why"><b>Why this plan.</b> ${V.esc(q.planExplanation)}</div>` : ""}
+    ${attachment}${signing}`;
+  wire();
+}
+
+function wire() {
+  const pages = document.getElementById("pages");
+  const toggle = () => pages.classList.toggle("open");
+  document.getElementById("preview")?.addEventListener("click", toggle);
+  document.getElementById("thumb")?.addEventListener("click", toggle);
+  document.getElementById("download")?.addEventListener("click", download);
+  const pad = document.getElementById("pad");
+  if (pad) signaturePad(pad);
+}
+
+async function download(event) {
+  const button = event.target;
+  button.disabled = true;
+  try {
+    const file = await V.call("proposal_pdf", { quote_id: quoteId });
+    await V.app.downloadFile({ contents: [{ type: "resource", resource: { uri: `file:///${file.fileName}`, mimeType: "application/pdf", blob: file.base64 } }] });
+  } catch (e) {
+    alert("Couldn't download the proposal: " + e.message);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function signaturePad(canvas) {
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * ratio;
+  canvas.height = canvas.offsetHeight * ratio;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio, ratio);
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = "#16241d";
+  let drawing = false;
+  canvas.dataset.signed = "";
+  const point = (e) => {
+    const r = canvas.getBoundingClientRect();
+    return [e.clientX - r.left, e.clientY - r.top];
+  };
+  canvas.addEventListener("pointerdown", (e) => {
+    drawing = true;
+    canvas.setPointerCapture(e.pointerId);
+    ctx.beginPath();
+    ctx.moveTo(...point(e));
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drawing) return;
+    ctx.lineTo(...point(e));
+    ctx.stroke();
+    canvas.dataset.signed = "1";
+  });
+  ["pointerup", "pointerleave", "pointercancel"].forEach((type) => canvas.addEventListener(type, () => { drawing = false; }));
+  document.getElementById("clear").addEventListener("click", () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.dataset.signed = "";
+  });
+  document.getElementById("pay").addEventListener("click", () => pay(canvas));
+}
+
+async function pay(canvas) {
+  const errorBox = document.getElementById("signError");
+  errorBox.innerHTML = "";
+  const signer = document.getElementById("signer").value.trim();
+  const number = document.getElementById("cardNumber").value.replace(/\D/g, "");
+  const expiry = document.getElementById("expiry").value.trim();
+  const problem = !signer ? "Enter the customer's name."
+    : !canvas.dataset.signed ? "The customer needs to sign."
+    : number.length < 12 ? "Enter the card number."
+    : !/^\d{2}\s*\/\s*\d{2}$/.test(expiry) ? "Enter the expiry as MM/YY."
+    : "";
+  if (problem) {
+    errorBox.innerHTML = `<div class="error" style="margin-top:8px">${V.esc(problem)}</div>`;
+    return;
+  }
+  const button = document.getElementById("pay");
+  button.disabled = true;
+  button.textContent = "Signing…";
+  try {
+    const brand = brandOf(number);
+    const last4 = number.slice(-4);
+    card = await V.call("sign_and_pay", {
+      quote_id: quoteId, signer_name: signer, card_last4: last4, card_brand: brand,
+      signature_png: canvas.toDataURL("image/png").split(",")[1],
+    });
+    render();
+    V.say(`${signer} signed the proposal and paid the Initial Service with ${brand} ending ${last4}. Place the order and book the first treatment.`);
+  } catch (e) {
+    button.disabled = false;
+    button.textContent = "Try again";
+    errorBox.innerHTML = `<div class="error" style="margin-top:8px">${V.esc(e.message)}</div>`;
+  }
+}
+
+async function load() {
+  try {
+    card = await V.call("quote_card", { quote_id: quoteId });
+    render();
+  } catch (e) {
+    V.error(document.getElementById("body"), e);
+  }
+}
+
+V.app.ontoolinput = (params) => {
+  quoteId = params.arguments?.quote_id;
+};
+V.app.ontoolresult = () => {
+  if (quoteId) load();
+};
+await V.connect();
+</script>
+</body>
+</html>

@@ -51,6 +51,8 @@ public with sharing class RLM_RTK_Assistant {
         public String address;
         public String coverage;
         public String reportedPest;
+        public Decimal latitude;
+        public Decimal longitude;
     }
 
     public class Plan {
@@ -239,7 +241,7 @@ public with sharing class RLM_RTK_Assistant {
         }
         Map<Id, WorkOrder> workOrders = new Map<Id, WorkOrder>([
             SELECT Id, WorkOrderNumber, WorkType.Name, Subject, Description, AccountId, Account.Name,
-                Street, City, State, PostalCode, RLM_Service_Coverage__c, RLM_RTK_Reported_Pest__c
+                Street, City, State, PostalCode, Latitude, Longitude, RLM_Service_Coverage__c, RLM_RTK_Reported_Pest__c
             FROM WorkOrder WHERE Id IN :workOrderIds AND (NOT Account.Name LIKE 'zz Archived%')
         ]);
         List<Visit> visits = new List<Visit>();
@@ -264,6 +266,8 @@ public with sharing class RLM_RTK_Assistant {
             v.address = joinAddress(wo.Street, wo.City, wo.State, wo.PostalCode);
             v.coverage = wo.RLM_Service_Coverage__c;
             v.reportedPest = wo.RLM_RTK_Reported_Pest__c;
+            v.latitude = wo.Latitude;
+            v.longitude = wo.Longitude;
             visits.add(v);
         }
         return visits;
