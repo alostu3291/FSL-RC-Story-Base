@@ -11,12 +11,15 @@ Environment:
     VERDANT_ORG          sf CLI alias or username of the org (default: verdant)
     VERDANT_TRACE        JSONL execution trace path (default: ~/.verdant-field-assistant/trace.jsonl)
     VERDANT_ADMIN_TOOLS  1 to expose reset_demo (presenter only)
+    VERDANT_CARDS        0 for chat apps that can't show MCP Apps cards: tools return pictures instead,
+                         and Sign & Pay, photo capture and the live map open in the browser
 """
 
 import asyncio
 import base64
 import datetime
 import io
+import json
 import logging
 import os
 import re
@@ -26,9 +29,11 @@ from typing import Annotated, Literal, Optional
 import httpx
 from mcp.server.apps import Apps, ResourceCsp, ResourcePermissions, client_supports_apps
 from mcp.server.mcpserver import Context, MCPServer
+from mcp_types import CallToolResult, ImageContent, TextContent
 from pydantic import Field
 
-from verdant_assistant import views
+from verdant_assistant import pictures, views
+from verdant_assistant.browser import Pages
 from verdant_assistant.salesforce import Refused, from_environment, today_central
 
 PROMPT_FILE = Path(__file__).resolve().parent.parent / "verdant_assistant_prompt.md"
@@ -48,16 +53,41 @@ def tool(fn):
     return fn
 
 
-# Inline cards (MCP Apps). Hosts without Apps support just get each tool's JSON.
+# Inline cards (MCP Apps). Hosts without Apps support just get each tool's JSON. Some hosts negotiate
+# Apps but block the card frame (managed Claude Desktop): run those with VERDANT_CARDS=0.
+CARDS = os.environ.get("VERDANT_CARDS", "1") != "0"
 DAY_MAP = "ui://verdant/day-map.html"
 QUOTE = "ui://verdant/quote.html"
 FINDINGS = "ui://verdant/findings.html"
 apps = Apps()
-apps.add_html_resource(DAY_MAP, views.page("day_map"), title="My day",
-                       csp=ResourceCsp(resource_domains=["https://*.basemaps.cartocdn.com"]))
-apps.add_html_resource(QUOTE, views.page("quote"), title="Quote, proposal and Sign & Pay")
-apps.add_html_resource(FINDINGS, views.page("findings"), title="Findings and photos",
-                       permissions=ResourcePermissions(camera={}))
+if CARDS:
+    apps.add_html_resource(DAY_MAP, views.page("day_map"), title="My day",
+                           csp=ResourceCsp(resource_domains=["https://tile.openstreetmap.org"]))
+    apps.add_html_resource(QUOTE, views.page("quote"), title="Quote, proposal and Sign & Pay")
+    apps.add_html_resource(FINDINGS, views.page("findings"), title="Findings and photos",
+                           permissions=ResourcePermissions(camera={}))
+
+
+def shows(card: str):
+    """A model tool that shows a card when cards are on, and is a plain tool otherwise."""
+    return apps.tool(resource_uri=card) if CARDS else tool
+
+
+def card_action(card: str):
+    """A tool only a card calls. Without cards, the browser pages call the function directly."""
+    def register(fn):
+        if CARDS:
+            apps.tool(resource_uri=card, visibility=["app"])(fn)
+        return fn
+    return register
+
+
+def _result(data, *images: Optional[bytes]) -> CallToolResult:
+    """The tool's data, plus inline pictures when cards are off (the card shows them otherwise)."""
+    content = [TextContent(type="text", text=json.dumps(data, indent=2, default=str))]
+    content += [ImageContent(type="image", data=base64.b64encode(i).decode(), mime_type="image/jpeg")
+                for i in images if i and not CARDS]
+    return CallToolResult(content=content, structured_content=data if isinstance(data, dict) else {"result": data})
 
 Visit = Annotated[str, Field(description="The visit: a work order Id or service appointment Id from get_my_schedule.")]
 Customer = Annotated[str, Field(description="Customer name as it appears in Salesforce (for example 'Sam Patel') or an Account Id.")]
@@ -160,15 +190,16 @@ async def find_customer(search: Annotated[str, Field(description="Part of the cu
 
 # ---------- 2. Plan the day ----------
 
-@apps.tool(resource_uri=DAY_MAP)
-async def get_my_schedule(ctx: Context, day: Day = None) -> dict:
+@shows(DAY_MAP)
+async def get_my_schedule(ctx: Context, day: Day = None) -> CallToolResult:
     """The technician's visits for a day (default today), in order, with customer, address and visit Ids.
     Shows the day on a map."""
     log.info("get_my_schedule: client supports MCP Apps cards: %s", client_supports_apps(ctx))
     chosen = _day(day) or today_central().isoformat()
     visits = await sf.call("get_my_schedule", "schedule", {"day": chosen})
     await asyncio.gather(*(_locate(v) for v in visits if v.get("latitude") is None))
-    return {"day": chosen, "today": today_central().isoformat(), "visits": visits}
+    data = {"day": chosen, "today": today_central().isoformat(), "visits": visits}
+    return _result(data, None if CARDS else await pictures.day_map(visits))
 
 
 _geocoded: dict = {}
@@ -267,11 +298,12 @@ def _photo(path: Path):
     return base64.b64encode(buffer.getvalue()).decode(), path.stem + ".jpg"
 
 
-@apps.tool(resource_uri=FINDINGS)
-async def get_inspection(visit: Visit) -> dict:
+@shows(FINDINGS)
+async def get_inspection(visit: Visit) -> CallToolResult:
     """The visit's findings (with treatment status), plan recommendation and plan explanation. Shows the
     findings with their Before and After photos, where the technician can add photos."""
-    return await sf.call("get_inspection", "inspection", {"recordId": visit})
+    state = await sf.call("get_inspection", "inspection", {"recordId": visit})
+    return _result(state, None if CARDS else await _contact_sheet("get_inspection", visit, state))
 
 
 # ---------- 4. Quote ----------
@@ -306,23 +338,27 @@ async def create_quote(
     })
 
 
-@apps.tool(resource_uri=QUOTE)
-async def get_quote(quote_id: str) -> dict:
+@shows(QUOTE)
+async def get_quote(quote_id: str) -> CallToolResult:
     """The quote's lines, monthly and one-time totals, plan explanation, signature and proposal. Shows the
     quote card with the proposal PDF and Sign & Pay."""
-    return await sf.call("get_quote", "quote", {"quoteId": quote_id})
+    quote = await sf.call("get_quote", "quote", {"quoteId": quote_id})
+    return _result(quote, *([] if CARDS else await _proposal_pictures("get_quote", quote)))
 
 
-@apps.tool(resource_uri=QUOTE)
-async def generate_proposal(quote_id: str) -> dict:
+@shows(QUOTE)
+async def generate_proposal(quote_id: str) -> CallToolResult:
     """Generates the Verdant proposal PDF for the quote and waits up to about 90 seconds for it. Shows the
     quote card with the PDF attached and a Sign & Pay pad where the customer signs and pays."""
-    started = await sf.call("generate_proposal", "startProposal", {"quoteId": quote_id})
-    if started.get("status") != "Generating":
-        return started
-    return await _poll("generate_proposal", "proposalStatus",
-                       {"processId": started.get("processId"), "quoteId": quote_id},
-                       lambda r: r.get("status") != "Generating", 90)
+    status = await sf.call("generate_proposal", "startProposal", {"quoteId": quote_id})
+    if status.get("status") == "Generating":
+        status = await _poll("generate_proposal", "proposalStatus",
+                             {"processId": status.get("processId"), "quoteId": quote_id},
+                             lambda r: r.get("status") != "Generating", 90)
+    if CARDS or status.get("status") == "Generating":
+        return _result(status)
+    quote = await sf.call("generate_proposal", "quote", {"quoteId": quote_id})
+    return _result(status, *await _proposal_pictures("generate_proposal", quote))
 
 
 @tool
@@ -384,11 +420,12 @@ async def book_treatment(
 
 # ---------- 7. The treatment visit ----------
 
-@apps.tool(resource_uri=FINDINGS)
-async def get_treatment_checklist(visit: Visit) -> dict:
+@shows(FINDINGS)
+async def get_treatment_checklist(visit: Visit) -> CallToolResult:
     """The findings to treat on this visit, from the inspection, with their treatment status. Shows them with
     their Before photos, where the technician can add After photos."""
-    return await sf.call("get_treatment_checklist", "inspection", {"recordId": visit})
+    state = await sf.call("get_treatment_checklist", "inspection", {"recordId": visit})
+    return _result(state, None if CARDS else await _contact_sheet("get_treatment_checklist", visit, state))
 
 
 @tool
@@ -493,18 +530,50 @@ def _thumbnail(data: bytes, size: int = THUMB_PX) -> str:
     return "data:image/jpeg;base64," + base64.b64encode(buffer.getvalue()).decode()
 
 
-def _pdf_pages(data: bytes, limit: int = 6) -> tuple[list[str], int]:
+def _pdf_images(data: bytes, limit: int = 6, dpi: int = 72) -> tuple[list[bytes], int]:
     import pymupdf
 
     with pymupdf.open(stream=data, filetype="pdf") as document:
-        pages = [
-            "data:image/png;base64," + base64.b64encode(page.get_pixmap(dpi=72).tobytes("png")).decode()
-            for page in list(document)[:limit]
-        ]
-        return pages, document.page_count
+        return [page.get_pixmap(dpi=dpi).tobytes("jpeg") for page in list(document)[:limit]], document.page_count
 
 
-@apps.tool(resource_uri=QUOTE, visibility=["app"])
+def _pdf_pages(data: bytes, limit: int = 6) -> tuple[list[str], int]:
+    images, count = _pdf_images(data, limit)
+    return ["data:image/jpeg;base64," + base64.b64encode(i).decode() for i in images], count
+
+
+async def _proposal_file(tool: str, quote: dict) -> Optional[tuple[dict, bytes]]:
+    version = await _latest_version(quote["proposalDocumentId"]) if quote.get("proposalDocumentId") else None
+    if not version:
+        return None
+    return version, await sf.download(tool, f"/sobjects/ContentVersion/{version['Id']}/VersionData")
+
+
+async def _proposal_pictures(tool: str, quote: dict) -> list[bytes]:
+    proposal = await _proposal_file(tool, quote)
+    return _pdf_images(proposal[1], limit=2, dpi=80)[0] if proposal else []
+
+
+async def _finding_photos(tool: str, state: dict) -> list[dict]:
+    """The state's findings with their Before and After photos downloaded (bytes)."""
+    async def photos(items):
+        return list(await asyncio.gather(*(
+            sf.download(tool, f"/sobjects/ContentVersion/{p['versionId']}/VersionData")
+            for p in items or [] if p.get("versionId"))))
+
+    return [{**f, "before": await photos(f.get("photos")), "after": await photos(f.get("afterPhotos"))}
+            for f in state.get("findings", [])]
+
+
+async def _contact_sheet(tool: str, visit: str, state: Optional[dict]) -> Optional[bytes]:
+    if not state:
+        return None
+    findings = await _finding_photos(tool, state)
+    context = (await sf.call(tool, "visitContext", {"recordId": visit}))["context"]
+    return await asyncio.to_thread(pictures.contact_sheet, f"{context.get('accountName') or 'Visit'} · photos", findings)
+
+
+@card_action(QUOTE)
 async def quote_card(quote_id: str) -> dict:
     """The quote card's data: quote, proposal page previews, signature and card on file."""
     quote = await sf.call("quote_card", "quote", {"quoteId": _record_id(quote_id)})
@@ -512,13 +581,12 @@ async def quote_card(quote_id: str) -> dict:
     rows = await sf.query(f"SELECT RLM_Demo_Card_Last4__c, RLM_Demo_Card_Brand__c FROM Quote WHERE Id = '{quote_id}'")
     if rows:
         card["cardLast4"], card["cardBrand"] = rows[0]["RLM_Demo_Card_Last4__c"], rows[0]["RLM_Demo_Card_Brand__c"]
-    if quote.get("proposalDocumentId"):
-        version = await _latest_version(quote["proposalDocumentId"])
-        if version:
-            data = await sf.download("quote_card", f"/sobjects/ContentVersion/{version['Id']}/VersionData")
-            pages, count = _pdf_pages(data)
-            card["proposal"] = {"title": quote.get("proposalTitle") or version["Title"], "pages": pages,
-                                "pageCount": count, "sizeKb": round(len(data) / 1024)}
+    proposal = await _proposal_file("quote_card", quote)
+    if proposal:
+        version, data = proposal
+        pages, count = _pdf_pages(data)
+        card["proposal"] = {"title": quote.get("proposalTitle") or version["Title"], "pages": pages,
+                            "pageCount": count, "sizeKb": round(len(data) / 1024)}
     signatures = await sf.query(
         "SELECT ContentDocument.LatestPublishedVersionId FROM ContentDocumentLink "
         f"WHERE LinkedEntityId = '{quote_id}' AND ContentDocument.Title LIKE 'Signature%' "
@@ -529,18 +597,18 @@ async def quote_card(quote_id: str) -> dict:
     return card
 
 
-@apps.tool(resource_uri=QUOTE, visibility=["app"])
+@card_action(QUOTE)
 async def proposal_pdf(quote_id: str) -> dict:
     """The proposal PDF for download."""
     quote = await sf.call("proposal_pdf", "quote", {"quoteId": _record_id(quote_id)})
-    version = await _latest_version(quote["proposalDocumentId"]) if quote.get("proposalDocumentId") else None
-    if not version:
+    proposal = await _proposal_file("proposal_pdf", quote)
+    if not proposal:
         raise Refused("The proposal hasn't been generated yet.")
-    data = await sf.download("proposal_pdf", f"/sobjects/ContentVersion/{version['Id']}/VersionData")
+    version, data = proposal
     return {"fileName": f"{version['Title']}.{version.get('FileExtension') or 'pdf'}", "base64": base64.b64encode(data).decode()}
 
 
-@apps.tool(resource_uri=QUOTE, visibility=["app"])
+@card_action(QUOTE)
 async def sign_and_pay(quote_id: str, signer_name: str, signature_png: str, card_last4: str, card_brand: str) -> dict:
     """The customer signed on the Sign & Pay pad: records the acceptance and attaches the signature to the quote."""
     await sf.call("sign_and_pay", "acceptQuote", {
@@ -554,24 +622,20 @@ async def sign_and_pay(quote_id: str, signer_name: str, signature_png: str, card
     return await quote_card(quote_id)
 
 
-@apps.tool(resource_uri=FINDINGS, visibility=["app"])
+@card_action(FINDINGS)
 async def findings_card(visit: str) -> dict:
     """The findings card's data: each finding with Before and After photo thumbnails."""
     context = (await sf.call("findings_card", "visitContext", {"recordId": visit}))["context"]
     state = await sf.call("findings_card", "inspection", {"recordId": visit}) or {}
 
-    async def thumb(photo):
-        data = await sf.download("findings_card", f"/sobjects/ContentVersion/{photo['versionId']}/VersionData")
-        return await asyncio.to_thread(_thumbnail, data)
-
     async def thumbs(photos):
-        return list(await asyncio.gather(*(thumb(p) for p in photos or [] if p.get("versionId"))))
+        return [await asyncio.to_thread(_thumbnail, data) for data in photos]
 
     findings = []
-    for f in state.get("findings", []):
+    for f in await _finding_photos("findings_card", state):
         findings.append({**{k: f.get(k) for k in ("id", "zone", "pest", "evidence", "severity", "customerNote",
                                                    "treatmentStatus", "treatmentNote")},
-                         "before": await thumbs(f.get("photos")), "after": await thumbs(f.get("afterPhotos"))})
+                         "before": await thumbs(f["before"]), "after": await thumbs(f["after"])})
     reco = state.get("recommendation") or {}
     return {
         "mode": "Before" if context.get("canInspect") else "After",
@@ -582,12 +646,48 @@ async def findings_card(visit: str) -> dict:
     }
 
 
-@apps.tool(resource_uri=FINDINGS, visibility=["app"])
+@card_action(FINDINGS)
 async def upload_finding_photo(finding_id: str, image_base64: str, stage: Literal["Before", "After"], file_name: str) -> dict:
     """A photo taken or picked on the findings card, saved on the finding."""
     return await sf.call("upload_finding_photo", "attachPhoto", {
         "findingId": _record_id(finding_id), "fileName": file_name, "base64Data": image_base64, "stage": stage,
     })
+
+
+# ---------- Browser pages (chat apps without cards) ----------
+
+pages = Pages({"quote_card": quote_card, "proposal_pdf": proposal_pdf, "sign_and_pay": sign_and_pay,
+               "findings_card": findings_card, "upload_finding_photo": upload_finding_photo})
+
+
+@tool
+async def open_sign_and_pay(quote_id: str) -> dict:
+    """Opens Sign & Pay for the quote in the browser on the presenter's screen: the quote, the proposal PDF,
+    a signature pad and a card form. The customer signs and pays there; it records the acceptance in
+    Salesforce. Use after generate_proposal, instead of record_customer_acceptance."""
+    quote = await sf.call("open_sign_and_pay", "quote", {"quoteId": _record_id(quote_id)})
+    if not quote.get("proposalDocumentId"):
+        raise Refused("Generate the proposal first, so the customer can see it before they sign.")
+    return {"opened": pages.open("quote", {"quote_id": quote_id}),
+            "next": "Wait for the presenter to say the customer signed, then confirm with get_quote."}
+
+
+@tool
+async def open_photo_capture(visit: Visit) -> dict:
+    """Opens the visit's findings in the browser to take or upload photos: Before photos during an
+    inspection, After photos of the clean-up on a treatment visit. Photos save to Salesforce."""
+    return {"opened": pages.open("findings", {"visit": visit}),
+            "next": "When the presenter says the photos are in, get_inspection or get_treatment_checklist shows them."}
+
+
+@tool
+async def open_day_map(day: Day = None) -> dict:
+    """Opens the day's visits on a live, zoomable map in the browser on the presenter's screen."""
+    chosen = _day(day) or today_central().isoformat()
+    visits = await sf.call("open_day_map", "schedule", {"day": chosen})
+    await asyncio.gather(*(_locate(v) for v in visits if v.get("latitude") is None))
+    data = {"day": chosen, "today": today_central().isoformat(), "visits": visits}
+    return {"opened": pages.open("day_map", {"day": chosen}, result=data), "visits": len(visits)}
 
 
 # ---------- Presenter ----------
@@ -607,7 +707,7 @@ mcp = MCPServer(
         "answer, never invent prices, times or coverage, and ask the customer before any tool that "
         "commits them (signing, add-ons, plan changes). Times come back with a Central-time *Local label."
     ),
-    extensions=[apps],
+    extensions=[apps] if CARDS else [],
 )
 for _fn in _tools:
     mcp.add_tool(_fn)

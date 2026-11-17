@@ -39,3 +39,15 @@ label { font-size: 12px; color: var(--muted); display: block; margin: 8px 0 4px;
 table { width: 100%; border-collapse: collapse; }
 td { padding: 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
 td.amount { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Opened as a browser page (chat apps without cards) */
+body.browser { background: #e9efeb; padding: 28px 16px 120px; }
+body.browser .card { max-width: 860px; margin: 0 auto; box-shadow: 0 8px 30px rgba(22, 36, 29, .12); }
+.banner {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(820px, calc(100% - 32px));
+  display: flex; gap: 12px; align-items: center; background: var(--forest); color: #fff;
+  border-radius: 12px; padding: 12px 16px; box-shadow: 0 8px 30px rgba(22, 36, 29, .3);
+}
+.banner-text { flex: 1; }
+.banner .quote { margin-top: 4px; font-style: italic; opacity: .9; }
+.banner button { background: #fff; color: var(--forest); }

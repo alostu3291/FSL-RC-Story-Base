@@ -37,7 +37,7 @@ Tech here, it's tomorrow morning. What's my day?
 Brief me on Sarah.
 ```
 
-The day shows as a map with numbered stops and the visit list. Clicking a visit asks Claude for its brief.
+The day shows as a map with numbered stops. For a live map you can zoom, say "Show me the map."
 
 **3. Inspect**
 
@@ -48,13 +48,19 @@ I'm at Sarah's.
 Ant trail along the sink, moderate. Paper wasp nest under the back porch eaves. Fresh mouse droppings by the attic hatch.
 ```
 
-Claude records one finding per item and recommends a plan. To show photos:
+Claude records one finding per item and recommends a plan. To add photos:
 
 ```
-Show me the findings.
+Let me add photos.
 ```
 
-The findings card has a **📷** (camera) and **Upload** button under **Before** for each finding.
+A Verdant page opens in your browser with **📷** (camera) and **Upload** buttons under **Before** for each finding. Add a photo or two, then back in Claude:
+
+```
+Photos are in. Show me the findings.
+```
+
+Claude shows a picture of the findings with their photos.
 
 **4. Quote**
 
@@ -62,13 +68,17 @@ The findings card has a **📷** (camera) and **Upload** button under **Before**
 Quote it. The house is under 2,000 square feet.
 ```
 
-Claude reads back the monthly price, the one-time Initial Service and why, and generates the proposal. The quote card shows the lines, the totals, the proposal PDF (**Preview** or **Download**) and **Sign & Pay**.
+Claude reads back the monthly price, the one-time Initial Service and why, generates the proposal, and shows its pages.
 
 **5. Sign and order**
 
-Hand Sarah the screen: on the card she types her name, signs with the mouse or trackpad, and enters a test card (4242 4242 4242 4242, any future date, any CVC; only the brand and last four are kept). **Sign & Pay** posts a message to Claude, which places the order; fulfillment creates the first treatment visit.
+```
+She's ready to sign.
+```
 
-Without the card, type instead:
+Sign & Pay opens in your browser: the quote, the proposal PDF (**Preview** or **Download**), a signature pad and a card form. Hand Sarah the screen: she types her name, signs with the mouse or trackpad, and enters a test card (4242 4242 4242 4242, any future date, any CVC; only the brand and last four are kept). After **Sign & Pay**, the page shows a line to say back in Claude (**Copy** copies it); paste it into Claude, which confirms the signature and places the order. Fulfillment creates the first treatment visit.
+
+To skip the browser, type instead:
 
 ```
 Sarah says yes, go ahead. Card ending 4242.
@@ -97,7 +107,7 @@ Starting Sarah's treatment. Show me the checklist.
 Kitchen treated, baited along the sink. Attic droppings cleaned and traps set. The wasp nest is big, she wants it gone.
 ```
 
-The treatment checklist card takes **After** photos of the clean-up next to the Before photos.
+For clean-up photos, say "Let me add after photos." The browser page takes **After** photos; then "Show me the checklist" puts Before and After side by side.
 
 Claude records each treatment and offers wasp nest removal with its price. Approve it:
 
@@ -142,4 +152,5 @@ Sarah's own invoice comes from the background invoice run, so use Sam Patel for 
 - A slow step (proposal, order) can take a minute or two; Claude waits.
 - Backup customers are on tomorrow's schedule: Aisha Brooks (first treatment, 11:00), Casey Morgan (covered re-service, 15:00), Sam Patel (not covered re-service, 16:00). Say "Let's go to Aisha's treatment instead."
 - Trial orgs send 15 emails a day; each visit summary uses one.
-- If cards don't appear (plain text only), this Claude build doesn't show MCP Apps cards; the demo still runs from the text, with "Card ending 4242" for signing.
+- Pictures appear inside the tool result: if Claude collapses it, click the tool step to expand it.
+- A browser page that says it expired is from an earlier Claude session: ask Claude to open it again.

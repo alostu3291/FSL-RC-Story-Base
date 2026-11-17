@@ -6,6 +6,7 @@
 <!--LEAFLET-->
 <style>
   #map { height: 300px; border-bottom: 1px solid var(--line); }
+  body.browser #map { height: 520px; }
   .stop { display: flex; gap: 12px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); cursor: pointer; }
   .stop:hover { background: var(--mint); }
   .stop:last-child { border-bottom: 0; }
@@ -64,9 +65,9 @@ function render(data) {
 function drawMap(visits) {
   if (!map) {
     map = L.map("map", { zoomControl: true, attributionControl: true, scrollWheelZoom: false });
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-      subdomains: "abcd", maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
   }
   const points = [];
