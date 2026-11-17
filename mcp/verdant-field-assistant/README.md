@@ -1,5 +1,7 @@
 # Verdant Field Assistant (MCP server)
 
+> **Presenting?** Start at [DEMO_SCRIPT.md](DEMO_SCRIPT.md): what to type, and `reset-demo.command` to reset before each run.
+
 Runs the Verdant pest control demo from an LLM, with no Salesforce or Field Service screens. The
 customer calls, a free inspection is booked, the technician inspects and quotes, the customer signs,
 the order books the first treatment, and on the treatment day the technician records the work and
@@ -32,9 +34,12 @@ need the customer's name or words as the approval.
 
 1. `cd mcp/verdant-field-assistant && uv sync`
 2. Check it reaches the org: `uv run python smoke_test.py` (lists the tools and today's schedule).
-3. Copy the `verdant-field-assistant` entry from `claude_desktop_config.example.json` into
-   `~/Library/Application Support/Claude/claude_desktop_config.json`, with this folder's absolute
-   path and your sf alias in `VERDANT_ORG`. Restart Claude Desktop.
+3. Copy the `verdant-field-assistant` entry from `claude_desktop_config.example.json` into the
+   `mcpServers` section of Claude's config, with this folder's absolute path and your sf alias in
+   `VERDANT_ORG`, then quit (⌘Q) and reopen Claude. The config is
+   `~/Library/Application Support/Claude/claude_desktop_config.json`, or
+   `~/Library/Application Support/Claude-3p/claude_desktop_config.json` when Claude signs in through
+   a company gateway (the account name shows "Gateway").
 4. Create a Claude Project (for example "Verdant Field Assistant") and paste
    `verdant_assistant_prompt.md` into its instructions, or pick the `verdant_field_assistant`
    prompt from the server's prompt list at the start of a chat.

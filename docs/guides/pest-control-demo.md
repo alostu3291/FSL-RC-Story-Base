@@ -208,28 +208,7 @@ The same storyline, run entirely from an LLM chat (Claude Desktop) with no Sales
 
 **Scripted caller.** Every run uses Sarah Mitchell, 218 Maple Ridge Dr. The assistant stamps the accounts it creates (`Account.RLM_RTK_Demo_Run__c`), and `reset_verdant_llm_demo` archives them ("zz Archived - Sarah Mitchell (…)") and cancels their open visits, so the next run starts from a new caller. It then re-seeds the backup cast above, which you can switch to if a live step goes wrong.
 
-```bash
-cci task run reset_verdant_llm_demo --org verdant                  # before each demo
-cd mcp/verdant-field-assistant && uv run python rehearse.py --reset # full dry run, then reset again
-```
-
-**Run of show.** Tell the assistant who it's talking to at each step.
-
-| # | Say (roughly) | The assistant |
-|---|---------------|---------------|
-| 1 | Office: "Sarah Mitchell is on the phone, 218 Maple Ridge Dr, (630) 555-0101. Ants in the kitchen, buzzing by the back porch, noises in the attic. Can we get someone out tomorrow morning?" | `book_inspection_for_caller`: new customer, free inspection dispatched to you |
-| 2 | Tech, next morning: "What's my day?" then "Brief me on Sarah." | `get_my_schedule` for that day, `get_visit_brief` |
-| 3 | "I'm here." then describe the walk-through: "Ant trail along the sink, moderate. Paper wasp nest under the back porch eaves. Fresh mouse droppings by the attic hatch." | `start_visit`, one `record_finding` per item, then the plan recommendation |
-| 4 | "Quote it. The house is under 2,000 square feet." | `create_quote`, reads back $/mo + one-time Initial Service and why; `generate_proposal` |
-| 5 | "Sarah says yes, go ahead. Card ending 4242." | `record_customer_acceptance` (her words as the approval), `place_order`; fulfillment creates the first treatment |
-| 6 | "When can we come back to treat?" → pick a slot | `find_treatment_slots`, `book_treatment`, `complete_visit` on the inspection |
-| 7 | "It's the treatment day now. What's my day?" | `get_my_schedule` for the treatment day (dates are real; jumping ahead is just asking about that day) |
-| 8 | "Starting Sarah's treatment." then report each item: "Kitchen treated, baited the sink. Wasp nest is big, she wants it gone." | `start_visit`, `get_treatment_checklist`, `record_treatment`; `get_add_on_options` → offers nest removal with its price → `add_add_ons` on her yes |
-| 9 | "She's seeing wasps every year. Is there a plan that covers that?" | `get_plan_options` → Home Protection Plus and the new monthly price → `change_plan` on her yes (amendment from tomorrow; guarantees and visits follow) |
-| 10 | "All done." | `complete_visit` (starts guarantees and maintenance visits), `send_visit_summary` |
-| 11 | "What does Sarah have now?" / Billing: "Why is Sam Patel's bill $366?" | `get_customer_summary`; `explain_bill` (Sarah's own invoice arrives with the background invoice run, so use Sam for the bill) |
-
-Keep `tail -f ~/.verdant-field-assistant/trace.jsonl` on a second screen to show each Salesforce call and its timing.
+**Presenter kit.** Everything for running it is in `mcp/verdant-field-assistant/`: [DEMO_SCRIPT.md](../../mcp/verdant-field-assistant/DEMO_SCRIPT.md) (what to type into Claude, step by step), `reset-demo.command` (double-click before each demo), `verdant_assistant_prompt.md` (the Claude Project instructions) and `claude_desktop_config.example.json` (connects Claude to the org). For a full dry run without Claude: `cd mcp/verdant-field-assistant && uv run python rehearse.py --reset`.
 
 ## Driver
 
