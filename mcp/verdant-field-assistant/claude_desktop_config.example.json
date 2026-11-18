@@ -11,7 +11,6 @@
       "env": {
         "VERDANT_ORG": "verdant",
         "VERDANT_ADMIN_TOOLS": "0",
-        "VERDANT_CARDS": "0",
         "PATH": "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
       }
     }

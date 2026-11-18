@@ -37,8 +37,6 @@ Tech here, it's tomorrow morning. What's my day?
 Brief me on Sarah.
 ```
 
-The day shows as a map with numbered stops. For a live map you can zoom, say "Show me the map."
-
 **3. Inspect**
 
 ```
@@ -48,19 +46,7 @@ I'm at Sarah's.
 Ant trail along the sink, moderate. Paper wasp nest under the back porch eaves. Fresh mouse droppings by the attic hatch.
 ```
 
-Claude records one finding per item and recommends a plan. To add photos:
-
-```
-Let me add photos.
-```
-
-A Verdant page opens in your browser with **📷** (camera) and **Upload** buttons under **Before** for each finding. Add a photo or two, then back in Claude:
-
-```
-Photos are in. Show me the findings.
-```
-
-Claude shows a picture of the findings with their photos.
+Claude records one finding per item and recommends a plan.
 
 **4. Quote**
 
@@ -68,21 +54,15 @@ Claude shows a picture of the findings with their photos.
 Quote it. The house is under 2,000 square feet.
 ```
 
-Claude reads back the monthly price, the one-time Initial Service and why, generates the proposal, and shows its pages.
+Claude reads back the monthly price, the one-time Initial Service and why, and generates the proposal.
 
 **5. Sign and order**
 
 ```
-She's ready to sign.
-```
-
-Sign & Pay opens in your browser: the quote, the proposal PDF (**Preview** or **Download**), a signature pad and a card form. Hand Sarah the screen: she types her name, signs with the mouse or trackpad, and enters a test card (4242 4242 4242 4242, any future date, any CVC; only the brand and last four are kept). After **Sign & Pay**, the page shows a line to say back in Claude (**Copy** copies it); paste it into Claude, which confirms the signature and places the order. Fulfillment creates the first treatment visit.
-
-To skip the browser, type instead:
-
-```
 Sarah says yes, go ahead. Card ending 4242.
 ```
+
+Claude records her signature and places the order; fulfillment creates the first treatment visit.
 
 **6. Schedule the follow-up**
 
@@ -98,7 +78,7 @@ Pick one of the times it offers (for example "The first one works."). Claude boo
 It's the treatment day now. What's my day?
 ```
 ```
-Starting Sarah's treatment. Show me the checklist.
+Starting Sarah's treatment.
 ```
 
 **8. Treat and find an add-on**
@@ -106,8 +86,6 @@ Starting Sarah's treatment. Show me the checklist.
 ```
 Kitchen treated, baited along the sink. Attic droppings cleaned and traps set. The wasp nest is big, she wants it gone.
 ```
-
-For clean-up photos, say "Let me add after photos." The browser page takes **After** photos; then "Show me the checklist" puts Before and After side by side.
 
 Claude records each treatment and offers wasp nest removal with its price. Approve it:
 
@@ -152,5 +130,3 @@ Sarah's own invoice comes from the background invoice run, so use Sam Patel for 
 - A slow step (proposal, order) can take a minute or two; Claude waits.
 - Backup customers are on tomorrow's schedule: Aisha Brooks (first treatment, 11:00), Casey Morgan (covered re-service, 15:00), Sam Patel (not covered re-service, 16:00). Say "Let's go to Aisha's treatment instead."
 - Trial orgs send 15 emails a day; each visit summary uses one.
-- Pictures appear inside the tool result: if Claude collapses it, click the tool step to expand it.
-- A browser page that says it expired is from an earlier Claude session: ask Claude to open it again.

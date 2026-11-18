@@ -67,10 +67,10 @@ refusal. Leave the org reset (not rehearsed) before the audience arrives. The ru
 | Storyline step | Tools |
 |----------------|-------|
 | The customer calls | `book_inspection_for_caller`, `report_reservice`, `find_customer` |
-| Plan the day | `get_my_schedule` (any day), `open_day_map`, `get_visit_brief`, `get_customer_summary`, `get_visit_status` |
-| Inspect | `start_visit`, `record_finding`, `attach_finding_photo`, `open_photo_capture`, `get_inspection` |
+| Plan the day | `get_my_schedule` (any day), `get_visit_brief`, `get_customer_summary`, `get_visit_status` |
+| Inspect | `start_visit`, `record_finding`, `attach_finding_photo`, `get_inspection` |
 | Quote | `get_plan_pricing`, `create_quote`, `get_quote`, `generate_proposal`, `get_proposal_status` |
-| Sign and order | `open_sign_and_pay`, `record_customer_acceptance`, `place_order`, `get_order_status` |
+| Sign and order | `record_customer_acceptance`, `place_order`, `get_order_status` |
 | Schedule the follow-up | `find_treatment_slots`, `book_treatment` |
 | Treatment visit | `get_treatment_checklist`, `record_treatment`, `get_add_on_options`, `add_add_ons`, `get_plan_options`, `change_plan`, `complete_visit`, `send_visit_summary` |
 | Billing (read-only) | `explain_bill` |
@@ -78,39 +78,6 @@ refusal. Leave the org reset (not rehearsed) before the audience arrives. The ru
 
 Visit tools take a work order or service appointment Id. Every UTC timestamp in a result gets a
 `<field>Local` label in Central time (the Bloomingdale territory's clock).
-
-## Cards (MCP Apps)
-
-In hosts that support [MCP Apps](https://modelcontextprotocol.io/extensions/apps), some tools also
-show an interactive card in the chat. The pages live in `verdant_assistant/views/`, with the
-ext-apps SDK and Leaflet vendored under `views/vendor/` so nothing loads from a CDN.
-
-| Card | Shown by | What it does |
-|------|----------|--------------|
-| Day map | `get_my_schedule` | OpenStreetMap with numbered stops, route and visit list; click a visit for its brief |
-| Quote | `get_quote`, `generate_proposal` | Lines, totals, "why this plan", the proposal PDF (preview, download) and Sign & Pay |
-| Findings | `get_inspection`, `get_treatment_checklist` | Each finding with Before and After photos; take one with the camera or upload |
-
-The cards call tools the model doesn't see: `quote_card`, `proposal_pdf`, `sign_and_pay`
-(records the acceptance and attaches the signature PNG to the quote; only the card's brand and
-last four leave the card form), `findings_card` and `upload_finding_photo`. Visits Salesforce
-hasn't geocoded yet are placed with OpenStreetMap Nominatim. The server logs whether the client
-negotiated Apps on each `get_my_schedule` (in Claude: `~/Library/Logs/Claude*/mcp-server-verdant-field-assistant.log`).
-
-### Without cards (`VERDANT_CARDS=0`)
-
-Some hosts negotiate MCP Apps but block the card frame. The managed (`Claude-3p`) Claude Desktop
-build does this (`userContentFrameAllowed: false`) and shows "There was a problem displaying
-content". Set `VERDANT_CARDS=0` in the server's `env` there. Then:
-
-- `get_my_schedule` returns a map picture (OpenStreetMap tiles, drawn with Pillow in `pictures.py`),
-  `get_inspection` and `get_treatment_checklist` a contact sheet of Before and After photos, and
-  `get_quote` and `generate_proposal` the first proposal pages.
-- `open_sign_and_pay`, `open_photo_capture` and `open_day_map` open the same card pages in the
-  presenter's browser. `browser.py` serves them on `127.0.0.1` (random port, per-run token in the
-  URL) with `views/browser.js` standing in for the MCP Apps client; card actions post to
-  `/api/<tool>` and run on the server's event loop. Messages a card would send to Claude show in a
-  banner with a **Copy** button for the presenter to paste back.
 
 ## Notes
 

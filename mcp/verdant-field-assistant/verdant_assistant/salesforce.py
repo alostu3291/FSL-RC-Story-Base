@@ -19,7 +19,6 @@ import httpx
 from mcp.server.mcpserver.exceptions import ToolError
 
 ENDPOINT = "/services/apexrest/verdant/assistant"
-DATA_API = "/services/data/v66.0"
 # The Bloomingdale IL territory's clock; every visit time is on it.
 CENTRAL = ZoneInfo("America/Chicago")
 ISO_UTC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$")
@@ -85,9 +84,14 @@ class Salesforce:
         return self._instance
 
     async def call(self, tool: str, operation: str, params: dict):
+        if self._token is None:
+            await self._authenticate()
         started = time.monotonic()
         body = {"operation": operation, "params": {k: v for k, v in params.items() if v is not None}}
-        response = await self._request("POST", ENDPOINT, json=body)
+        response = await self._post(body)
+        if response.status_code == 401:
+            await self._authenticate()
+            response = await self._post(body)
         if response.status_code != 200:
             self._trace(tool, operation, body["params"], started, error=f"HTTP {response.status_code}")
             raise Unavailable(f"Salesforce returned HTTP {response.status_code}: {response.text[:500]}")
@@ -99,46 +103,11 @@ class Salesforce:
         self._trace(tool, operation, body["params"], started, result=result)
         return result
 
-    async def query(self, soql: str) -> list:
-        response = await self._request("GET", f"{DATA_API}/query", params={"q": soql})
-        self._raise_for(response)
-        return response.json()["records"]
-
-    async def download(self, tool: str, path: str) -> bytes:
-        """A file's bytes, for example /sobjects/ContentVersion/<id>/VersionData."""
-        started = time.monotonic()
-        response = await self._request("GET", DATA_API + path)
-        self._raise_for(response)
-        self._trace(tool, "download", {"path": path}, started, result=f"<{len(response.content)} bytes>")
-        return response.content
-
-    async def create(self, tool: str, sobject: str, fields: dict) -> str:
-        started = time.monotonic()
-        response = await self._request("POST", f"{DATA_API}/sobjects/{sobject}", json=fields)
-        self._raise_for(response)
-        record_id = response.json()["id"]
-        summary = {k: (f"<{len(v)} chars>" if k == "VersionData" else v) for k, v in fields.items()}
-        self._trace(tool, f"create {sobject}", summary, started, result={"id": record_id})
-        return record_id
-
-    async def _request(self, method, path, **kwargs):
-        if self._token is None:
-            await self._authenticate()
-        response = await self._send(method, path, **kwargs)
-        if response.status_code == 401:
-            await self._authenticate()
-            response = await self._send(method, path, **kwargs)
-        return response
-
-    async def _send(self, method, path, **kwargs):
-        return await self._client.request(
-            method, self._instance + path, headers={"Authorization": f"Bearer {self._token}"}, **kwargs,
+    async def _post(self, body):
+        return await self._client.post(
+            self._instance + ENDPOINT, json=body,
+            headers={"Authorization": f"Bearer {self._token}", "Content-Type": "application/json"},
         )
-
-    @staticmethod
-    def _raise_for(response):
-        if response.status_code >= 300:
-            raise Unavailable(f"Salesforce returned HTTP {response.status_code}: {response.text[:500]}")
 
     def _trace(self, tool, operation, params, started, result=None, error=None):
         entry = {
