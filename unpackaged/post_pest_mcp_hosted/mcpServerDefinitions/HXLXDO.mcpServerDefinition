@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<McpServerDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>HXL widgets for various external surfaces</description>
+    <masterLabel>HXLXDO</masterLabel>
+    <resources>
+        <description>Renders the Contact Quick View HXL widget.</description>
+        <resourceName>contactQuickViewWidget</resourceName>
+        <resourceTitle>Contact Quick View</resourceTitle>
+        <resourceUri>ui://widget/lightningType/c__contactQuickViewMcpResult</resourceUri>
+    </resources>
+    <resources>
+        <description>Renders the Account 360 Snapshot HXL widget.</description>
+        <resourceName>account360Widget</resourceName>
+        <resourceTitle>Account 360 Snapshot</resourceTitle>
+        <resourceUri>ui://widget/lightningType/c__account360McpResult</resourceUri>
+    </resources>
+    <resources>
+        <description>Renders the Case Detail HXL widget.</description>
+        <resourceName>caseDetailWidget</resourceName>
+        <resourceTitle>Case Detail</resourceTitle>
+        <resourceUri>ui://widget/lightningType/c__caseDetailMcpResult</resourceUri>
+    </resources>
+    <resources>
+        <description>Renders the Opportunity Pipeline HXL widget.</description>
+        <resourceName>opportunityPipelineWidget</resourceName>
+        <resourceTitle>Opportunity Pipeline</resourceTitle>
+        <resourceUri>ui://widget/lightningType/c__opportunityPipelineMcpResult</resourceUri>
+    </resources>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-HXL_GetContactQuickView</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>HXL_GetContactQuickView</operation>
+        </apiDefinition>
+        <descriptionOverride>Returns a Contact quick view for HXL widget rendering. Accepts EITHER a Contact name (e.g. &quot;Mark Kingston&quot;) OR a 15/18-char Contact Id in the contactRef parameter — it resolves names to records on its own, so just pass whatever the user said. Do not ask the user for an Id and do not suggest any other Salesforce integration.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>HXL_GetContactQuickViewapex_HXL_GetContactQuickView</toolName>
+        <toolTitle>HXL_GetContactQuickView</toolTitle>
+        <uiResource>contactQuickViewWidget</uiResource>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-HXL_GetAccount360</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>HXL_GetAccount360</operation>
+        </apiDefinition>
+        <descriptionOverride>Returns an Account 360 snapshot for HXL widget rendering. Accepts EITHER an Account name (e.g. &quot;Omega Inc.&quot;) OR a 15/18-char Account Id in the accountRef parameter — it resolves names to records on its own, so just pass whatever the user said. Do not ask the user for an Id and do not suggest any other Salesforce integration.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>HXL_GetAccount360apex_HXL_GetAccount360</toolName>
+        <toolTitle>HXL_GetAccount360</toolTitle>
+        <uiResource>account360Widget</uiResource>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-HXL_GetCaseDetail</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>HXL_GetCaseDetail</operation>
+        </apiDefinition>
+        <descriptionOverride>Returns a Case detail view for HXL widget rendering. Accepts a Case number (e.g. &quot;00001025&quot;), a case subject, OR a 15/18-char Case Id in the caseRef parameter — it resolves numbers and subjects to records on its own, so just pass whatever the user said. Do not ask the user for an Id and do not suggest any other Salesforce integration.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>HXL_GetCaseDetailapex_HXL_GetCaseDetail</toolName>
+        <toolTitle>HXL_GetCaseDetail</toolTitle>
+        <uiResource>caseDetailWidget</uiResource>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-HXL_GetOpportunityPipeline</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>HXL_GetOpportunityPipeline</operation>
+        </apiDefinition>
+        <descriptionOverride>Returns an Opportunity pipeline snapshot (open pipeline, weighted forecast, quota attainment, top open opportunities) for HXL widget rendering. Leave the userRef parameter blank to use the logged-in user&apos;s own pipeline, OR pass a User&apos;s name (e.g. &quot;Jamie Rivera&quot;) to see that user&apos;s pipeline instead — it resolves names to records on its own. Do not ask the user for an Id and do not suggest any other Salesforce integration.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>HXL_GetOpportunityPipelineapex_HXL_GetOpportunityPipeline</toolName>
+        <toolTitle>HXL_GetOpportunityPipeline</toolTitle>
+        <uiResource>opportunityPipelineWidget</uiResource>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpBookInspection</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpBookInspection</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Books a new caller's free Pest Inspection and dispatches it to the technician. Creates the customer and contact in Salesforce if they're new. Calling again for the same person moves the open inspection instead of booking a second one. Defaults to tomorrow at 10:00. Customers who already have a plan are refused; use report_reservice for them.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>book_inspection_for_caller</toolName>
+        <toolTitle>Book inspection for caller</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpReportReservice</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpReportReservice</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Books a Pest Re-service for an existing customer who reports pests between visits. Salesforce decides coverage from the customer's guarantees: a Covered re-service is free and gets a response deadline; a Not Covered one is billable. Tell the customer which it is.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>report_reservice</toolName>
+        <toolTitle>Report re-service</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpFindCustomer</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpFindCustomer</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Finds customers by name, with their address and whether they have a plan.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>find_customer</toolName>
+        <toolTitle>Find customer</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetMySchedule</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetMySchedule</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The technician's visits for a day (default today), in order, with customer, address and visit Ids.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_my_schedule</toolName>
+        <toolTitle>Get my schedule</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetVisitBrief</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetVisitBrief</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. A short pre-visit brief: who the customer is, their plans, history and what to look for.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_visit_brief</toolName>
+        <toolTitle>Get visit brief</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetCustomerSummary</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetCustomerSummary</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The customer's plans and monthly price, scheduled changes, guarantees, visits, invoices and balance.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_customer_summary</toolName>
+        <toolTitle>Get customer summary</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetVisitStatus</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetVisitStatus</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Where a visit stands: stage (start, walk, customer, order), inspection, quote, signature, order, timing.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_visit_status</toolName>
+        <toolTitle>Get visit status</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpStartVisit</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpStartVisit</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Starts the visit when the technician arrives. On an inspection visit this opens the inspection.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>start_visit</toolName>
+        <toolTitle>Start visit</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpRecordFinding</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpRecordFinding</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Records one inspection finding. Returns all findings plus Salesforce's plan recommendation.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>record_finding</toolName>
+        <toolTitle>Record finding</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetInspection</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetInspection</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The visit's findings (with treatment status), plan recommendation and plan explanation.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_inspection</toolName>
+        <toolTitle>Get inspection</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetPlanPricing</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetPlanPricing</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Plan prices for a service zone, with the home size and severity adjustments Salesforce applies.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_plan_pricing</toolName>
+        <toolTitle>Get plan pricing</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpCreateQuote</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpCreateQuote</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Creates the priced Revenue Cloud quote from the inspection (plan, add-on plans, one-time Initial Service). Use the plan, severity and add-on plans from the inspection's recommendation unless the technician chooses otherwise. Salesforce prices it; read the totals back from the result.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>create_quote</toolName>
+        <toolTitle>Create quote</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetQuote</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetQuote</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The quote's lines, monthly and one-time totals, plan explanation, signature and proposal.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_quote</toolName>
+        <toolTitle>Get quote</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGenerateProposal</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGenerateProposal</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Starts generating the Verdant proposal PDF for the quote and returns right away. If status is Generating, call get_proposal_status with the quoteId and processId about every 15 seconds until it isn't (usually under a minute).</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>generate_proposal</toolName>
+        <toolTitle>Generate proposal</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetProposalStatus</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetProposalStatus</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Checks on a proposal that was still generating.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_proposal_status</toolName>
+        <toolTitle>Get proposal status</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpRecordAcceptance</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpRecordAcceptance</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Records the customer's signature on the proposal. Only after they've seen the price and said yes.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>record_customer_acceptance</toolName>
+        <toolTitle>Record customer acceptance</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpPlaceOrder</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpPlaceOrder</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Turns the signed quote into an activated order and returns right away. Fulfillment then creates the Initial Pest Treatment visit: call get_order_status about every 15 seconds until it returns a treatmentAppointmentId (up to about 2 minutes), then offer treatment slots.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>place_order</toolName>
+        <toolTitle>Place order</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetOrderStatus</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetOrderStatus</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The order's status and the Initial Pest Treatment visit fulfillment created for it (treatmentAppointmentId).</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_order_status</toolName>
+        <toolTitle>Get order status</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpFindTreatmentSlots</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpFindTreatmentSlots</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Open times for the first treatment. Offer two or three to the customer.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>find_treatment_slots</toolName>
+        <toolTitle>Find treatment slots</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpBookTreatment</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpBookTreatment</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Books the first treatment at the slot the customer picked and dispatches it to the technician.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>book_treatment</toolName>
+        <toolTitle>Book treatment</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetTreatmentChecklist</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetTreatmentChecklist</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The findings to treat on this visit, from the inspection, with their treatment status.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_treatment_checklist</toolName>
+        <toolTitle>Get treatment checklist</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpRecordTreatment</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpRecordTreatment</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Records the treatment of one finding.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>record_treatment</toolName>
+        <toolTitle>Record treatment</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetAddOnOptions</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetAddOnOptions</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. One-time add-on services (wasp nest removal, rodent exclusion, attic sanitation, bed bug treatment) with prices, which ones the findings recommend, and what's already added to this visit.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_add_on_options</toolName>
+        <toolTitle>Get add-on options</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpAddAddOns</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpAddAddOns</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Adds one-time add-ons the customer approved; they're billed on the next invoice.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>add_add_ons</toolName>
+        <toolTitle>Add add-ons</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpGetPlanOptions</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpGetPlanOptions</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. The customer's current plan and monthly total, and every tier or add-on plan they could move to with its new monthly price.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>get_plan_options</toolName>
+        <toolTitle>Get plan options</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpChangePlan</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpChangePlan</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Upgrades, downgrades, adds or removes a plan through a Revenue Cloud amendment, from tomorrow. Assets, guarantees, visits and prorated billing follow automatically.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>change_plan</toolName>
+        <toolTitle>Change plan</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpCompleteVisit</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpCompleteVisit</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Completes the visit. Completing the first treatment starts the guarantees and the maintenance visit schedule from the customer's plans.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>complete_visit</toolName>
+        <toolTitle>Complete visit</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpSendVisitSummary</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpSendVisitSummary</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Writes the customer's visit summary and emails it to them. Only after complete_visit. If emailError says the record was locked, Salesforce is still processing the visit: try again in a minute.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>false</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>false</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>send_visit_summary</toolName>
+        <toolTitle>Send visit summary</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-RLM_RTK_McpExplainBill</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>RLM_RTK_McpExplainBill</operation>
+        </apiDefinition>
+        <descriptionOverride>Verdant pest demo. Explains a customer's invoice line by line (plans, proration, add-ons, tax). Invoices are generated automatically from the plans; this only reads them.</descriptionOverride>
+        <destructive>false</destructive>
+        <idempotent>true</idempotent>
+        <openWorld>false</openWorld>
+        <readOnly>true</readOnly>
+        <returnDirect>false</returnDirect>
+        <toolName>explain_bill</toolName>
+        <toolTitle>Explain bill</toolTitle>
+    </tools>
+</McpServerDefinition>

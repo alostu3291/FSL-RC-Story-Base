@@ -50,6 +50,32 @@ need the customer's name or words as the approval.
 | `VERDANT_TRACE` | `~/.verdant-field-assistant/trace.jsonl` | Execution trace: one line per Salesforce call, with timing |
 | `VERDANT_ADMIN_TOOLS` | unset | `1` exposes `reset_demo` (presenter only; keep it off in the audience's chat) |
 
+## Run it hosted in Salesforce (no Mac server)
+
+The same tools also run on Salesforce's hosted MCP server, so the demo works from the Salesforce
+Demo Claude account with nothing running locally:
+
+```
+Claude (Salesforce Demo account) ──"SDO / IDO - HXL - Customizable" connector──▶ HXLXDO hosted MCP server
+                                                                                      ▼
+                         RLM_RTK_Mcp* invocable actions (one per tool) ──▶ RLM_RTK_McpTool ──▶ RLM_RTK_AssistantApi.run
+```
+
+1. Install the Headless 360 Surface Demo Connector QBrix in the org (it creates `HXLXDO`).
+2. `cci task run deploy_post_pest_mcp_hosted --org verdant` (needs `deploy_post_pest_mcp`). It adds
+   the 29 Verdant tools to `HXLXDO` next to its four HXL tools. Re-run it after reinstalling the
+   QBrix, which resets the server's tool list.
+3. In the Demo Claude account, connect **SDO / IDO - HXL - Customizable** (Settings → Connectors)
+   and log in to the org.
+4. Create a Project and paste `hosted_project_instructions.md` into its instructions.
+
+Differences from the Mac server: no photo upload and no `reset_demo` tool (reset with
+`reset-demo.command`), and `generate_proposal` and `place_order` return right away while Claude
+checks `get_proposal_status` and `get_order_status`. Each tool returns `success`, `error` and
+`result` (JSON with the same `...Local` Central-time labels). To change a tool, edit its
+`RLM_RTK_Mcp*` class and its entry in `unpackaged/post_pest_mcp_hosted/mcpServerDefinitions/HXLXDO.mcpServerDefinition`
+(API 67.0; deploy with the CCI task or the latest `sf` CLI).
+
 ## Before and between demos
 
 ```bash

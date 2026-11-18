@@ -3,7 +3,7 @@
 > **Auto-generated** by `scripts/ai/generate_cci_reference.py` from `cumulusci.yml`.  
 > Do not edit manually — re-run the script after changing `cumulusci.yml`.
 
-**235 tasks** across **9 groups**.
+**236 tasks** across **9 groups**.
 
 ---
 
@@ -620,7 +620,7 @@
 
 ## Revenue Lifecycle Management
 
-*154 task(s)*
+*155 task(s)*
 
 ### `activate_and_deploy_expression_sets`
 
@@ -1391,6 +1391,20 @@
 - `path`: `unpackaged/post_pest_mcp`
 - `test_level`: `RunSpecifiedTests`
 - `specified_tests`: `RLM_RTK_AssistantTest,RLM_RTK_AssistantApiTest`
+
+---
+
+### `deploy_post_pest_mcp_hosted`
+
+**Description:** Deploy the Verdant Field Assistant as tools on the hosted Salesforce MCP server HXLXDO, so the pest storyline runs from the Salesforce Demo Claude account through the "SDO / IDO - HXL - Customizable" connector with nothing running locally. Adds 29 invocable actions (RLM_RTK_Mcp*, one per tool, all calling RLM_RTK_AssistantApi through RLM_RTK_McpTool, which resolves today/tomorrow and customer names and labels times in Central) and the HXLXDO McpServerDefinition with its four HXL tools kept. Requires deploy_post_pest_mcp and the Headless 360 Surface Demo Connector QBrix (which creates HXLXDO); the definition replaces the server's tool list, so re-run this after reinstalling that QBrix. Runs RLM_RTK_McpToolTest.
+
+**Class:** `cumulusci.tasks.salesforce.Deploy`
+
+**Options:**
+
+- `path`: `unpackaged/post_pest_mcp_hosted`
+- `test_level`: `RunSpecifiedTests`
+- `specified_tests`: `RLM_RTK_McpToolTest`
 
 ---
 

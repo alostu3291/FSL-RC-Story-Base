@@ -7,6 +7,7 @@ Everything for running the demo lives in this folder:
 | `DEMO_SCRIPT.md` | This page: what to type into Claude, step by step |
 | `reset-demo.command` | Reset before each demo (double-click in Finder) |
 | `verdant_assistant_prompt.md` | Paste into the Claude Project's instructions (one time) |
+| `hosted_project_instructions.md` | The same, for the hosted version in the Salesforce Demo Claude account |
 | `claude_desktop_config.example.json` | Connects Claude to Salesforce (one time; see [README](README.md#run-it-in-claude-desktop)) |
 
 ## Before each demo
@@ -17,6 +18,12 @@ Everything for running the demo lives in this folder:
 4. Optional second screen: `tail -f ~/.verdant-field-assistant/trace.jsonl` shows each Salesforce call live.
 
 The first time Claude uses a tool, choose **Allow always**.
+
+**Hosted instead (Salesforce Demo Claude account, no Mac server):** reset the same way, open the
+Project that has `hosted_project_instructions.md`, start a new chat and check **SDO / IDO - HXL -
+Customizable** is connected. The script below is the same, except that the proposal and the first
+treatment visit take up to a minute or two while Claude checks on them itself. If Claude reaches
+for another connector, say "use the SDO / IDO - HXL connector".
 
 ## What to type
 
